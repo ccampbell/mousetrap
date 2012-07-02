@@ -288,7 +288,7 @@ window['Mousetrap'] = (function() {
         },
 
         trigger: function(keys, action) {
-            _direct_map[keys + ':' + (action || '')]();
+            _direct_map[keys + ':' + (action == 'up' ? 'up' : '')]();
         },
 
         addEvent: function(object, type, callback) {
