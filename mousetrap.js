@@ -202,6 +202,8 @@ window['Mousetrap'] = (function() {
      * binds a single event
      */
     function _bindSingle(combination, callback, action) {
+        combination = combination.replace(/\s+\+\s+/g, '+');
+
         var i,
             key,
             keys = combination.split('+'),
