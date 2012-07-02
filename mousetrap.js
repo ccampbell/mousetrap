@@ -195,7 +195,7 @@ window['Mousetrap'] = (function() {
     function _bindSingle(combination, callback, action) {
 
         // strip out any spaces around a plus sign
-        combination = combination.replace(/\s+\+\s+/g, '+');
+        combination = combination.replace(/\s+\+\s+/g, '+').replace(/\s+/, ' ');
 
         var i,
             key,
