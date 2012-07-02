@@ -310,4 +310,7 @@ window['Mousetrap'] = (function() {
     };
 }) ();
 
+// closure compiler in advanced mode might rename these
+Mousetrap['trigger'] = Mousetrap.trigger;
 Mousetrap.addEvent(window, 'load', Mousetrap.init);
+
