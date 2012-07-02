@@ -76,7 +76,11 @@ window['Mousetrap'] = (function() {
         /**
          * direct map used for trigger()
          */
-        _direct_map = {};
+        _direct_map = {},
+
+        _chain_level = 0,
+
+        _reset_timer;
 
         for (var i = 1; i < 13; ++i) {
             _MAP['f' + i] = 111 + i;
@@ -131,6 +135,12 @@ window['Mousetrap'] = (function() {
         for (i = 0; i < _callbacks[code].length; ++i) {
             callback = _callbacks[code][i];
 
+            // if this is a chain but it is not at the right level
+            // then move onto the next match
+            if (callback['chain'] && _chain_level != callback['level']) {
+                continue;
+            }
+
             if (action == callback.action && _modifiersMatch(modifiers, callback.modifiers)) {
                 if (remove) {
                     _callbacks[code].splice(i, 1);
@@ -165,7 +175,7 @@ window['Mousetrap'] = (function() {
     function _fireCallback(code, action, e) {
         var callback = _getMatch(code, _eventModifiers(e), action);
         if (callback) {
-            return callback.callback(e);
+            callback.callback(e);
         }
     }
 
@@ -189,18 +199,43 @@ window['Mousetrap'] = (function() {
         return (code > 15 && code < 19) || code == 91;
     }
 
+    function _resetChain() {
+        _reset_timer = setTimeout(function() {
+            _chain_level = 0;
+        }, 1000);
+    }
+
+    function _bindChain(combo, keys, callback, action) {
+        var _increaseChain = function() {
+            ++_chain_level;
+            clearTimeout(_reset_timer);
+            _resetChain();
+        };
+
+        for (var i = 0; i < keys.length; ++i) {
+            _bindSingle(keys[i], i < keys.length - 1 ? _increaseChain : callback, action, combo, i);
+        }
+    }
+
     /**
      * binds a single event
      */
-    function _bindSingle(combination, callback, action) {
+    function _bindSingle(combination, callback, action, chain_name, level) {
 
         // strip out any spaces around a plus sign
         combination = combination.replace(/\s+\+\s+/g, '+').replace(/\s+/, ' ');
 
-        var i,
+        var chain = combination.split(' '),
+            i,
             key,
-            keys = combination.split('+'),
+            keys,
             modifiers = [];
+
+        if (chain.length > 1) {
+            return _bindChain(combination, chain, callback, action);
+        }
+
+        keys = combination.split('+');
 
         for (i = 0; i < keys.length; ++i) {
             key = keys[i];
@@ -222,10 +257,16 @@ window['Mousetrap'] = (function() {
         }
 
         // remove an existing match if there is one
-        _getMatch(key, modifiers, action, true);
+        _getMatch(key, modifiers, action, !!!chain_name);
 
         // add this call back to the array
-        _callbacks[key].push({callback: callback, modifiers: modifiers, action: action});
+        _callbacks[key][chain_name ? 'unshift' : 'push']({
+            callback: callback,
+            modifiers: modifiers,
+            action: action,
+            chain: chain_name,
+            level: level
+        });
     }
 
     /**
