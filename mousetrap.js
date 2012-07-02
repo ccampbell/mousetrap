@@ -114,14 +114,12 @@ window['Mousetrap'] = (function() {
     }
 
     function _keyCodeFromEvent(e) {
-        var code = e.keyCode;
-
         // right command on webkit, command on gecko
-        if (code == 93 || code == 224) {
+        if (e.keyCode == 93 || e.keyCode == 224) {
             return 91;
         }
 
-        return code;
+        return e.keyCode;
     }
 
     function _stop(e) {
