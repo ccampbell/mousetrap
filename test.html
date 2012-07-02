@@ -7,16 +7,19 @@
     <textarea name="test"></textarea>
     <script src="mousetrap.js"></script>
     <script>
-        Mousetrap.bind('r', function() { console.log('refresh'); });
-        Mousetrap.bind(']', function() { console.log('zoom in'); });
-        Mousetrap.bind('[', function() { console.log('zoom out'); });
         // Mousetrap.bind('g i', function() { console.log('go to inbox'); });
-        Mousetrap.bind('f1', function () {console.log('f1');return false; });
-        Mousetrap.bind('f2', function () {console.log('f2');return false; });
 
-        Mousetrap.bind('@', function() { console.log('2');});
-        Mousetrap.bind('shift+r', function() { console.log('force refresh'); });
+        Mousetrap.bind('ctrl + alt + del', function() {console.log('die'); });
 
-        Mousetrap.bind('r', function() { console.log('refresh2'); });
+        Mousetrap.bind('4', function() { console.log('4 down'); });
+        Mousetrap.bind('4', function() { console.log('4 up'); }, 'up');
+
+        Mousetrap.bind('$', function() { console.log('dollar sign down'); }, 'down');
+
+        Mousetrap.bind('$', function() { console.log('dollar sign up'); }, 'up');
+
+        Mousetrap.bind('ctrl + shift + up', function() { console.log('control shift up'); });
+        Mousetrap.bind('shift', function() { console.log('shift down'); });
+        Mousetrap.bind('shift', function() { console.log('shift up'); }, 'up');
     </script>
 </body>
