@@ -238,7 +238,7 @@ window['Mousetrap'] = (function() {
     return {
         bind: function(keys, callback, action) {
             action = action || '';
-            _bindMultiple(keys.split(','), callback, action);
+            _bindMultiple(keys instanceof Array ? keys : keys.split(','), callback, action);
             _direct_map[keys + ':' + action] = callback;
         },
 
