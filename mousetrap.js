@@ -225,6 +225,7 @@ window['Mousetrap'] = (function() {
     function _bindSingle(combination, callback, action, chain_name, level) {
 
         // strip out any spaces around a plus sign
+        // also make sure multiple spaces in a row become a single space
         combination = combination.replace(/\s+\+\s+/g, '+').replace(/\s+/, ' ');
 
         var chain = combination.split(' '),
@@ -262,6 +263,8 @@ window['Mousetrap'] = (function() {
         _getMatch(key, modifiers, action, !!!chain_name);
 
         // add this call back to the array
+        // if it is a chain put it at the beginning
+        // if not put it at the end
         _callbacks[key][chain_name ? 'unshift' : 'push']({
             callback: callback,
             modifiers: modifiers,
