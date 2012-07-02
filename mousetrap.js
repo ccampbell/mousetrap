@@ -46,7 +46,7 @@ window['Mousetrap'] = (function() {
             '\'': 222
         },
 
-        _SHIFT = {
+        _SHIFT_MAP = {
             '~': '`',
             '!': '1',
             '@': '2',
@@ -204,9 +204,10 @@ window['Mousetrap'] = (function() {
 
         for (i = 0; i < keys.length; ++i) {
             key = keys[i];
-            if (_SHIFT[key]) {
+
+            if (_SHIFT_MAP[key]) {
                 modifiers.push(_MAP.shift);
-                key = _SHIFT[key];
+                key = _SHIFT_MAP[key];
             }
 
             key = _MAP[key] || key.toUpperCase().charCodeAt(0);
