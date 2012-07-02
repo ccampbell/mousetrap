@@ -184,7 +184,6 @@ window['Mousetrap'] = (function() {
         }
 
         var code = _keyCodeFromEvent(e),
-            i,
             index = -1;
 
         // fire the callback before the modifiers are removed
