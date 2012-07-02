@@ -12,18 +12,15 @@ window['Mousetrap'] = (function() {
      * mapping of special keys
      */
     var _MAP = {
-            'shift': 16,
-            'ctrl': 17,
-            'control': 17,
-            'alt': 18,
-            'option': 18,
-            'cmd': 91,
-            'command': 91,
             'backspace': 8,
             'tab': 9,
-            'clear': 12,
             'enter': 13,
             'return': 13,
+            'shift': 16,
+            'ctrl': 17,
+            'alt': 18,
+            'option': 18,
+            'capslock': 20,
             'esc': 27,
             'escape': 27,
             'space': 32,
@@ -36,7 +33,8 @@ window['Mousetrap'] = (function() {
             'right': 39,
             'down': 40,
             'del': 46,
-            'delete': 46,
+            'meta': 91,
+            'command': 91,
             ';': 186,
             '=': 187,
             ',': 188,
@@ -48,6 +46,28 @@ window['Mousetrap'] = (function() {
             '\\': 220,
             ']': 221,
             '\'': 222
+        },
+
+        _SHIFT = {
+            '~': '`',
+            '!': '1',
+            '@': '2',
+            '#': '3',
+            '$': '4',
+            '%': '5',
+            '^': '6',
+            '&': '7',
+            '*': '8',
+            '(': '9',
+            ')': '0',
+            '_': '-',
+            '+': '=',
+            ':': ';',
+            '\"': '\'',
+            '<': ',',
+            '>': '.',
+            '?': '/',
+            '|': '\\'
         },
 
         /**
@@ -102,6 +122,11 @@ window['Mousetrap'] = (function() {
 
         var i,
             callback;
+
+        // if a modifier key is coming up we should allow it
+        if (action == 'up' && _isModifier(code)) {
+            modifiers = [code];
+        }
 
         // loop through all callbacks for the key that was pressed
         // and see if any of them match
@@ -162,10 +187,16 @@ window['Mousetrap'] = (function() {
         _fireCallback(_keyCodeFromEvent(e), 'up', e);
     }
 
+    function _isModifier(code) {
+        return (code > 15 && code < 19) || code == 91;
+    }
+
     /**
      * binds a single event
      */
     function _bindSingle(combination, callback, action) {
+
+        // strip out any spaces around a plus sign
         combination = combination.replace(/\s+\+\s+/g, '+');
 
         var i,
@@ -174,18 +205,21 @@ window['Mousetrap'] = (function() {
             modifiers = [];
 
         for (i = 0; i < keys.length; ++i) {
-            key = _MAP[keys[i]] || keys[i].toUpperCase().charCodeAt(0);
-            if ((key > 15 && key < 19) || key == 91) {
+            key = keys[i];
+            if (_SHIFT[key]) {
+                modifiers.push(_MAP.shift);
+                key = _SHIFT[key];
+            }
+
+            key = _MAP[key] || key.toUpperCase().charCodeAt(0);
+
+            if (_isModifier(key)) {
                 modifiers.push(key);
             }
         }
 
         if (!_callbacks[key]) {
             _callbacks[key] = [];
-        }
-
-        if (action == 'up') {
-            modifiers = [];
         }
 
         // remove an existing match if there is one
@@ -206,7 +240,7 @@ window['Mousetrap'] = (function() {
 
     return {
         bind: function(keys, callback, action) {
-            action = action || '';
+            action = action == 'up' ? 'up' : '';
             _bindMultiple(keys instanceof Array ? keys : keys.split(','), callback, action);
             _direct_map[keys + ':' + action] = callback;
         },
