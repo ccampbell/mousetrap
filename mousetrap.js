@@ -298,6 +298,11 @@ window['Mousetrap'] = (function() {
             _addEvent(object, type, callback);
         },
 
+        clear: function() {
+            _callbacks = {};
+            _direct_map = {};
+        },
+
         init: function() {
             _addEvent(document, 'keydown', _handleKeyDown);
             _addEvent(document, 'keyup', _handleKeyUp);
