@@ -2,8 +2,6 @@
  * Mousetrap is a simple keyboard command library for Javascript that does
  * not depend on using any existing framework
  *
- * TODO: handle function keys
- *
  * @author Craig Campbell <iamcraigcampbell@gmail.com>
  */
 window['Mousetrap'] = (function() {
