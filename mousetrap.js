@@ -78,7 +78,7 @@ window['Mousetrap'] = (function() {
          */
         _direct_map = {},
 
-        _chain_level = 0,
+        _chain_levels = {},
 
         _reset_timer;
 
@@ -137,7 +137,7 @@ window['Mousetrap'] = (function() {
 
             // if this is a chain but it is not at the right level
             // then move onto the next match
-            if (callback['chain'] && _chain_level != callback['level']) {
+            if (callback['chain'] && _chain_levels[callback['chain']] != callback['level']) {
                 continue;
             }
 
@@ -199,17 +199,19 @@ window['Mousetrap'] = (function() {
         return (code > 15 && code < 19) || code == 91;
     }
 
-    function _resetChain() {
+    function _resetChain(chain) {
+        clearTimeout(_reset_timer);
         _reset_timer = setTimeout(function() {
-            _chain_level = 0;
+            _chain_levels[chain] = 0;
         }, 1000);
     }
 
     function _bindChain(combo, keys, callback, action) {
+        _chain_levels[combo] = 0;
+
         var _increaseChain = function() {
-            ++_chain_level;
-            clearTimeout(_reset_timer);
-            _resetChain();
+            ++_chain_levels[combo];
+            _resetChain(combo);
         };
 
         for (var i = 0; i < keys.length; ++i) {
