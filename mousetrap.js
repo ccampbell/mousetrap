@@ -9,32 +9,16 @@
 window['Mousetrap'] = (function() {
 
     /**
-     * list of modifier keys
+     * mapping of special keys
      */
-    var _MODIFIERS = {
+    var _MAP = {
             'shift': 16,
             'ctrl': 17,
             'control': 17,
             'alt': 18,
             'option': 18,
             'cmd': 91,
-            'command': 91
-        },
-
-        /**
-         * reverse lookup of modifier keys by code
-         */
-        _MODS = {
-            16: 1,
-            17: 1,
-            18: 1,
-            91: 1
-        },
-
-        /**
-         * mapping of special keys
-         */
-        _MAP = {
+            'command': 91,
             'backspace': 8,
             'tab': 9,
             'clear': 12,
@@ -67,11 +51,6 @@ window['Mousetrap'] = (function() {
         },
 
         /**
-         * an array of all current modifiers that are down
-         */
-        _active_modifiers = [],
-
-        /**
          * a list of all the callbacks setup via Mousetrap.bind()
          */
         _callbacks = {},
@@ -94,23 +73,6 @@ window['Mousetrap'] = (function() {
         }
 
         object.attachEvent('on' + type, callback);
-    }
-
-    function _indexOf(array, value) {
-        var index = -1,
-            i;
-
-        for (i = 0; i < array.length; ++i) {
-            if (array[i] == value) {
-                index = i;
-                break;
-            }
-        }
-        return index;
-    }
-
-    function _resetModifiers() {
-        _active_modifiers = [];
     }
 
     function _keyCodeFromEvent(e) {
@@ -155,8 +117,30 @@ window['Mousetrap'] = (function() {
         }
     }
 
-    function _fireCallback(code, modifiers, action, e) {
-        var callback = _getMatch(code, modifiers, action);
+    function _eventModifiers(e) {
+        var modifiers = [];
+
+        if (e.shiftKey) {
+            modifiers.push(_MAP.shift);
+        }
+
+        if (e.altKey) {
+            modifiers.push(_MAP.alt);
+        }
+
+        if (e.ctrlKey) {
+            modifiers.push(_MAP.ctrl);
+        }
+
+        if (e.metaKey) {
+            modifiers.push(_MAP.command);
+        }
+
+        return modifiers;
+    }
+
+    function _fireCallback(code, action, e) {
+        var callback = _getMatch(code, _eventModifiers(e), action);
         if (callback) {
             return callback.callback(e);
         }
@@ -167,13 +151,7 @@ window['Mousetrap'] = (function() {
             return;
         }
 
-        var code = _keyCodeFromEvent(e);
-
-        if (_MODS[code]) {
-            _active_modifiers.push(code);
-        }
-
-        return _fireCallback(code, _active_modifiers, '', e);
+        return _fireCallback(_keyCodeFromEvent(e), '', e);
     }
 
     function _handleKeyUp(e) {
@@ -181,21 +159,7 @@ window['Mousetrap'] = (function() {
             return;
         }
 
-        var code = _keyCodeFromEvent(e),
-            index = -1;
-
-        // fire the callback before the modifiers are removed
-        // this is so this library works if the key
-        // IS a modifier key
-        _fireCallback(code, _active_modifiers, 'up', e);
-
-        if (_MODS[code]) {
-            index = _indexOf(_active_modifiers, code);
-        }
-
-        if (index !== -1) {
-            _active_modifiers.splice(index, 1);
-        }
+        _fireCallback(_keyCodeFromEvent(e), 'up', e);
     }
 
     /**
@@ -210,15 +174,18 @@ window['Mousetrap'] = (function() {
             modifiers = [];
 
         for (i = 0; i < keys.length; ++i) {
-            if (keys[i] in _MODIFIERS) {
-                modifiers.push(_MODIFIERS[keys[i]]);
+            key = _MAP[keys[i]] || keys[i].toUpperCase().charCodeAt(0);
+            if ((key > 15 && key < 19) || key == 91) {
+                modifiers.push(key);
             }
-
-            key = _MODIFIERS[keys[i]] || _MAP[keys[i]] || keys[i].toUpperCase().charCodeAt(0);
         }
 
         if (!_callbacks[key]) {
             _callbacks[key] = [];
+        }
+
+        if (action == 'up') {
+            modifiers = [];
         }
 
         // remove an existing match if there is one
@@ -255,7 +222,6 @@ window['Mousetrap'] = (function() {
         init: function() {
             _addEvent(document, 'keydown', _handleKeyDown);
             _addEvent(document, 'keyup', _handleKeyUp);
-            _addEvent(window, 'focus', _resetModifiers);
         }
     };
 }) ();
