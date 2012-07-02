@@ -118,7 +118,7 @@ window['Mousetrap'] = (function() {
 
         // right command on webkit, command on gecko
         if (code == 93 || code == 224) {
-            code = 91;
+            return 91;
         }
 
         return code;
