@@ -311,6 +311,8 @@ window['Mousetrap'] = (function() {
             }
         }
 
+        // make sure to initialize array if this is the first time
+        // a callback is added for this key
         if (!_callbacks[key]) {
             _callbacks[key] = [];
         }
