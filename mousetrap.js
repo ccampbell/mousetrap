@@ -82,7 +82,7 @@ window['Mousetrap'] = (function() {
 
         _reset_timer;
 
-        for (var i = 1; i < 13; ++i) {
+        for (var i = 1; i < 20; ++i) {
             _MAP['f' + i] = 111 + i;
         }
 
