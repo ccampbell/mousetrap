@@ -22,7 +22,9 @@
 window['Mousetrap'] = (function() {
 
     /**
-     * mapping of special keys
+     * mapping of special keys to their corresponding keycodes
+     *
+     * @type {Object}
      */
     var _MAP = {
             'backspace': 8,
@@ -61,6 +63,11 @@ window['Mousetrap'] = (function() {
             '\'': 222
         },
 
+        /**
+         * mapping of keys that require shift to their non shift equivalents
+         *
+         * @type {Object}
+         */
         _SHIFT_MAP = {
             '~': '`',
             '!': '1',
@@ -85,21 +92,40 @@ window['Mousetrap'] = (function() {
 
         /**
          * a list of all the callbacks setup via Mousetrap.bind()
+         *
+         * @type {Object}
          */
         _callbacks = {},
 
         /**
-         * direct map used for trigger()
+         * direct map of string combinations to callbacks used for trigger()
+         *
+         * @type {Object}
          */
         _direct_map = {},
 
+        /**
+         * keeps track of what leven each chain is at since multiple chains
+         * can start out with the same sequence
+         *
+         * @type {Object}
+         */
         _chain_levels = {},
 
+        /**
+         * variable to store the setTimeout call
+         *
+         * @type {null}
+         */
         _reset_timer;
 
-        for (var i = 1; i < 20; ++i) {
-            _MAP['f' + i] = 111 + i;
-        }
+    /**
+     * loop through the f keys, f1 to f19 and add them to the map
+     * programatically
+     */
+    for (var i = 1; i < 20; ++i) {
+        _MAP['f' + i] = 111 + i;
+    }
 
     /**
      * cross browser add event method
@@ -218,6 +244,10 @@ window['Mousetrap'] = (function() {
     }
 
     function _fireCallback(code, action, e) {
+        if (_stop(e)) {
+            return;
+        }
+
         var callbacks = _getMatches(code, _eventModifiers(e), action),
             i,
             do_not_reset = {},
@@ -246,23 +276,35 @@ window['Mousetrap'] = (function() {
         }
     }
 
+    /**
+     * handles a keydown event
+     *
+     * @param {Event} e
+     * @returns void
+     */
     function _handleKeyDown(e) {
-        if (_stop(e)) {
-            return;
-        }
-
-        return _fireCallback(_keyCodeFromEvent(e), '', e);
+        _fireCallback(_keyCodeFromEvent(e), '', e);
     }
 
+    /**
+     * handles a keyup event
+     *
+     * @param {Event} e
+     * @returns void
+     */
     function _handleKeyUp(e) {
-        if (_stop(e)) {
-            return;
-        }
-
         _fireCallback(_keyCodeFromEvent(e), 'up', e);
     }
 
+    /**
+     * determines if the keycode specified is a modifier key or not
+     *
+     * @param {number} code
+     * @returns {boolean}
+     */
     function _isModifier(code) {
+
+        // 16, 17, 18, and 91 are modifier keys
         return (code > 15 && code < 19) || code == 91;
     }
 
