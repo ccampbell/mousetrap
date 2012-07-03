@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Mousetrap is a simple keyboard command library for Javascript with
+ * Mousetrap is a simple keyboard shortcut library for Javascript with
  * no external dependencies
  *
  * @preserve @version 1.0
@@ -143,6 +143,12 @@ window['Mousetrap'] = (function() {
         object.attachEvent('on' + type, callback);
     }
 
+    /**
+     * takes the event and returns the keycode
+     *
+     * @param {Event} e
+     * @return {number}
+     */
     function _keyCodeFromEvent(e) {
         // right command on webkit, command on gecko
         if (e.keyCode == 93 || e.keyCode == 224) {
@@ -152,11 +158,17 @@ window['Mousetrap'] = (function() {
         return e.keyCode;
     }
 
+    /**
+     * should we stop this event before firing off callbacks
+     *
+     * @param {Event} e
+     * @return {boolean}
+     */
     function _stop(e) {
         var element = e.target || e.srcElement,
             tag_name = element.tagName;
 
-        // if the element has the class "mousetrap" then still fire off events
+        // if the element has the class "mousetrap" then no need to stop
         if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
             return false;
         }
@@ -165,10 +177,23 @@ window['Mousetrap'] = (function() {
         return tag_name == 'INPUT' || tag_name == 'SELECT' || tag_name == 'TEXTAREA';
     }
 
-    function _modifiersMatch(group1, group2) {
-        return group1.sort().join(',') === group2.sort().join(',');
+    /**
+     * checks if two arrays are equal
+     *
+     * @param {Array} modifiers1
+     * @param {Array} modifiers2
+     * @returns {boolean}
+     */
+    function _modifiersMatch(modifiers1, modifiers2) {
+        return modifiers1.sort().join(',') === modifiers2.sort().join(',');
     }
 
+    /**
+     * resets all sequence counters accept for the ones specified
+     *
+     * @param {Object|null} no_reset
+     * @returns void
+     */
     function _resetCounters(no_reset) {
         no_reset = no_reset || {};
 
@@ -179,17 +204,27 @@ window['Mousetrap'] = (function() {
         }
     }
 
+    /**
+     * finds all callbacks that match based on the keycode, modifiers,
+     * and action
+     *
+     * @param {number} code
+     * @param {Array} modifiers
+     * @param {string} action
+     * @param {boolean} remove - should we remove any matches
+     * @returns {Array}
+     */
     function _getMatches(code, modifiers, action, remove) {
         var i,
             callback,
-            matches = [],
-            chain_match = false;
+            matches = [];
 
+        // if there are no events related to this keycode
         if (!_callbacks[code]) {
             return [];
         }
 
-        // if a modifier key is coming up we should allow it
+        // if a modifier key is coming up on its own we should allow it
         if (action == 'up' && _isModifier(code)) {
             modifiers = [code];
         }
@@ -205,11 +240,12 @@ window['Mousetrap'] = (function() {
                 continue;
             }
 
+            // if this is the same action and uses the same modifiers then it
+            // is a match
             if (action == callback.action && _modifiersMatch(modifiers, callback.modifiers)) {
-                if (callback['chain']) {
-                    chain_match = true;
-                }
 
+                // remove is used so if you change your mind and call bind a
+                // second time with a new function the first one is overwritten
                 if (remove) {
                     _callbacks[code].splice(i, 1);
                 }
@@ -221,6 +257,12 @@ window['Mousetrap'] = (function() {
         return matches;
     }
 
+    /**
+     * takes a key event and figures out what the modifiers are
+     *
+     * @param {Event} e
+     * @returns {Array}
+     */
     function _eventModifiers(e) {
         var modifiers = [];
 
@@ -243,7 +285,17 @@ window['Mousetrap'] = (function() {
         return modifiers;
     }
 
+    /**
+     * fires a callback for a matching keycode
+     *
+     * @param {number} code
+     * @param {string} action
+     * @param {Event} e
+     * @returns void
+     */
     function _fireCallback(code, action, e) {
+
+        // if this event should not happen stop here
         if (_stop(e)) {
             return;
         }
@@ -254,23 +306,35 @@ window['Mousetrap'] = (function() {
             processed_chain_callback = false,
             apply_reset = !_isModifier(code);
 
+        // loop through matching callbacks for this key event
         for (i = 0; i < callbacks.length; ++i) {
 
             // fire for all chain callbacks
+            // this is because if for example you have multiple sequences
+            // bound such as "g i" and "g t" they both need to fire the
+            // callback for matching g cause otherwise you can only ever
+            // match the first one
             if (callbacks[i]['chain']) {
                 processed_chain_callback = true;
+
+                // keep a list of which chains were matches for later
                 do_not_reset[callbacks[i]['chain']] = 1;
                 callbacks[i].callback(e);
                 continue;
             }
 
-            // first non chain callback fire and exit
+            // if there were no chain matches but we are still here
+            // that means this is a regular match so we should fire then break
             if (!processed_chain_callback) {
                 callbacks[i].callback(e);
                 break;
             }
         }
 
+        // at this point we can tell what we need to reset
+        // if this is not a modifier key or this was part of a chain
+        // and it is a keydown vs. a keyup then we should reset all chain
+        // counters minus the ones that just got updated during this loop
         if ((apply_reset || processed_chain_callback) && !action) {
             _resetCounters(do_not_reset);
         }
