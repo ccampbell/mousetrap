@@ -105,12 +105,12 @@ window.Mousetrap = (function() {
         _direct_map = {},
 
         /**
-         * keeps track of what level each chain is at since multiple chains
-         * can start out with the same sequence
+         * keeps track of what level each sequence is at since multiple
+         * sequences can start out with the same sequence
          *
          * @type {Object}
          */
-        _chain_levels = {},
+        _sequence_levels = {},
 
         /**
          * variable to store the setTimeout call
@@ -127,11 +127,11 @@ window.Mousetrap = (function() {
         _ignore_next_keyup = false,
 
         /**
-         * are we currently inside of a chain?
+         * are we currently inside of a sequence?
          *
          * @type {boolean}
          */
-        _inside_chain = false;
+        _inside_sequence = false;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -211,9 +211,9 @@ window.Mousetrap = (function() {
     function _resetCounters(no_reset) {
         no_reset = no_reset || {};
 
-        for (var key in _chain_levels) {
+        for (var key in _sequence_levels) {
             if (!no_reset[key]) {
-                _chain_levels[key] = 0;
+                _sequence_levels[key] = 0;
             }
         }
     }
@@ -248,9 +248,9 @@ window.Mousetrap = (function() {
         for (i = 0; i < _callbacks[code].length; ++i) {
             callback = _callbacks[code][i];
 
-            // if this is a chain but it is not at the right level
+            // if this is a sequence but it is not at the right level
             // then move onto the next match
-            if (callback['chain'] && _chain_levels[callback['chain']] != callback['level']) {
+            if (callback['seq'] && _sequence_levels[callback['seq']] != callback['level']) {
                 continue;
             }
 
@@ -317,39 +317,39 @@ window.Mousetrap = (function() {
         var callbacks = _getMatches(code, _eventModifiers(e), action),
             i,
             do_not_reset = {},
-            processed_chain_callback = false,
+            processed_sequence_callback = false,
             apply_reset = !_isModifier(code);
 
         // loop through matching callbacks for this key event
         for (i = 0; i < callbacks.length; ++i) {
 
-            // fire for all chain callbacks
+            // fire for all sequence callbacks
             // this is because if for example you have multiple sequences
             // bound such as "g i" and "g t" they both need to fire the
             // callback for matching g cause otherwise you can only ever
             // match the first one
-            if (callbacks[i]['chain']) {
-                processed_chain_callback = true;
+            if (callbacks[i]['seq']) {
+                processed_sequence_callback = true;
 
-                // keep a list of which chains were matches for later
-                do_not_reset[callbacks[i]['chain']] = 1;
+                // keep a list of which sequences were matches for later
+                do_not_reset[callbacks[i]['seq']] = 1;
                 callbacks[i].callback(e);
                 continue;
             }
 
-            // if there were no chain matches but we are still here
+            // if there were no sequence matches but we are still here
             // that means this is a regular match so we should fire then break
-            if (!processed_chain_callback && !_inside_chain) {
+            if (!processed_sequence_callback && !_inside_sequence) {
                 callbacks[i].callback(e);
                 break;
             }
         }
 
         // at this point we can tell what we need to reset
-        // if this is not a modifier key or this was part of a chain
-        // and it is a keydown vs. a keyup then we should reset all chain
+        // if this is not a modifier key or this was part of a sequence
+        // and it is a keydown vs. a keyup then we should reset all sequence
         // counters minus the ones that just got updated during this loop
-        if ((apply_reset || processed_chain_callback) && !action) {
+        if ((apply_reset || processed_sequence_callback) && !action) {
             _resetCounters(do_not_reset);
         }
     }
@@ -396,14 +396,14 @@ window.Mousetrap = (function() {
      * this is so after each key press in the sequence you have 1 second
      * to press the next key before you have to start over
      *
-     * @param {string} chain
+     * @param {string} sequence
      * @returns void
      */
-    function _resetChain(chain) {
+    function _resetSequence(sequence) {
         clearTimeout(_reset_timer);
         _reset_timer = setTimeout(function() {
-            _chain_levels[chain] = 0;
-            _inside_chain = false;
+            _sequence_levels[sequence] = 0;
+            _inside_sequence = false;
         }, 1000);
     }
 
@@ -416,27 +416,27 @@ window.Mousetrap = (function() {
      * @param {string} action
      * @returns void
      */
-    function _bindChain(combo, keys, callback, action) {
+    function _bindSequence(combo, keys, callback, action) {
 
-        // start off by adding a chain level record for this combination
+        // start off by adding a sequence level record for this combination
         // and setting the level to 0
-        _chain_levels[combo] = 0;
+        _sequence_levels[combo] = 0;
 
         /**
-         * callback to increase the chain level for this chain and reset
-         * all other chains that were active
+         * callback to increase the sequence level for this sequence and reset
+         * all other sequences that were active
          *
          * @returns void
          */
-        var _increaseChain = function() {
-                _inside_chain = true;
-                ++_chain_levels[combo];
-                _resetChain(combo);
+        var _increaseSequence = function() {
+                _inside_sequence = true;
+                ++_sequence_levels[combo];
+                _resetSequence(combo);
             },
 
             /**
              * wraps the specified callback inside of another function in order
-             * to reset call chain counters as soon as this sequence is done
+             * to reset all sequence counters as soon as this sequence is done
              *
              * @returns void
              */
@@ -458,9 +458,9 @@ window.Mousetrap = (function() {
 
         // loop through keys one at a time and bind the appropriate callback
         // function.  for any key leading up to the final one it should
-        // increase the chain. after the final, it should reset all sequences
+        // increase the sequence. after the final, it should reset all sequences
         for (i = 0; i < keys.length; ++i) {
-            _bindSingle(keys[i], i < keys.length - 1 ? _increaseChain : _callbackAndReset, action, combo, i);
+            _bindSingle(keys[i], i < keys.length - 1 ? _increaseSequence : _callbackAndReset, action, combo, i);
         }
     }
 
@@ -470,17 +470,17 @@ window.Mousetrap = (function() {
      * @param {string} combination
      * @param {Function} callback
      * @param {string} action
-     * @param {string|null} chain_name - name of chain if part of sequence
-     * @param {number|null} level - what part of the chain the command is
+     * @param {string|null} sequence_name - name of sequence if part of sequence
+     * @param {number|null} level - what part of the sequence the command is
      * @returns void
      */
-    function _bindSingle(combination, callback, action, chain_name, level) {
+    function _bindSingle(combination, callback, action, sequence_name, level) {
 
         // strip out any spaces around a plus sign
         // also make sure multiple spaces in a row become a single space
         combination = combination.replace(/\s+\+\s+/g, '+').replace(/\s+/g, ' ');
 
-        var chain = combination.split(' '),
+        var sequence = combination.split(' '),
             i,
             key,
             keys,
@@ -488,8 +488,8 @@ window.Mousetrap = (function() {
 
         // if this pattern is a sequence of keys then run through this method
         // to reprocess each pattern one key at a time
-        if (chain.length > 1) {
-            return _bindChain(combination, chain, callback, action);
+        if (sequence.length > 1) {
+            return _bindSequence(combination, sequence, callback, action);
         }
 
         // take the keys from this pattern and figure out what the actual
@@ -524,19 +524,19 @@ window.Mousetrap = (function() {
         }
 
         // remove an existing match if there is one
-        _getMatches(key, modifiers, action, !!!chain_name);
+        _getMatches(key, modifiers, action, !!!sequence_name);
 
         // add this call back to the array
-        // if it is a chain put it at the beginning
+        // if it is a sequence put it at the beginning
         // if not put it at the end
         //
         // this is important because the way these are processed expects
-        // the chain ones to come first
-        _callbacks[key][chain_name ? 'unshift' : 'push']({
+        // the sequence ones to come first
+        _callbacks[key][sequence_name ? 'unshift' : 'push']({
             callback: callback,
             modifiers: modifiers,
             action: action,
-            chain: chain_name,
+            seq: sequence_name,
             level: level
         });
     }
