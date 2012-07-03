@@ -102,7 +102,12 @@ window['Mousetrap'] = (function() {
         }
 
     /**
-     * cross browser add event
+     * cross browser add event method
+     *
+     * @param {Element} element
+     * @param {string} name
+     * @param {Function} callback
+     * @returns void
      */
     function _addEvent(object, type, callback) {
         if (object.addEventListener) {
@@ -261,6 +266,15 @@ window['Mousetrap'] = (function() {
         return (code > 15 && code < 19) || code == 91;
     }
 
+    /**
+     * called to set a 1 second timeout on the specified sequence
+     *
+     * this is so after each key press in the sequence you have 1 second
+     * to press the next key before you have to start over
+     *
+     * @param {string} chain
+     * @returns void
+     */
     function _resetChain(chain) {
         clearTimeout(_reset_timer);
         _reset_timer = setTimeout(function() {
@@ -268,14 +282,38 @@ window['Mousetrap'] = (function() {
         }, 1000);
     }
 
+    /**
+     * binds a key sequence to an event
+     *
+     * @param {string} combo - combo specified in bind call
+     * @param {Array} keys
+     * @param {Function} callback
+     * @param {string} action
+     * @returns void
+     */
     function _bindChain(combo, keys, callback, action) {
+
+        // start off by adding a chain level record for this combination
+        // and setting the level to 0
         _chain_levels[combo] = 0;
 
+        /**
+         * callback to increase the chain level for this chain and reset
+         * all other chains that were active
+         *
+         * @returns void
+         */
         var _increaseChain = function() {
                 ++_chain_levels[combo];
                 _resetChain(combo);
             },
 
+            /**
+             * wraps the specified callback inside of another function in order
+             * to reset call chain counters as soon as this sequence is done
+             *
+             * @returns void
+             */
             _callbackAndReset = function() {
                 callback();
 
@@ -285,13 +323,23 @@ window['Mousetrap'] = (function() {
             },
             i;
 
+        // loop through keys one at a time and bind the appropriate callback
+        // function.  for any key leading up to the final one it should
+        // increase the chain. after the final, it should reset all sequences
         for (i = 0; i < keys.length; ++i) {
             _bindSingle(keys[i], i < keys.length - 1 ? _increaseChain : _callbackAndReset, action, combo, i);
         }
     }
 
     /**
-     * binds a single event
+     * binds a single keyboard combination
+     *
+     * @param {string} combination
+     * @param {Function} callback
+     * @param {string} action
+     * @param {string|null} chain_name - name of chain if part of sequence
+     * @param {number|null} level - what part of the chain the command is
+     * @returns void
      */
     function _bindSingle(combination, callback, action, chain_name, level) {
 
@@ -305,22 +353,32 @@ window['Mousetrap'] = (function() {
             keys,
             modifiers = [];
 
+        // if this pattern is a sequence of keys then run through this method
+        // to reprocess each pattern one key at a time
         if (chain.length > 1) {
             return _bindChain(combination, chain, callback, action);
         }
 
+        // take the keys from this pattern and figure out what the actual
+        // pattern is all about
         keys = combination.split('+');
 
         for (i = 0; i < keys.length; ++i) {
             key = keys[i];
 
+            // if this is a key that requires shift to be pressed such as ?
+            // or $ or * then we should set shift as the modifier and map the
+            // key to the non shift version of the key
             if (_SHIFT_MAP[key]) {
                 modifiers.push(_MAP.shift);
                 key = _SHIFT_MAP[key];
             }
 
+            // determine the keycode for the key
+            // first check in the key map then fallback to character code
             key = _MAP[key] || key.toUpperCase().charCodeAt(0);
 
+            // if this key is a modifier then add it to the list of modifiers
             if (_isModifier(key)) {
                 modifiers.push(key);
             }
@@ -338,6 +396,9 @@ window['Mousetrap'] = (function() {
         // add this call back to the array
         // if it is a chain put it at the beginning
         // if not put it at the end
+        //
+        // this is important because the way these are processed expects
+        // the chain ones to come first
         _callbacks[key][chain_name ? 'unshift' : 'push']({
             callback: callback,
             modifiers: modifiers,
@@ -349,6 +410,11 @@ window['Mousetrap'] = (function() {
 
     /**
      * binds multiple combinations to the same callback
+     *
+     * @param {Array} combinations
+     * @param {Function} callback
+     * @param {string} action
+     * @returns void
      */
     function _bindMultiple(combinations, callback, action) {
         for (var i = 0; i < combinations.length; ++i) {
@@ -357,25 +423,68 @@ window['Mousetrap'] = (function() {
     }
 
     return {
+
+        /**
+         * binds an event to mousetrap
+         *
+         * can be a single key, a combination of keys separated with +,
+         * a comma separated list of keys, an array of keys, or
+         * a sequence of keys separated by spaces
+         *
+         * be sure to list the modifier keys first to make sure that the
+         * correct key ends up getting bound (the last key in the pattern)
+         *
+         * @param {string} keys
+         * @param {Function} callback
+         * @param {string} action - 'up' for keyup anything else assumes keydown
+         * @returns void
+         */
         bind: function(keys, callback, action) {
             action = action == 'up' ? 'up' : '';
             _bindMultiple(keys instanceof Array ? keys : keys.split(','), callback, action);
             _direct_map[keys + ':' + action] = callback;
         },
 
+        /**
+         * triggers an event that has already been bound
+         *
+         * @param {string} keys
+         * @param {string} action
+         * @returns void
+         */
         trigger: function(keys, action) {
             _direct_map[keys + ':' + (action == 'up' ? 'up' : '')]();
         },
 
-        addEvent: function(object, type, callback) {
-            _addEvent(object, type, callback);
+        /**
+         * cross browser add event method
+         *
+         * @param {Element} element
+         * @param {string} name
+         * @param {Function} callback
+         * @returns void
+         */
+        addEvent: function(element, name, callback) {
+            _addEvent(element, name, callback);
         },
 
+        /**
+         * resets the library back to its initial state.  this is useful
+         * if you want to clear out the current keyboard shortcuts and bind
+         * new ones - for example if you switch to another page
+         *
+         * @returns void
+         */
         reset: function() {
             _callbacks = {};
             _direct_map = {};
         },
 
+        /**
+         * starts the event listeners
+         *
+         * @returns void
+         */
         init: function() {
             _addEvent(document, 'keydown', _handleKeyDown);
             _addEvent(document, 'keyup', _handleKeyUp);
