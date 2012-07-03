@@ -261,16 +261,17 @@ window['Mousetrap'] = (function() {
                 _resetChain(combo);
             },
 
-            new_callback = function() {
+            _callbackAndReset = function() {
                 callback();
 
                 // weird race condition if a sequence ends with the key
                 // another sequence begins with
                 setTimeout(_resetCounters, 10);
-            };
+            },
+            i;
 
-        for (var i = 0; i < keys.length; ++i) {
-            _bindSingle(keys[i], i < keys.length - 1 ? _increaseChain : new_callback, action, combo, i);
+        for (i = 0; i < keys.length; ++i) {
+            _bindSingle(keys[i], i < keys.length - 1 ? _increaseChain : _callbackAndReset, action, combo, i);
         }
     }
 
