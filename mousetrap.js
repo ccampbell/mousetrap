@@ -118,7 +118,6 @@ window['Mousetrap'] = (function() {
     }
 
     function _resetCounters(no_reset) {
-        // console.log('reset all counters except', no_reset);
         no_reset = no_reset || {};
 
         for (var key in _chain_levels) {
@@ -264,7 +263,10 @@ window['Mousetrap'] = (function() {
 
             new_callback = function() {
                 callback();
-                _resetCounters();
+
+                // weird race condition if a sequence ends with the key
+                // another sequence begins with
+                setTimeout(_resetCounters, 10);
             };
 
         for (var i = 0; i < keys.length; ++i) {
