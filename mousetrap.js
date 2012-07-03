@@ -107,7 +107,13 @@ window['Mousetrap'] = (function() {
     }
 
     function _stop(e) {
-        var tag_name = (e.target || e.srcElement).tagName;
+        var element = e.target || e.srcElement,
+            tag_name = element.tagName;
+
+        // if the element has the class "mousetrap" then still fire off events
+        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+            return false;
+        }
 
         // stop for input, select, and textarea
         return tag_name == 'INPUT' || tag_name == 'SELECT' || tag_name == 'TEXTAREA';
