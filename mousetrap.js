@@ -124,7 +124,14 @@ window.Mousetrap = (function() {
          *
          * @type {boolean}
          */
-        _ignore_next_keyup = false;
+        _ignore_next_keyup = false,
+
+        /**
+         * are we currently inside of a chain?
+         *
+         * @type {boolean}
+         */
+        _inside_chain = false;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -332,7 +339,7 @@ window.Mousetrap = (function() {
 
             // if there were no chain matches but we are still here
             // that means this is a regular match so we should fire then break
-            if (!processed_chain_callback) {
+            if (!processed_chain_callback && !_inside_chain) {
                 callbacks[i].callback(e);
                 break;
             }
@@ -396,6 +403,7 @@ window.Mousetrap = (function() {
         clearTimeout(_reset_timer);
         _reset_timer = setTimeout(function() {
             _chain_levels[chain] = 0;
+            _inside_chain = false;
         }, 1000);
     }
 
@@ -421,6 +429,7 @@ window.Mousetrap = (function() {
          * @returns void
          */
         var _increaseChain = function() {
+                _inside_chain = true;
                 ++_chain_levels[combo];
                 _resetChain(combo);
             },
