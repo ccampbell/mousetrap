@@ -120,10 +120,20 @@ window['Mousetrap'] = (function() {
     function _getMatch(code, modifiers, action, remove) {
         if (!_callbacks[code]) {
             return;
+    function _resetCounters(no_reset) {
+        // console.log('reset all counters except', no_reset);
+        no_reset = no_reset || {};
+
+        for (var key in _chain_levels) {
+            if (!no_reset[key]) {
+                _chain_levels[key] = 0;
+            }
         }
+    }
 
         var i,
             callback;
+        }
 
         // if a modifier key is coming up we should allow it
         if (action == 'up' && _isModifier(code)) {
@@ -210,12 +220,17 @@ window['Mousetrap'] = (function() {
         _chain_levels[combo] = 0;
 
         var _increaseChain = function() {
-            ++_chain_levels[combo];
-            _resetChain(combo);
-        };
+                ++_chain_levels[combo];
+                _resetChain(combo);
+            },
+
+            new_callback = function() {
+                callback();
+                _resetCounters();
+            };
 
         for (var i = 0; i < keys.length; ++i) {
-            _bindSingle(keys[i], i < keys.length - 1 ? _increaseChain : callback, action, combo, i);
+            _bindSingle(keys[i], i < keys.length - 1 ? _increaseChain : new_callback, action, combo, i);
         }
     }
 
