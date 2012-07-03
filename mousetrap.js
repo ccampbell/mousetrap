@@ -125,6 +125,7 @@ window.Mousetrap = (function() {
          * @type {boolean}
          */
         _ignore_next_keyup = false;
+        _keys_to_ignore = {keydown: {}, keyup: {}};
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -292,6 +293,22 @@ window.Mousetrap = (function() {
         return modifiers;
     }
 
+    function _ignore(code, action) {
+        var ignore_data = _keys_to_ignore[action][code],
+            combo;
+
+        if (ignore_data) {
+            for (combo in ignore_data) {
+                if (_chain_levels[combo] === ignore_data[combo]) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+    }
+
     /**
      * fires a callback for a matching keycode
      *
@@ -304,6 +321,10 @@ window.Mousetrap = (function() {
 
         // if this event should not happen stop here
         if (_stop(e)) {
+            return;
+        }
+
+        if (_ignore(code, action)) {
             return;
         }
 
@@ -445,13 +466,23 @@ window.Mousetrap = (function() {
                 // another sequence begins with
                 setTimeout(_resetCounters, 10);
             },
-            i;
+            i,
+            key,
+            opposite_action = action === 'keydown' ? 'keyup' : 'keydown';
 
         // loop through keys one at a time and bind the appropriate callback
         // function.  for any key leading up to the final one it should
         // increase the chain. after the final, it should reset all sequences
         for (i = 0; i < keys.length; ++i) {
-            _bindSingle(keys[i], i < keys.length - 1 ? _increaseChain : _callbackAndReset, action, combo, i);
+            key = _bindSingle(keys[i], i < keys.length - 1 ? _increaseChain : _callbackAndReset, action, combo, i);
+
+            // keep track of events that we should not fire during this
+            // sequence
+
+            if (!_keys_to_ignore[opposite_action][key]) {
+                _keys_to_ignore[opposite_action][key] = {};
+            }
+            _keys_to_ignore[opposite_action][key][combo] = i + 1;
         }
     }
 
