@@ -49,17 +49,17 @@
     <pre data-language="javascript">
 <code id="line-1">// single keys down</code>
 <code id="line-2">Mousetrap.bind('4', function() { highlight(2); });</code>
-<code id="line-3">Mousetrap.bind("$", function() { highlight(3); }, 'down');</code>
+<code id="line-3">Mousetrap.bind("$", function() { highlight(3); }, 'keydown');</code>
 <code id="line-4"></code>
 <code id="line-5">// single keys up</code>
-<code id="line-6">Mousetrap.bind('x', function() { highlight(6); }, 'up');</code>
+<code id="line-6">Mousetrap.bind('x', function() { highlight(6); }, 'keyup');</code>
 <code id="line-7"></code>
 <code id="line-8">// combinations down</code>
 <code id="line-9">Mousetrap.bind('command+shift+K', function() { highlight(9); });</code>
 <code id="line-10">Mousetrap.bind(['command + k', 'ctrl + k'], function() { highlight(10); });</code>
 <code id="line-11"></code>
 <code id="line-12">// combinations up</code>
-<code id="line-13">Mousetrap.bind('shift + q', function() { highlight(13); }, 'up');</code>
+<code id="line-13">Mousetrap.bind('shift + q', function() { highlight(13); }, 'keyup');</code>
 <code id="line-14"></code>
 <code id="line-15">// gmail style sequences</code>
 <code id="line-16">Mousetrap.bind('g i', function() { highlight(16); });</code>
@@ -118,17 +118,17 @@
     <script>
         // single keys down
         Mousetrap.bind('4', function() { highlight(2); });
-        Mousetrap.bind("$", function() { highlight(3); }, 'down');
+        Mousetrap.bind("$", function() { highlight(3); }, 'keydown');
 
         // single keys up
-        Mousetrap.bind('x', function() { highlight(6); }, 'up');
+        Mousetrap.bind('x', function() { highlight(6); }, 'keyup');
 
         // combinations down
         Mousetrap.bind('command+shift+K', function() { highlight(9); });
         Mousetrap.bind(['command + k', 'ctrl + k'], function() { highlight(10); });
 
         // combinations up
-        Mousetrap.bind('shift + q', function() { highlight(13); }, 'up');
+        Mousetrap.bind('shift + q', function() { highlight(13); }, 'keyup');
 
         // gmail style sequences
         Mousetrap.bind('g i', function() { highlight(16); });
