@@ -203,18 +203,14 @@ window.Mousetrap = (function() {
     }
 
     /**
-     * resets all sequence counters accept for the ones specified
+     * resets all sequence counters
      *
-     * @param {Object|null} no_reset
      * @returns void
      */
-    function _resetCounters(no_reset) {
-        no_reset = no_reset || {};
-
+    function _resetSequences() {
+        _inside_sequence = false;
         for (var key in _sequence_levels) {
-            if (!no_reset[key]) {
-                _sequence_levels[key] = 0;
-            }
+            _sequence_levels[key] = 0;
         }
     }
 
@@ -317,8 +313,7 @@ window.Mousetrap = (function() {
         var callbacks = _getMatches(code, _eventModifiers(e), action),
             i,
             do_not_reset = {},
-            processed_sequence_callback = false,
-            apply_reset = !_isModifier(code);
+            processed_sequence_callback = false;
 
         // loop through matching callbacks for this key event
         for (i = 0; i < callbacks.length; ++i) {
@@ -343,14 +338,14 @@ window.Mousetrap = (function() {
                 callbacks[i].callback(e);
                 break;
             }
+
         }
 
-        // at this point we can tell what we need to reset
-        // if this is not a modifier key or this was part of a sequence
-        // and it is a keydown vs. a keyup then we should reset all sequence
-        // counters minus the ones that just got updated during this loop
-        if ((apply_reset || processed_sequence_callback) && !action) {
-            _resetCounters(do_not_reset);
+        // if you are inside of a sequence and the key you are pressing
+        // is not a modifier key and doesn't match the sequence
+        // then we should reset all the sequences
+        if (action == _inside_sequence && !processed_sequence_callback && !_isModifier(code)) {
+            _resetSequences();
         }
     }
 
@@ -399,12 +394,9 @@ window.Mousetrap = (function() {
      * @param {string} sequence
      * @returns void
      */
-    function _resetSequence(sequence) {
+    function _resetSequence() {
         clearTimeout(_reset_timer);
-        _reset_timer = setTimeout(function() {
-            _sequence_levels[sequence] = 0;
-            _inside_sequence = false;
-        }, 1000);
+        _reset_timer = setTimeout(_resetSequences, 1000);
     }
 
     /**
@@ -428,8 +420,8 @@ window.Mousetrap = (function() {
          *
          * @returns void
          */
-        var _increaseSequence = function() {
-                _inside_sequence = true;
+        var _increaseSequence = function(e) {
+                _inside_sequence = action;
                 ++_sequence_levels[combo];
                 _resetSequence(combo);
             },
@@ -452,7 +444,7 @@ window.Mousetrap = (function() {
 
                 // weird race condition if a sequence ends with the key
                 // another sequence begins with
-                setTimeout(_resetCounters, 10);
+                setTimeout(_resetSequences, 10);
             },
             i;
 
