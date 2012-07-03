@@ -50,36 +50,33 @@
 <code id="line-1">// single keys down</code>
 <code id="line-2">Mousetrap.bind('4', function() { highlight(2); });</code>
 <code id="line-3">Mousetrap.bind("$", function() { highlight(3); }, 'down');</code>
-<code id="line-4">Mousetrap.bind('i', function() { highlight(4); });</code>
-<code id="line-5"></code>
-<code id="line-6">// single keys up</code>
-<code id="line-7">Mousetrap.bind('4', function() { highlight(7); }, 'up');</code>
-<code id="line-8">Mousetrap.bind("$", function() { highlight(8); }, 'up');</code>
-<code id="line-9"></code>
-<code id="line-10">// combinations down</code>
-<code id="line-11">Mousetrap.bind('ctrl + shift + up', function() { highlight(11); });</code>
-<code id="line-12">Mousetrap.bind('ctrl+shift+down', function() { highlight(12); });</code>
-<code id="line-13">Mousetrap.bind('command + K', function() { highlight(13)}, 'up');</code>
+<code id="line-4"></code>
+<code id="line-5">// single keys up</code>
+<code id="line-6">Mousetrap.bind('x', function() { highlight(6); }, 'up');</code>
+<code id="line-7"></code>
+<code id="line-8">// combinations down</code>
+<code id="line-9">Mousetrap.bind('command+shift+K', function() { highlight(9); });</code>
+<code id="line-10">Mousetrap.bind(['command + k', 'ctrl + k'], function() { highlight(10); });</code>
+<code id="line-11"></code>
+<code id="line-12">// combinations up</code>
+<code id="line-13">Mousetrap.bind('shift + q', function() { highlight(13); }, 'up');</code>
 <code id="line-14"></code>
-<code id="line-15">// combinations up</code>
-<code id="line-16">Mousetrap.bind('shift + q', function() { highlight(16); }, 'up');</code>
-<code id="line-17"></code>
-<code id="line-18">// gmail style sequences</code>
-<code id="line-19">Mousetrap.bind('g i', function() { highlight(19); });</code>
-<code id="line-20">Mousetrap.bind('g t', function() { highlight(20); });</code>
+<code id="line-15">// gmail style sequences</code>
+<code id="line-16">Mousetrap.bind('g i', function() { highlight(16); });</code>
+<code id="line-17">Mousetrap.bind('g t', function() { highlight(17); });</code>
+<code id="line-18"></code>
+<code id="line-19">Mousetrap.bind('* a', function() { highlight(19)});</code>
+<code id="line-20">Mousetrap.bind('* n', function() { highlight(20)});</code>
 <code id="line-21"></code>
-<code id="line-22">Mousetrap.bind('* a', function() { highlight(22)});</code>
-<code id="line-23">Mousetrap.bind('* n', function() { highlight(23)});</code>
-<code id="line-24"></code>
-<code id="line-25">// konami code!</code>
-<code id="line-26">Mousetrap.bind('up up down down left right left right b a enter', function() {</code>
-<code id="line-27">    highlight([26, 27, 28]);</code>
-<code id="line-28">});</code>
-<code id="line-29"></code>
-<code id="line-30">Mousetrap.bind('c r a i g', function() { highlight(30); });</code>
-<code id="line-31"></code>
-<code id="line-32">// combination and sequence together!</code>
-<code id="line-33">Mousetrap.bind('shift+c r a i g', function() { highlight(33); });</code></pre>
+<code id="line-22">// konami code!</code>
+<code id="line-23">Mousetrap.bind('up up down down left right left right b a enter', function() {</code>
+<code id="line-24">    highlight([23, 24, 25]);</code>
+<code id="line-25">});</code>
+<code id="line-26"></code>
+<code id="line-27">Mousetrap.bind('c r a i g', function() { highlight(27); });</code>
+<code id="line-28"></code>
+<code id="line-29">// combination and sequence together!</code>
+<code id="line-30">Mousetrap.bind('shift+c r a i g', function() { highlight(30); });</code></pre>
     <script>
         var timeouts = {};
 
@@ -122,35 +119,32 @@
         // single keys down
         Mousetrap.bind('4', function() { highlight(2); });
         Mousetrap.bind("$", function() { highlight(3); }, 'down');
-        Mousetrap.bind('i', function() { highlight(4); });
 
         // single keys up
-        Mousetrap.bind('4', function() { highlight(7); }, 'up');
-        Mousetrap.bind("$", function() { highlight(8); }, 'up');
+        Mousetrap.bind('x', function() { highlight(6); }, 'up');
 
         // combinations down
-        Mousetrap.bind('ctrl + shift + up', function() { highlight(11); });
-        Mousetrap.bind('ctrl+shift+down', function() { highlight(12); });
-        Mousetrap.bind('command + k', function() { highlight(13)});
+        Mousetrap.bind('command+shift+K', function() { highlight(9); });
+        Mousetrap.bind(['command + k', 'ctrl + k'], function() { highlight(10); });
 
         // combinations up
-        Mousetrap.bind('shift + q', function() { highlight(16); }, 'up');
+        Mousetrap.bind('shift + q', function() { highlight(13); }, 'up');
 
         // gmail style sequences
-        Mousetrap.bind('g i', function() { highlight(19); });
-        Mousetrap.bind('g t', function() { highlight(20); });
+        Mousetrap.bind('g i', function() { highlight(16); });
+        Mousetrap.bind('g t', function() { highlight(17); });
 
-        Mousetrap.bind('* a', function() { highlight(22)});
-        Mousetrap.bind('* n', function() { highlight(23)});
+        Mousetrap.bind('* a', function() { highlight(19)});
+        Mousetrap.bind('* n', function() { highlight(20)});
 
         // konami code!
         Mousetrap.bind('up up down down left right left right b a enter', function() {
-        highlight([26, 27, 28]);
+            highlight([23, 24, 25]);
         });
 
-        Mousetrap.bind('c r a i g', function() { highlight(30); });
+        Mousetrap.bind('c r a i g', function() { highlight(27); });
 
         // combination and sequence together!
-        Mousetrap.bind('shift+c r a i g', function() { highlight(33); });
+        Mousetrap.bind('shift+c r a i g', function() { highlight(30); });
     </script>
 </body>
