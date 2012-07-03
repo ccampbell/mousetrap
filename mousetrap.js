@@ -225,7 +225,7 @@ window['Mousetrap'] = (function() {
         }
 
         // if a modifier key is coming up on its own we should allow it
-        if (action == 'up' && _isModifier(code)) {
+        if (action == 'keyup' && _isModifier(code)) {
             modifiers = [code];
         }
 
@@ -347,7 +347,7 @@ window['Mousetrap'] = (function() {
      * @returns void
      */
     function _handleKeyDown(e) {
-        _fireCallback(_keyCodeFromEvent(e), '', e);
+        _fireCallback(_keyCodeFromEvent(e), 'keydown', e);
     }
 
     /**
@@ -357,7 +357,7 @@ window['Mousetrap'] = (function() {
      * @returns void
      */
     function _handleKeyUp(e) {
-        _fireCallback(_keyCodeFromEvent(e), 'up', e);
+        _fireCallback(_keyCodeFromEvent(e), 'keyup', e);
     }
 
     /**
@@ -546,7 +546,7 @@ window['Mousetrap'] = (function() {
          * @returns void
          */
         bind: function(keys, callback, action) {
-            action = action == 'up' ? 'up' : '';
+            action = action || 'keydown';
             _bindMultiple(keys instanceof Array ? keys : keys.split(','), callback, action);
             _direct_map[keys + ':' + action] = callback;
         },
@@ -559,7 +559,7 @@ window['Mousetrap'] = (function() {
          * @returns void
          */
         trigger: function(keys, action) {
-            _direct_map[keys + ':' + (action == 'up' ? 'up' : '')]();
+            _direct_map[keys + ':' + (action || 'keydown')]();
         },
 
         /**
