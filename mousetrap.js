@@ -105,7 +105,7 @@ window.Mousetrap = (function() {
         _direct_map = {},
 
         /**
-         * keeps track of what leven each chain is at since multiple chains
+         * keeps track of what level each chain is at since multiple chains
          * can start out with the same sequence
          *
          * @type {Object}
