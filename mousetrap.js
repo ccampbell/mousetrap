@@ -19,7 +19,7 @@
  * @preserve @version 1.0
  * @url craig.is/killing/mice
  */
-window['Mousetrap'] = (function() {
+window.Mousetrap = (function() {
 
     /**
      * mapping of special keys to their corresponding keycodes
