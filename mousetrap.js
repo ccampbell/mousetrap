@@ -356,7 +356,7 @@ window['Mousetrap'] = (function() {
             _addEvent(object, type, callback);
         },
 
-        clear: function() {
+        reset: function() {
             _callbacks = {};
             _direct_map = {};
         },
