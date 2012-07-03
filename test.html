@@ -2,42 +2,99 @@
 <head>
     <meta charset=utf-8>
     <title>Mousetrap tests</title>
+    <style>
+        textarea {
+            width: 400px;
+            height: 500px;
+            font-family: monaco, monospace;
+        }
+
+        pre {
+            position: absolute;
+            top: -4px;
+            left: 450px;
+        }
+    </style>
+    <link href="http://craig.is/assets/rainbow-themes/github.css" rel="stylesheet">
 </head>
 <body>
-    <textarea name="test"></textarea>
+    <textarea name="test" id="text" readonly></textarea>
+    <pre><code data-language="javascript">// single keys down
+Mousetrap.bind('4', function() { append('4 down'); });
+Mousetrap.bind("$", function() { append('dollar sign down'); }, 'down');
+Mousetrap.bind('i', function() { append('i down'); });
+
+// single keys up
+Mousetrap.bind('4', function() { append('4 up'); }, 'up');
+Mousetrap.bind("$", function() { append('dollar sign up'); }, 'up');
+
+// combinations down
+Mousetrap.bind('ctrl + shift + up', function() { append('control shift up'); });
+Mousetrap.bind('ctrl+shift+down', function() { append('control shift down'); });
+
+// combinations up
+Mousetrap.bind('shift + Q', function() { append('shift q down')});
+Mousetrap.bind('shift + q', function() { append('shift q up'); }, 'up');
+
+// sequences
+Mousetrap.bind('g i', function() { append('go to inbox'); });
+Mousetrap.bind('g t', function() { append('go to sent'); });
+
+Mousetrap.bind('up up down down left right left right b a enter', function() {
+    append('konami code!');
+});
+Mousetrap.bind('* a', function() { append('select all')});
+Mousetrap.bind('* n', function() { append('select none')});
+
+Mousetrap.bind('c r a i g', function() { append('craig'); });
+
+// combination and sequence together!
+Mousetrap.bind('shift+c r a i g', function() { append('capital craig'); });
+    </code></pre>
+    <script>
+        function append(text) {
+            var textarea = document.getElementById("text");
+            textarea.innerHTML += text + "\n";
+            if (textarea.selectionStart == textarea.selectionEnd) {
+                textarea.scrollTop = textarea.scrollHeight;
+            }
+        }
+    </script>
+    <script src="http://craig.is/assets/js/rainbow/rainbow.min.js"></script>
+    <script src="http://craig.is/assets/js/rainbow/language/generic.js"></script>
+    <script src="http://craig.is/assets/js/rainbow/language/javascript.js"></script>
     <script src="mousetrap.js"></script>
     <script>
-        // Mousetrap.bind('g i', function() { console.log('go to inbox'); });
+        // single keys down
+        Mousetrap.bind('4', function() { append('4 down'); });
+        Mousetrap.bind('$', function() { append('dollar sign down'); }, 'down');
+        Mousetrap.bind('i', function() { append('i down'); });
 
-        Mousetrap.bind('ctrl + alt + del', function() {console.log('die'); });
+        // single keys up
+        Mousetrap.bind('4', function() { append('4 up'); }, 'up');
+        Mousetrap.bind('$', function() { append('dollar sign up'); }, 'up');
 
-        Mousetrap.bind('4', function() { console.log('4 down'); });
-        Mousetrap.bind('4', function() { console.log('4 up'); }, 'up');
+        // combinations down
+        Mousetrap.bind('ctrl + shift + up', function() { append('control shift up'); });
+        Mousetrap.bind('ctrl+shift+down', function() { append('control shift down'); });
 
-        Mousetrap.bind('$', function() { console.log('dollar sign down'); }, 'down');
+        // combinations up
+        Mousetrap.bind('shift + Q', function() { append('shift q down')});
+        Mousetrap.bind('shift + q', function() { append('shift q up'); }, 'up');
 
-        Mousetrap.bind('$', function() { console.log('dollar sign up'); }, 'up');
+        // sequences
+        Mousetrap.bind('g i', function() { append('go to inbox'); });
+        Mousetrap.bind('g t', function() { append('go to sent'); });
 
-        Mousetrap.bind('ctrl + shift + up', function() { console.log('control shift up'); });
-        Mousetrap.bind('shift', function() { console.log('shift down'); });
-        Mousetrap.bind('shift', function() { console.log('shift up'); }, 'up');
+        Mousetrap.bind('up up down down left right left right b a enter', function() {
+            append('konami code!');
+        });
+        Mousetrap.bind('* a', function() { append('select all')});
+        Mousetrap.bind('* n', function() { append('select none')});
 
-        // Mousetrap.bind('r', function() { console.log('refresh'); });
-        Mousetrap.bind(']', function() { console.log('zoom in'); });
-        // Mousetrap.bind('[', function() { console.log('zoom out'); });
-        Mousetrap.bind('i', function() { console.log('i alone'); });
-        Mousetrap.bind('g i', function() { console.log('go to inbox'); });
-        // Mousetrap.bind('j q u e r y enter', function() { console.log('jquery'); });
-        Mousetrap.bind('up up down down left right left right b a enter', function() { console.log('konami code'); });
-        Mousetrap.bind('* a', function() { console.log('select all')});
-        Mousetrap.bind('c r a i g', function() { console.log('craig'); });
+        Mousetrap.bind('c r a i g', function() { append('craig'); });
 
-        // Mousetrap.bind('f1', function () {console.log('f1');return false; });
-        // Mousetrap.bind('f2', function () {console.log('f2');return false; });
-
-        // Mousetrap.bind('@', function() { console.log('2');});
-        // Mousetrap.bind('ctrl+r a b c', function() { console.log('force refresh'); });
-
-        // Mousetrap.bind('r', function() { console.log('refresh2'); });
+        // combination and sequence together!
+        Mousetrap.bind('shift+c r a i g', function() { append('capital craig'); });
     </script>
 </body>
