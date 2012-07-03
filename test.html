@@ -4,75 +4,114 @@
     <title>Mousetrap tests</title>
     <style>
         body {
-            height: 640px;
-            font-family: helvetica, sans-serif;
+            background: #eee;
+            /*font-family: Lucida Sans Unicode, Lucida Grande, sans-serif;*/
+            font-family: Tahoma, Geneva, sans-serif;
         }
 
-        .content {
-            width: 960px;
+        h1 {
+            text-align: center;
+            font-size: 80px;
         }
 
-        textarea {
-            margin-top: 13px;
-            float: right;
-            width: 220px;
-            height: 400px;
-            font-family: monaco, monospace;
+        p {
+            margin: 10px 0px 20px 0px;
+            text-align: center;
+        }
+
+        h1, body {
+            margin: 0px;
+            padding: 0px;
         }
 
         pre {
-            float: left;
-            width: 686px;
+            margin: auto;
+            width: 635px;
+            margin-bottom: 20px;
+        }
+
+        pre code {
+            -moz-transition: background .4s ease-in;
+            -o-transition: background .4s ease-in;
+            -webkit-transition: background .4s ease-in;
+            transition: background .4s ease-in;
+        }
+
+        pre code.highlight {
+            background: #70c6ff;
         }
     </style>
     <link href="http://craig.is/assets/rainbow-themes/github.css" rel="stylesheet">
 </head>
 <body>
     <h1>mousetrap.js</h1>
-    <p>type some stuff and look over there</p>
-    <div class="content">
-        <textarea name="test" id="text" readonly></textarea>
-        <pre><code data-language="javascript">// single keys down
-Mousetrap.bind('4', function() { debug('4 down'); });
-Mousetrap.bind("$", function() { debug('dollar sign down'); }, 'down');
-Mousetrap.bind('i', function() { debug('i down'); });
-
-// single keys up
-Mousetrap.bind('4', function() { debug('4 up'); }, 'up');
-Mousetrap.bind("$", function() { debug('dollar sign up'); }, 'up');
-
-// combinations down
-Mousetrap.bind('ctrl + shift + up', function() { debug('control shift up'); });
-Mousetrap.bind('ctrl+shift+down', function() { debug('control shift down'); });
-
-// combinations up
-Mousetrap.bind('shift + Q', function() { debug('shift q down')});
-Mousetrap.bind('shift + q', function() { debug('shift q up'); }, 'up');
-
-// gmail style sequences
-Mousetrap.bind('g i', function() { debug('go to inbox'); });
-Mousetrap.bind('g t', function() { debug('go to sent'); });
-
-Mousetrap.bind('* a', function() { debug('select all')});
-Mousetrap.bind('* n', function() { debug('select none')});
-
-Mousetrap.bind('up up down down left right left right b a enter', function() {
-    debug('konami code!');
-});
-
-Mousetrap.bind('c r a i g', function() { debug('craig'); });
-
-// combination and sequence together!
-Mousetrap.bind('shift+c r a i g', function() { debug('capital craig'); });
-        </code></pre>
-    </div>
+    <p>this mouse is dead. try using the keyboard instead</p>
+    <pre data-language="javascript">
+<code id="line-1">// single keys down</code>
+<code id="line-2">Mousetrap.bind('4', function() { highlight(2); });</code>
+<code id="line-3">Mousetrap.bind("$", function() { highlight(3); }, 'down');</code>
+<code id="line-4">Mousetrap.bind('i', function() { highlight(4); });</code>
+<code id="line-5"></code>
+<code id="line-6">// single keys up</code>
+<code id="line-7">Mousetrap.bind('4', function() { highlight(7); }, 'up');</code>
+<code id="line-8">Mousetrap.bind("$", function() { highlight(8); }, 'up');</code>
+<code id="line-9"></code>
+<code id="line-10">// combinations down</code>
+<code id="line-11">Mousetrap.bind('ctrl + shift + up', function() { highlight(11); });</code>
+<code id="line-12">Mousetrap.bind('ctrl+shift+down', function() { highlight(12); });</code>
+<code id="line-13">Mousetrap.bind('command + K', function() { highlight(13)}, 'up');</code>
+<code id="line-14"></code>
+<code id="line-15">// combinations up</code>
+<code id="line-16">Mousetrap.bind('shift + q', function() { highlight(16); }, 'up');</code>
+<code id="line-17"></code>
+<code id="line-18">// gmail style sequences</code>
+<code id="line-19">Mousetrap.bind('g i', function() { highlight(19); });</code>
+<code id="line-20">Mousetrap.bind('g t', function() { highlight(20); });</code>
+<code id="line-21"></code>
+<code id="line-22">Mousetrap.bind('* a', function() { highlight(22)});</code>
+<code id="line-23">Mousetrap.bind('* n', function() { highlight(23)});</code>
+<code id="line-24"></code>
+<code id="line-25">// konami code!</code>
+<code id="line-26">Mousetrap.bind('up up down down left right left right b a enter', function() {</code>
+<code id="line-27">    highlight([26, 27, 28]);</code>
+<code id="line-28">});</code>
+<code id="line-29"></code>
+<code id="line-30">Mousetrap.bind('c r a i g', function() { highlight(30); });</code>
+<code id="line-31"></code>
+<code id="line-32">// combination and sequence together!</code>
+<code id="line-33">Mousetrap.bind('shift+c r a i g', function() { highlight(33); });</code></pre>
     <script>
-        function debug(text) {
-            var textarea = document.getElementById("text");
-            textarea.innerHTML += text + "\n";
-            if (textarea.selectionStart == textarea.selectionEnd) {
-                textarea.scrollTop = textarea.scrollHeight;
+        var timeouts = {};
+
+        function _remove(lines) {
+            for (var i = 0; i < lines.length; ++i) {
+                document.getElementById('line-' + lines[i]).className = '';
             }
+        }
+
+        function highlight(line) {
+            var lines = line instanceof Array ? line : [line],
+                i,
+                code;
+
+            for (i = 0; i < lines.length; ++i) {
+                code = document.getElementById('line-' + lines[i]);
+                code.className = 'highlight';
+
+                if (timeouts[lines[i]]) {
+                    clearTimeout(timeouts[lines[i]]);
+                    delete timeouts[lines[i]];
+                }
+
+                timeouts[lines[i]] = setTimeout(function() {
+                    _remove(lines);
+                }, 1500);
+            }
+            // var textarea = document.getElementById("text");
+            // textarea.innerHTML += text + "\n";
+            // if (textarea.selectionStart == textarea.selectionEnd) {
+            //     textarea.scrollTop = textarea.scrollHeight;
+            // }
         }
     </script>
     <script src="http://craig.is/assets/js/rainbow/rainbow.min.js"></script>
@@ -81,36 +120,37 @@ Mousetrap.bind('shift+c r a i g', function() { debug('capital craig'); });
     <script src="mousetrap.js"></script>
     <script>
         // single keys down
-        Mousetrap.bind('4', function() { debug('4 down'); });
-        Mousetrap.bind('$', function() { debug('dollar sign down'); }, 'down');
-        Mousetrap.bind('i', function() { debug('i down'); });
+        Mousetrap.bind('4', function() { highlight(2); });
+        Mousetrap.bind("$", function() { highlight(3); }, 'down');
+        Mousetrap.bind('i', function() { highlight(4); });
 
         // single keys up
-        Mousetrap.bind('4', function() { debug('4 up'); }, 'up');
-        Mousetrap.bind('$', function() { debug('dollar sign up'); }, 'up');
+        Mousetrap.bind('4', function() { highlight(7); }, 'up');
+        Mousetrap.bind("$", function() { highlight(8); }, 'up');
 
         // combinations down
-        Mousetrap.bind('ctrl + shift + up', function() { debug('control shift up'); });
-        Mousetrap.bind('ctrl+shift+down', function() { debug('control shift down'); });
+        Mousetrap.bind('ctrl + shift + up', function() { highlight(11); });
+        Mousetrap.bind('ctrl+shift+down', function() { highlight(12); });
+        Mousetrap.bind('command + k', function() { highlight(13)});
 
         // combinations up
-        Mousetrap.bind('shift + Q', function() { debug('shift q down')});
-        Mousetrap.bind('shift + q', function() { debug('shift q up'); }, 'up');
+        Mousetrap.bind('shift + q', function() { highlight(16); }, 'up');
 
         // gmail style sequences
-        Mousetrap.bind('g i', function() { debug('go to inbox'); });
-        Mousetrap.bind('g t', function() { debug('go to sent'); });
+        Mousetrap.bind('g i', function() { highlight(19); });
+        Mousetrap.bind('g t', function() { highlight(20); });
 
-        Mousetrap.bind('* a', function() { debug('select all')});
-        Mousetrap.bind('* n', function() { debug('select none')});
+        Mousetrap.bind('* a', function() { highlight(22)});
+        Mousetrap.bind('* n', function() { highlight(23)});
 
+        // konami code!
         Mousetrap.bind('up up down down left right left right b a enter', function() {
-            debug('konami code!');
+        highlight([26, 27, 28]);
         });
 
-        Mousetrap.bind('c r a i g', function() { debug('craig'); });
+        Mousetrap.bind('c r a i g', function() { highlight(30); });
 
         // combination and sequence together!
-        Mousetrap.bind('shift+c r a i g', function() { debug('capital craig'); });
+        Mousetrap.bind('shift+c r a i g', function() { highlight(33); });
     </script>
 </body>
