@@ -117,9 +117,6 @@ window['Mousetrap'] = (function() {
         return group1.sort().join(',') === group2.sort().join(',');
     }
 
-    function _getMatch(code, modifiers, action, remove) {
-        if (!_callbacks[code]) {
-            return;
     function _resetCounters(no_reset) {
         // console.log('reset all counters except', no_reset);
         no_reset = no_reset || {};
@@ -131,12 +128,22 @@ window['Mousetrap'] = (function() {
         }
     }
 
+    function _getMatches(code, modifiers, action, remove) {
         var i,
-            callback;
+            is_modifier = _isModifier(code),
+            callback,
+            matches = [],
+            chain_match = false;
+
+        if (!_callbacks[code]) {
+            if (!is_modifier) {
+                _resetCounters();
+            }
+            return [];
         }
 
         // if a modifier key is coming up we should allow it
-        if (action == 'up' && _isModifier(code)) {
+        if (action == 'up' && is_modifier) {
             modifiers = [code];
         }
 
@@ -152,12 +159,19 @@ window['Mousetrap'] = (function() {
             }
 
             if (action == callback.action && _modifiersMatch(modifiers, callback.modifiers)) {
+                if (callback['chain']) {
+                    chain_match = true;
+                }
+
                 if (remove) {
                     _callbacks[code].splice(i, 1);
                 }
-                return callback;
+
+                matches.push(callback);
             }
         }
+
+        return matches;
     }
 
     function _eventModifiers(e) {
@@ -183,9 +197,33 @@ window['Mousetrap'] = (function() {
     }
 
     function _fireCallback(code, action, e) {
-        var callback = _getMatch(code, _eventModifiers(e), action);
-        if (callback) {
-            callback.callback(e);
+        var callbacks = _getMatches(code, _eventModifiers(e), action),
+            i,
+            do_not_reset = {},
+            processed_chain_callback = false,
+            apply_reset = !_isModifier(code);
+
+        // console.log('matching callbacks', callbacks);
+
+        for (i = 0; i < callbacks.length; ++i) {
+
+            // fire for all chain callbacks
+            if (callbacks[i]['chain']) {
+                processed_chain_callback = true;
+                do_not_reset[callbacks[i]['chain']] = 1;
+                callbacks[i].callback(e);
+                continue;
+            }
+
+            // first non chain callback fire and exit
+            if (!processed_chain_callback) {
+                callbacks[i].callback(e);
+                break;
+            }
+        }
+
+        if ((apply_reset || processed_chain_callback) && callbacks.length) {
+            _resetCounters(do_not_reset);
         }
     }
 
@@ -275,7 +313,7 @@ window['Mousetrap'] = (function() {
         }
 
         // remove an existing match if there is one
-        _getMatch(key, modifiers, action, !!!chain_name);
+        _getMatches(key, modifiers, action, !!!chain_name);
 
         // add this call back to the array
         // if it is a chain put it at the beginning
