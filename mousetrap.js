@@ -117,7 +117,14 @@ window.Mousetrap = (function() {
          *
          * @type {null}
          */
-        _reset_timer;
+        _reset_timer,
+
+        /**
+         * temporary state where we will ignore the next keyup
+         *
+         * @type {boolean}
+         */
+        _ignore_next_keyup = false;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -357,6 +364,10 @@ window.Mousetrap = (function() {
      * @returns void
      */
     function _handleKeyUp(e) {
+        if (_ignore_next_keyup === e.keyCode) {
+            _ignore_next_keyup = false;
+            return;
+        }
         _fireCallback(_keyCodeFromEvent(e), 'keyup', e);
     }
 
@@ -420,8 +431,15 @@ window.Mousetrap = (function() {
              *
              * @returns void
              */
-            _callbackAndReset = function() {
-                callback();
+            _callbackAndReset = function(e) {
+                callback(e);
+
+                // we should ignore the next key up if the action is key down
+                // this is so if you finish a sequence and release the key
+                // the final key will not trigger a keyup
+                if (action === 'keydown') {
+                    _ignore_next_keyup = e.keyCode;
+                }
 
                 // weird race condition if a sequence ends with the key
                 // another sequence begins with
