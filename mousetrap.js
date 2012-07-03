@@ -135,20 +135,16 @@ window['Mousetrap'] = (function() {
 
     function _getMatches(code, modifiers, action, remove) {
         var i,
-            is_modifier = _isModifier(code),
             callback,
             matches = [],
             chain_match = false;
 
         if (!_callbacks[code]) {
-            if (!is_modifier) {
-                _resetCounters();
-            }
             return [];
         }
 
         // if a modifier key is coming up we should allow it
-        if (action == 'up' && is_modifier) {
+        if (action == 'up' && _isModifier(code)) {
             modifiers = [code];
         }
 
@@ -208,8 +204,6 @@ window['Mousetrap'] = (function() {
             processed_chain_callback = false,
             apply_reset = !_isModifier(code);
 
-        // console.log('matching callbacks', callbacks);
-
         for (i = 0; i < callbacks.length; ++i) {
 
             // fire for all chain callbacks
@@ -227,7 +221,7 @@ window['Mousetrap'] = (function() {
             }
         }
 
-        if ((apply_reset || processed_chain_callback) && callbacks.length) {
+        if ((apply_reset || processed_chain_callback) && !action) {
             _resetCounters(do_not_reset);
         }
     }
