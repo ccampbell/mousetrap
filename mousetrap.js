@@ -463,7 +463,7 @@ window.Mousetrap = (function() {
      * @param {string} action
      * @param {string|null} chain_name - name of chain if part of sequence
      * @param {number|null} level - what part of the chain the command is
-     * @returns {number}
+     * @returns void
      */
     function _bindSingle(combination, callback, action, chain_name, level) {
 
@@ -530,8 +530,6 @@ window.Mousetrap = (function() {
             chain: chain_name,
             level: level
         });
-
-        return key;
     }
 
     /**
