@@ -3,15 +3,33 @@
     <meta charset=utf-8>
     <title>Mousetrap tests</title>
     <style>
-        body {
+
+        html {
             background: #eee;
             /*font-family: Lucida Sans Unicode, Lucida Grande, sans-serif;*/
             font-family: Tahoma, Geneva, sans-serif;
         }
 
+        body {
+            width: 650px;
+            margin: auto;
+            padding: 0px;
+        }
+
         h1 {
             text-align: center;
-            font-size: 80px;
+        }
+
+        h1 {
+            margin-top: 20px;
+            text-indent: -9999px;
+        }
+
+        h1 a {
+            background: url("logo.svg") no-repeat;
+            width: 650px;
+            height: 66px;
+            display: block;
         }
 
         p {
@@ -19,14 +37,7 @@
             text-align: center;
         }
 
-        h1, body {
-            margin: 0px;
-            padding: 0px;
-        }
-
         pre {
-            margin: auto;
-            width: 635px;
             margin-bottom: 20px;
         }
 
@@ -44,7 +55,7 @@
     <link href="http://craig.is/assets/rainbow-themes/github.css" rel="stylesheet">
 </head>
 <body>
-    <h1>mousetrap.js</h1>
+    <h1><a href="/killing/mice">mousetrap</a></h1>
     <p>this mouse is dead. try using the keyboard instead</p>
     <pre data-language="javascript">
 <code id="line-1">// single keys down</code>
@@ -77,6 +88,11 @@
 <code id="line-28"></code>
 <code id="line-29">// combination and sequence together!</code>
 <code id="line-30">Mousetrap.bind('shift+c r a i g', function() { highlight(30); });</code></pre>
+
+    <script src="http://craig.is/assets/js/rainbow/rainbow.min.js"></script>
+    <script src="http://craig.is/assets/js/rainbow/language/generic.js"></script>
+    <script src="http://craig.is/assets/js/rainbow/language/javascript.js"></script>
+    <script src="mousetrap.min.js"></script>
     <script>
         var timeouts = {};
 
@@ -104,17 +120,8 @@
                     _remove(lines);
                 }, 1500);
             }
-            // var textarea = document.getElementById("text");
-            // textarea.innerHTML += text + "\n";
-            // if (textarea.selectionStart == textarea.selectionEnd) {
-            //     textarea.scrollTop = textarea.scrollHeight;
-            // }
         }
     </script>
-    <script src="http://craig.is/assets/js/rainbow/rainbow.min.js"></script>
-    <script src="http://craig.is/assets/js/rainbow/language/generic.js"></script>
-    <script src="http://craig.is/assets/js/rainbow/language/javascript.js"></script>
-    <script src="mousetrap.js"></script>
     <script>
         // single keys down
         Mousetrap.bind('4', function() { highlight(2); });
