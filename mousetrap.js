@@ -468,9 +468,8 @@ window.Mousetrap = (function() {
      */
     function _bindSingle(combination, callback, action, sequence_name, level) {
 
-        // strip out any spaces around a plus sign
-        // also make sure multiple spaces in a row become a single space
-        combination = combination.replace(/\s+\+\s+/g, '+').replace(/\s+/g, ' ');
+        // make sure multiple spaces in a row become a single space
+        combination = combination.replace(/\s+/g, ' ');
 
         var sequence = combination.split(' '),
             i,
