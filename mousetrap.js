@@ -485,7 +485,7 @@ window.Mousetrap = (function() {
 
         // take the keys from this pattern and figure out what the actual
         // pattern is all about
-        keys = combination.split('+');
+        keys = combination === '+' ? ['+'] : combination.split('+');
 
         for (i = 0; i < keys.length; ++i) {
             key = keys[i];
