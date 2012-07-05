@@ -9,6 +9,8 @@ It is around **1.4kb** minified and gzipped, has no external dependencies, and h
 - Firefox
 - Chrome
 
+It has support for ``keyup`` and ``keydown`` events on specific keys, keyboard combinations, or key sequences.
+
 ## Getting started
 
 1.  Include mousetrap on your page before the closing ``<body>`` tag
