@@ -203,7 +203,7 @@ window.Mousetrap = (function() {
     }
 
     /**
-     * resets all sequence counters
+     * resets all sequence counters except for the ones passed in
      *
      * @param {Object} do_not_reset
      * @returns void
