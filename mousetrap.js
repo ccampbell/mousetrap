@@ -115,21 +115,22 @@ window.Mousetrap = (function() {
         /**
          * variable to store the setTimeout call
          *
-         * @type {null}
+         * @type {null|number}
          */
         _reset_timer,
 
         /**
          * temporary state where we will ignore the next keyup
          *
-         * @type {boolean}
+         * @type {boolean|number}
          */
         _ignore_next_keyup = false,
 
         /**
          * are we currently inside of a sequence?
+         * type of action ("keyup" or "keydown") or false
          *
-         * @type {boolean}
+         * @type {boolean|string}
          */
         _inside_sequence = false;
 
@@ -144,8 +145,8 @@ window.Mousetrap = (function() {
     /**
      * cross browser add event method
      *
-     * @param {Element} element
-     * @param {string} name
+     * @param {Element|HTMLDocument} object
+     * @param {string} type
      * @param {Function} callback
      * @returns void
      */
@@ -233,7 +234,7 @@ window.Mousetrap = (function() {
      * @param {number} code
      * @param {Array} modifiers
      * @param {string} action
-     * @param {boolean} remove - should we remove any matches
+     * @param {boolean=} remove - should we remove any matches
      * @returns {Array}
      */
     function _getMatches(code, modifiers, action, remove) {
@@ -403,7 +404,6 @@ window.Mousetrap = (function() {
      * this is so after each key press in the sequence you have 1 second
      * to press the next key before you have to start over
      *
-     * @param {string} sequence
      * @returns void
      */
     function _resetSequence() {
@@ -430,18 +430,20 @@ window.Mousetrap = (function() {
          * callback to increase the sequence level for this sequence and reset
          * all other sequences that were active
          *
+         * @param {Event} e
          * @returns void
          */
         var _increaseSequence = function(e) {
                 _inside_sequence = action;
                 ++_sequence_levels[combo];
-                _resetSequence(combo);
+                _resetSequence();
             },
 
             /**
              * wraps the specified callback inside of another function in order
              * to reset all sequence counters as soon as this sequence is done
              *
+             * @param {Event} e
              * @returns void
              */
             _callbackAndReset = function(e) {
@@ -474,8 +476,8 @@ window.Mousetrap = (function() {
      * @param {string} combination
      * @param {Function} callback
      * @param {string} action
-     * @param {string|null} sequence_name - name of sequence if part of sequence
-     * @param {number|null} level - what part of the sequence the command is
+     * @param {string=} sequence_name - name of sequence if part of sequence
+     * @param {number=} level - what part of the sequence the command is
      * @returns void
      */
     function _bindSingle(combination, callback, action, sequence_name, level) {
@@ -570,7 +572,7 @@ window.Mousetrap = (function() {
          * be sure to list the modifier keys first to make sure that the
          * correct key ends up getting bound (the last key in the pattern)
          *
-         * @param {string} keys
+         * @param {string|Array} keys
          * @param {Function} callback
          * @param {string} action - 'up' for keyup anything else assumes keydown
          * @returns void
@@ -595,7 +597,7 @@ window.Mousetrap = (function() {
         /**
          * cross browser add event method
          *
-         * @param {Element} element
+         * @param {Element|HTMLDocument} element
          * @param {string} name
          * @param {Function} callback
          * @returns void
