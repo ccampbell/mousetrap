@@ -9,7 +9,7 @@ It is around **1.4kb** minified and gzipped, has no external dependencies, and h
 - Firefox
 - Chrome
 
-## Usage
+## Getting started
 
 1.  Include mousetrap on your page before the closing ``<body>`` tag
 
@@ -17,7 +17,7 @@ It is around **1.4kb** minified and gzipped, has no external dependencies, and h
     <script src="/path/to/mousetrap.min.js"></script>
     ```
 
-2.  Start using it
+2.  Add some keyboard events to listen for
 
     ```html
     <script>
