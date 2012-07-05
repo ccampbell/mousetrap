@@ -205,12 +205,24 @@ window.Mousetrap = (function() {
     /**
      * resets all sequence counters
      *
+     * @param {Object} do_not_reset
      * @returns void
      */
-    function _resetSequences() {
-        _inside_sequence = false;
+    function _resetSequences(do_not_reset) {
+        do_not_reset = do_not_reset || {};
+
+        var active_sequences = false;
+
         for (var key in _sequence_levels) {
-            _sequence_levels[key] = 0;
+            if (!do_not_reset[key]) {
+                _sequence_levels[key] = 0;
+                continue;
+            }
+            active_sequences = true;
+        }
+
+        if (!active_sequences) {
+            _inside_sequence = false;
         }
     }
 
@@ -342,10 +354,10 @@ window.Mousetrap = (function() {
         }
 
         // if you are inside of a sequence and the key you are pressing
-        // is not a modifier key and doesn't match the sequence
-        // then we should reset all the sequences
-        if (action == _inside_sequence && !processed_sequence_callback && !_isModifier(code)) {
-            _resetSequences();
+        // is not a modifier key then we should reset all sequences
+        // there were not matched by this key event
+        if (action == _inside_sequence && !_isModifier(code)) {
+            _resetSequences(do_not_reset);
         }
     }
 
