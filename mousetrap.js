@@ -584,6 +584,25 @@ window.Mousetrap = (function() {
         },
 
         /**
+        * batch version of bind()
+        *
+        * accepts an object in the format {key: callback} and binds each
+        * key to its callback using bind
+        *
+        * it's not possible to change the action from the default
+        *
+        * @param {object} keys_callbacks
+        * @returns void
+        */
+        bindMany: function(keys_callbacks) {
+            for (var key in keys_callbacks) {
+                if (keys_callbacks.hasOwnProperty(key)) {
+                    this.bind(key, keys_callbacks[key]);
+                }
+            }
+        },
+
+        /**
          * triggers an event that has already been bound
          *
          * @param {string} keys
