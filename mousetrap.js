@@ -95,7 +95,7 @@ window.Mousetrap = (function() {
          *
          * @type {Object}
          */
-        keycode_map = {
+        _KEYCODE_MAP = {
             // right command on webkit, command on gecko
             93: 91,
             224: 91,
@@ -166,13 +166,6 @@ window.Mousetrap = (function() {
     }
 
     /**
-     * IE5-8 shim for the standard event cancellation method
-     */
-    function stopMyPropogation() {
-        this.cancelBubble = true;
-    }
-
-    /**
      * cross browser add event method. implements only necessary event
      * attributes, and only the bubbling phase.
      *
@@ -186,7 +179,6 @@ window.Mousetrap = (function() {
     } : function (el, type, callback) {
         el.attachEvent('on' + type, function (e) {
             // assumes e has correct altKey, ctrlKey, metaKey, shiftKey, srcElement, and target
-            e.stopPropogation = stopMyPropogation;
             e.which = e.keyCode;
             callback.call(el, e);
         });
@@ -326,7 +318,7 @@ window.Mousetrap = (function() {
      */
     function _fireCallback(action, e) {
         var i, callback,
-            code = keycode_map.hasOwnProperty(e.which) ? keycode_map[e.which] : e.which,
+            code = _KEYCODE_MAP.hasOwnProperty(e.which) ? _KEYCODE_MAP[e.which] : e.which,
             callbacks = _getMatches(code, _eventModifiers(e), action),
             do_not_reset = {},
             processed_sequence_callback = false,
