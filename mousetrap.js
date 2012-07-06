@@ -317,7 +317,7 @@ window.Mousetrap = (function() {
      * @returns void
      */
     function _fireCallback(action, e) {
-        var i, callback,
+        var i, len,
             code = _KEYCODE_MAP.hasOwnProperty(e.which) ? _KEYCODE_MAP[e.which] : e.which,
             callbacks = _getMatches(code, _eventModifiers(e), action),
             do_not_reset = {},
@@ -333,26 +333,26 @@ window.Mousetrap = (function() {
         }
 
         // loop through matching callbacks for this key event
-        for (i = 0; callback = callbacks[i]; i++) {
+        for (i = 0, len = callbacks.length; i < len; i++) {
 
             // fire for all sequence callbacks
             // this is because if for example you have multiple sequences
             // bound such as "g i" and "g t" they both need to fire the
             // callback for matching g cause otherwise you can only ever
             // match the first one
-            if (callback['seq']) {
+            if (callbacks[i]['seq']) {
                 processed_sequence_callback = true;
 
                 // keep a list of which sequences were matches for later
-                do_not_reset[callback['seq']] = 1;
-                callback.callback(e);
+                do_not_reset[callbacks[i]['seq']] = 1;
+                callbacks[i].callback(e);
                 continue;
             }
 
             // if there were no sequence matches but we are still here
             // that means this is a regular match so we should fire then break
             if (!processed_sequence_callback && !_inside_sequence) {
-                callback.callback(e);
+                callbacks[i].callback(e);
                 break;
             }
         }
