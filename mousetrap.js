@@ -19,7 +19,29 @@
  * @preserve @version 1.0
  * @url craig.is/killing/mice
  */
-window.Mousetrap = (function() {
+
+(function(definition, undefined) {
+
+    'use strict';
+
+    var Mousetrap = definition.call(undefined, this);
+
+    var define = this.define;
+    if(typeof define === 'function' && define.amd) {
+        define('mice', function() {
+            return Mousetrap;
+        });
+    } else {
+        this.Mousetrap = Mousetrap;
+    }
+
+}).call(this, function(global, undefined) {
+
+    'use strict';
+
+    var setTimeout = global.setTimeout,
+        clearTimeout = global.clearTimeout,
+        document = global.document;
 
     /**
      * mapping of special keys to their corresponding keycodes
@@ -249,7 +271,7 @@ window.Mousetrap = (function() {
      */
     function _getMatches(code, modifiers, action, remove) {
         var i,
-            callback,
+            callback, seq,
             matches = [];
 
         // if there are no events related to this keycode
@@ -266,10 +288,11 @@ window.Mousetrap = (function() {
         // and see if any of them match
         for (i = 0; i < _callbacks[code].length; ++i) {
             callback = _callbacks[code][i];
+            seq = callback.seq;
 
             // if this is a sequence but it is not at the right level
             // then move onto the next match
-            if (callback['seq'] && _sequence_levels[callback['seq']] != callback['level']) {
+            if (seq && _sequence_levels[seq] != callback.level) {
                 continue;
             }
 
@@ -346,11 +369,11 @@ window.Mousetrap = (function() {
             // bound such as "g i" and "g t" they both need to fire the
             // callback for matching g cause otherwise you can only ever
             // match the first one
-            if (callbacks[i]['seq']) {
+            if (callbacks[i].seq) {
                 processed_sequence_callback = true;
 
                 // keep a list of which sequences were matches for later
-                do_not_reset[callbacks[i]['seq']] = 1;
+                do_not_reset[callbacks[i].seq] = 1;
                 callbacks[i].callback(e);
                 continue;
             }
@@ -570,6 +593,10 @@ window.Mousetrap = (function() {
         }
     }
 
+
+    _addEvent(document, 'keydown', _handleKeyDown);
+    _addEvent(document, 'keyup', _handleKeyUp);
+
     return {
 
         /**
@@ -605,18 +632,6 @@ window.Mousetrap = (function() {
         },
 
         /**
-         * cross browser add event method
-         *
-         * @param {Element|HTMLDocument} element
-         * @param {string} name
-         * @param {Function} callback
-         * @returns void
-         */
-        addEvent: function(element, name, callback) {
-            _addEvent(element, name, callback);
-        },
-
-        /**
          * resets the library back to its initial state.  this is useful
          * if you want to clear out the current keyboard shortcuts and bind
          * new ones - for example if you switch to another page
@@ -626,18 +641,6 @@ window.Mousetrap = (function() {
         reset: function() {
             _callbacks = {};
             _direct_map = {};
-        },
-
-        /**
-         * starts the event listeners
-         *
-         * @returns void
-         */
-        init: function() {
-            _addEvent(document, 'keydown', _handleKeyDown);
-            _addEvent(document, 'keyup', _handleKeyUp);
         }
     };
-}) ();
-
-Mousetrap.addEvent(window, 'load', Mousetrap.init);
+});
