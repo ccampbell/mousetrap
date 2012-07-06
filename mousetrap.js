@@ -605,18 +605,6 @@ window.Mousetrap = (function() {
         },
 
         /**
-         * cross browser add event method
-         *
-         * @param {Element|HTMLDocument} element
-         * @param {string} name
-         * @param {Function} callback
-         * @returns void
-         */
-        addEvent: function(element, name, callback) {
-            _addEvent(element, name, callback);
-        },
-
-        /**
          * resets the library back to its initial state.  this is useful
          * if you want to clear out the current keyboard shortcuts and bind
          * new ones - for example if you switch to another page
@@ -640,4 +628,5 @@ window.Mousetrap = (function() {
     };
 }) ();
 
-Mousetrap.addEvent(window, 'load', Mousetrap.init);
+// start!
+Mousetrap.init();
