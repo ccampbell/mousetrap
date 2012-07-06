@@ -20,22 +20,20 @@
  * @url craig.is/killing/mice
  */
 
-(function(definition, undefined) {
-
+(function (definition, undefined) {
     'use strict';
 
     var Mousetrap = definition.call(undefined, this);
 
     var define = this.define;
     if(typeof define === 'function' && define.amd) {
-        define('mice', function() {
+        define('Mousetrap', function () {
             return Mousetrap;
         });
     } else {
         this.Mousetrap = Mousetrap;
     }
-
-}).call(this, function(global, undefined) {
+}).call(this, function (global) {
 
     'use strict';
 
