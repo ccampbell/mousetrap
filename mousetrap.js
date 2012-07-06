@@ -170,6 +170,11 @@ window.Mousetrap = (function() {
             return 91;
         }
 
+        // map keypad numbers to top-of-keyboard numbers
+        if (e.keyCode >= 96 && e.keyCode <= 105){
+            return e.keyCode - 48;
+        }
+
         return e.keyCode;
     }
 
