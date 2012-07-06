@@ -570,6 +570,10 @@ window.Mousetrap = (function() {
         }
     }
 
+    // start!
+    _addEvent(document, 'keydown', _handleKeyDown);
+    _addEvent(document, 'keyup', _handleKeyUp);
+
     return {
 
         /**
@@ -614,19 +618,6 @@ window.Mousetrap = (function() {
         reset: function() {
             _callbacks = {};
             _direct_map = {};
-        },
-
-        /**
-         * starts the event listeners
-         *
-         * @returns void
-         */
-        init: function() {
-            _addEvent(document, 'keydown', _handleKeyDown);
-            _addEvent(document, 'keyup', _handleKeyUp);
         }
     };
 }) ();
-
-// start!
-Mousetrap.init();
