@@ -696,6 +696,33 @@ window.Mousetrap = (function() {
         },
 
         /**
+         * unbinds an event to mousetrap
+         *
+         * can be a single key, a combination of keys separated with +,
+         * a comma separated list of keys, an array of keys, or
+         * a sequence of keys separated by spaces
+         *
+         * be sure to list the modifier keys first to make sure that the
+         * correct key ends up getting unbound (the last key in the pattern)
+         *
+         * the unbinding just sets the callback function of that keycombo as an empty function
+         * and deletes the corresponding key in the _direct_map dict
+         *
+         * @param {string|Array} keys
+         * @param {string} action - 'up' for keyup anything else assumes keydown
+         * @returns void
+         */
+        unbind: function(keys, action) {
+            action = action || 'keydown';
+            if(typeof _direct_map[keys + ':' + action] === 'function'){
+                delete _direct_map[keys + ':' + action]
+                this.bind(keys,function(){},action);
+                return true
+            }
+            return false
+        },
+
+        /**
          * triggers an event that has already been bound
          *
          * @param {string} keys
