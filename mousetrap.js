@@ -635,9 +635,6 @@ window.Mousetrap = (function() {
          */
         init: function() {
             _addEvent(document, 'keydown', _handleKeyDown);
-            _addEvent(document, 'keypress', function(e) {
-                console.log(String.fromCharCode(e.which));
-            });
             _addEvent(document, 'keyup', _handleKeyUp);
         }
     };
