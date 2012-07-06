@@ -19,7 +19,28 @@
  * @preserve @version 1.0
  * @url craig.is/killing/mice
  */
-window.Mousetrap = (function() {
+
+(function (definition, undefined) {
+    'use strict';
+
+    var Mousetrap = definition.call(undefined, this);
+
+    var define = this.define;
+    if(typeof define === 'function' && define.amd) {
+        define('Mousetrap', function () {
+            return Mousetrap;
+        });
+    } else {
+        this.Mousetrap = Mousetrap;
+    }
+}).call(this, function (global) {
+
+    'use strict';
+
+    var setTimeout = global.setTimeout,
+        clearTimeout = global.clearTimeout,
+        document = global.document,
+        HTMLElement = global.HTMLElement;
 
     /**
      * mapping of special keys to their corresponding keycodes
@@ -60,7 +81,26 @@ window.Mousetrap = (function() {
             '[': 219,
             '\\': 220,
             ']': 221,
-            '\'': 222
+            '\'': 222,
+            'f1': 112,
+            'f2': 113,
+            'f3': 114,
+            'f4': 115,
+            'f5': 116,
+            'f6': 117,
+            'f7': 118,
+            'f8': 119,
+            'f9': 120,
+            'f10': 121,
+            'f11': 122,
+            'f12': 123,
+            'f13': 124,
+            'f14': 125,
+            'f15': 126,
+            'f16': 127,
+            'f17': 128,
+            'f18': 129,
+            'f19': 130
         },
 
         /**
@@ -88,6 +128,29 @@ window.Mousetrap = (function() {
             '>': '.',
             '?': '/',
             '|': '\\'
+        },
+
+        /**
+         * mapping of keycodes to normalized equivalents
+         *
+         * @type {Object}
+         */
+        _KEYCODE_MAP = {
+            // right command on webkit, command on gecko
+            93: 91,
+            224: 91,
+
+            // map keypad numbers to top-of-keyboard numbers
+            96: 48,
+            97: 49,
+            98: 50,
+            99: 51,
+            100: 52,
+            101: 53,
+            102: 54,
+            103: 55,
+            104: 56,
+            105: 57
         },
 
         /**
@@ -135,72 +198,23 @@ window.Mousetrap = (function() {
         _inside_sequence = false;
 
     /**
-     * loop through the f keys, f1 to f19 and add them to the map
-     * programatically
-     */
-    for (var i = 1; i < 20; ++i) {
-        _MAP['f' + i] = 111 + i;
-    }
-
-    /**
-     * cross browser add event method
+     * cross browser add event method. implements only necessary event
+     * attributes, and only the bubbling phase.
      *
      * @param {Element|HTMLDocument} object
      * @param {string} type
      * @param {Function} callback
      * @returns void
      */
-    function _addEvent(object, type, callback) {
-        if (object.addEventListener) {
-            return object.addEventListener(type, callback, false);
-        }
-
-        object.attachEvent('on' + type, callback);
-    }
-
-    /**
-     * takes the event and returns the keycode
-     *
-     * @param {Event} e
-     * @return {number}
-     */
-    function _keyCodeFromEvent(e) {
-
-        // add which for key events
-        // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
-        var char_code = typeof e.which == "number" ? e.which : e.keyCode;
-
-        // right command on webkit, command on gecko
-        if (char_code == 93 || char_code == 224) {
-            return 91;
-        }
-
-        // map keypad numbers to top-of-keyboard numbers
-        if (char_code >= 96 && char_code <= 105){
-            return char_code - 48;
-        }
-
-        return char_code;
-    }
-
-    /**
-     * should we stop this event before firing off callbacks
-     *
-     * @param {Event} e
-     * @return {boolean}
-     */
-    function _stop(e) {
-        var element = e.target || e.srcElement,
-            tag_name = element.tagName;
-
-        // if the element has the class "mousetrap" then no need to stop
-        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
-            return false;
-        }
-
-        // stop for input, select, and textarea
-        return tag_name == 'INPUT' || tag_name == 'SELECT' || tag_name == 'TEXTAREA';
-    }
+    var _addEvent = HTMLElement.prototype.addEventListener ? function (el, type, callback) {
+        el.addEventListener(type, callback, false);
+    } : function (el, type, callback) {
+        el.attachEvent('on' + type, function (e) {
+            // assumes e has correct altKey, ctrlKey, metaKey, shiftKey, srcElement, and target
+            e.which = e.keyCode;
+            callback.call(el, e);
+        });
+    };
 
     /**
      * checks if two arrays are equal
@@ -209,8 +223,19 @@ window.Mousetrap = (function() {
      * @param {Array} modifiers2
      * @returns {boolean}
      */
-    function _modifiersMatch(modifiers1, modifiers2) {
-        return modifiers1.sort().join(',') === modifiers2.sort().join(',');
+    function _arraysMatch(arr1, arr2) {
+        var i,
+            len = arr1.length;
+
+        if (len !== arr2.length) {
+            return false;
+        }
+        for (i = 0; i < len; i++) {
+            if (arr1[i] !== arr2[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -220,16 +245,19 @@ window.Mousetrap = (function() {
      * @returns void
      */
     function _resetSequences(do_not_reset) {
+        var key,
+            active_sequences = false;
+
         do_not_reset = do_not_reset || {};
-
-        var active_sequences = false;
-
-        for (var key in _sequence_levels) {
-            if (!do_not_reset[key]) {
-                _sequence_levels[key] = 0;
+        for (key in _sequence_levels) {
+            if (!_sequence_levels.hasOwnProperty(key)) {
                 continue;
             }
-            active_sequences = true;
+            if (do_not_reset[key]) {
+                active_sequences = true;
+            } else {
+                _sequence_levels[key] = 0;
+            }
         }
 
         if (!active_sequences) {
@@ -248,7 +276,7 @@ window.Mousetrap = (function() {
      * @returns {Array}
      */
     function _getMatches(code, modifiers, action, remove) {
-        var i,
+        var i, len,
             callback,
             matches = [];
 
@@ -264,18 +292,18 @@ window.Mousetrap = (function() {
 
         // loop through all callbacks for the key that was pressed
         // and see if any of them match
-        for (i = 0; i < _callbacks[code].length; ++i) {
+        for (i = 0, len = _callbacks[code].length; i < len; i++) {
             callback = _callbacks[code][i];
 
             // if this is a sequence but it is not at the right level
             // then move onto the next match
-            if (callback['seq'] && _sequence_levels[callback['seq']] != callback['level']) {
+            if (callback.seq && _sequence_levels[callback.seq] != callback.level) {
                 continue;
             }
 
             // if this is the same action and uses the same modifiers then it
             // is a match
-            if (action == callback.action && _modifiersMatch(modifiers, callback.modifiers)) {
+            if (action == callback.action && _arraysMatch(modifiers, callback.modifiers)) {
 
                 // remove is used so if you change your mind and call bind a
                 // second time with a new function the first one is overwritten
@@ -302,15 +330,12 @@ window.Mousetrap = (function() {
         if (e.shiftKey) {
             modifiers.push(_MAP.shift);
         }
-
         if (e.altKey) {
             modifiers.push(_MAP.alt);
         }
-
         if (e.ctrlKey) {
             modifiers.push(_MAP.ctrl);
         }
-
         if (e.metaKey) {
             modifiers.push(_MAP.command);
         }
@@ -321,47 +346,46 @@ window.Mousetrap = (function() {
     /**
      * fires a callback for a matching keycode
      *
-     * @param {number} code
      * @param {string} action
      * @param {Event} e
      * @returns void
      */
-    function _fireCallback(code, action, e) {
+    function _fireCallback(action, e) {
+        var i, len,
+            code = _KEYCODE_MAP.hasOwnProperty(e.which) ? _KEYCODE_MAP[e.which] : e.which,
+            callbacks = _getMatches(code, _eventModifiers(e), action),
+            do_not_reset = {},
+            processed_sequence_callback = false,
+            element = e.target || e.srcElement,
+            tag_name = element.tagName;
 
-        // if this event should not happen stop here
-        if (_stop(e)) {
+        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+            // the element has the class "mousetrap"; no need to stop
+        } else if (tag_name == 'INPUT' || tag_name == 'SELECT' || tag_name == 'TEXTAREA') {
+            // stop for input, select, and textarea
             return;
         }
 
-        var callbacks = _getMatches(code, _eventModifiers(e), action),
-            i,
-            do_not_reset = {},
-            processed_sequence_callback = false;
-
         // loop through matching callbacks for this key event
-        for (i = 0; i < callbacks.length; ++i) {
+        for (i = 0, len = callbacks.length; i < len; i++) {
 
             // fire for all sequence callbacks
             // this is because if for example you have multiple sequences
             // bound such as "g i" and "g t" they both need to fire the
             // callback for matching g cause otherwise you can only ever
             // match the first one
-            if (callbacks[i]['seq']) {
+            if (callbacks[i].seq) {
                 processed_sequence_callback = true;
 
                 // keep a list of which sequences were matches for later
-                do_not_reset[callbacks[i]['seq']] = 1;
-                callbacks[i].callback(e);
-                continue;
-            }
-
-            // if there were no sequence matches but we are still here
-            // that means this is a regular match so we should fire then break
-            if (!processed_sequence_callback && !_inside_sequence) {
-                callbacks[i].callback(e);
+                do_not_reset[callbacks[i].seq] = 1;
+                callbacks[i].callback.call(document, e);
+            } else if (!processed_sequence_callback && !_inside_sequence) {
+                // if there were no sequence matches but we are still here
+                // that means this is a regular match so we should fire then break
+                callbacks[i].callback.call(document, e);
                 break;
             }
-
         }
 
         // if you are inside of a sequence and the key you are pressing
@@ -379,7 +403,7 @@ window.Mousetrap = (function() {
      * @returns void
      */
     function _handleKeyDown(e) {
-        _fireCallback(_keyCodeFromEvent(e), 'keydown', e);
+        _fireCallback('keydown', e);
     }
 
     /**
@@ -389,11 +413,11 @@ window.Mousetrap = (function() {
      * @returns void
      */
     function _handleKeyUp(e) {
-        if (_ignore_next_keyup === e.keyCode) {
+        if (_ignore_next_keyup === e.which) {
             _ignore_next_keyup = false;
             return;
         }
-        _fireCallback(_keyCodeFromEvent(e), 'keyup', e);
+        _fireCallback('keyup', e);
     }
 
     /**
@@ -403,7 +427,6 @@ window.Mousetrap = (function() {
      * @returns {boolean}
      */
     function _isModifier(code) {
-
         // 16, 17, 18, and 91 are modifier keys
         return (code > 15 && code < 19) || code == 91;
     }
@@ -431,11 +454,6 @@ window.Mousetrap = (function() {
      * @returns void
      */
     function _bindSequence(combo, keys, callback, action) {
-
-        // start off by adding a sequence level record for this combination
-        // and setting the level to 0
-        _sequence_levels[combo] = 0;
-
         /**
          * callback to increase the sequence level for this sequence and reset
          * all other sequences that were active
@@ -443,9 +461,10 @@ window.Mousetrap = (function() {
          * @param {Event} e
          * @returns void
          */
-        var _increaseSequence = function(e) {
+        var i, len,
+            _increaseSequence = function(e) {
                 _inside_sequence = action;
-                ++_sequence_levels[combo];
+                _sequence_levels[combo]++;
                 _resetSequence();
             },
 
@@ -457,26 +476,29 @@ window.Mousetrap = (function() {
              * @returns void
              */
             _callbackAndReset = function(e) {
-                callback(e);
+                callback.call(document, e);
 
                 // we should ignore the next key up if the action is key down
                 // this is so if you finish a sequence and release the key
                 // the final key will not trigger a keyup
                 if (action === 'keydown') {
-                    _ignore_next_keyup = e.keyCode;
+                    _ignore_next_keyup = e.which;
                 }
 
                 // weird race condition if a sequence ends with the key
                 // another sequence begins with
                 setTimeout(_resetSequences, 10);
-            },
-            i;
+            };
+
+        // start off by adding a sequence level record for this combination
+        // and setting the level to 0
+        _sequence_levels[combo] = 0;
 
         // loop through keys one at a time and bind the appropriate callback
         // function.  for any key leading up to the final one it should
         // increase the sequence. after the final, it should reset all sequences
-        for (i = 0; i < keys.length; ++i) {
-            _bindSingle(keys[i], i < keys.length - 1 ? _increaseSequence : _callbackAndReset, action, combo, i);
+        for (i = 0, len = keys.length; i < len; i++) {
+            _bindSingle(keys[i], i < len - 1 ? _increaseSequence : _callbackAndReset, action, combo, i);
         }
     }
 
@@ -495,10 +517,8 @@ window.Mousetrap = (function() {
         // make sure multiple spaces in a row become a single space
         combination = combination.replace(/\s+/g, ' ');
 
-        var sequence = combination.split(' '),
-            i,
-            key,
-            keys,
+        var i, len, keys, key,
+            sequence = combination.split(' '),
             modifiers = [];
 
         // if this pattern is a sequence of keys then run through this method
@@ -511,7 +531,7 @@ window.Mousetrap = (function() {
         // pattern is all about
         keys = combination === '+' ? ['+'] : combination.split('+');
 
-        for (i = 0; i < keys.length; ++i) {
+        for (i = 0, len = keys.length; i < len; i++) {
             key = keys[i];
 
             // if this is a key that requires shift to be pressed such as ?
@@ -539,7 +559,7 @@ window.Mousetrap = (function() {
         }
 
         // remove an existing match if there is one
-        _getMatches(key, modifiers, action, !!!sequence_name);
+        _getMatches(key, modifiers, action, !sequence_name);
 
         // add this call back to the array
         // if it is a sequence put it at the beginning
@@ -556,19 +576,11 @@ window.Mousetrap = (function() {
         });
     }
 
-    /**
-     * binds multiple combinations to the same callback
-     *
-     * @param {Array} combinations
-     * @param {Function} callback
-     * @param {string} action
-     * @returns void
-     */
-    function _bindMultiple(combinations, callback, action) {
-        for (var i = 0; i < combinations.length; ++i) {
-            _bindSingle(combinations[i], callback, action);
-        }
-    }
+
+    // Bind events on document, don't need to wait for window-load or DOMReady for this
+    _addEvent(document, 'keydown', _handleKeyDown);
+    _addEvent(document, 'keyup', _handleKeyUp);
+
 
     return {
 
@@ -588,8 +600,13 @@ window.Mousetrap = (function() {
          * @returns void
          */
         bind: function(keys, callback, action) {
+            var i, len;
+
             action = action || 'keydown';
-            _bindMultiple(keys instanceof Array ? keys : keys.split(','), callback, action);
+            keys = keys instanceof Array ? keys : keys.split(',');
+            for (i = 0, len = keys.length; i < len; i++) {
+                _bindSingle(keys[i], callback, action);
+            }
             _direct_map[keys + ':' + action] = callback;
         },
 
@@ -601,19 +618,10 @@ window.Mousetrap = (function() {
          * @returns void
          */
         trigger: function(keys, action) {
-            _direct_map[keys + ':' + (action || 'keydown')]();
-        },
-
-        /**
-         * cross browser add event method
-         *
-         * @param {Element|HTMLDocument} element
-         * @param {string} name
-         * @param {Function} callback
-         * @returns void
-         */
-        addEvent: function(element, name, callback) {
-            _addEvent(element, name, callback);
+            var key = keys + ':' + (action || 'keydown');
+            if (_direct_map.hasOwnProperty(key)) {
+                _direct_map[key].call(document);
+            }
         },
 
         /**
@@ -626,18 +634,6 @@ window.Mousetrap = (function() {
         reset: function() {
             _callbacks = {};
             _direct_map = {};
-        },
-
-        /**
-         * starts the event listeners
-         *
-         * @returns void
-         */
-        init: function() {
-            _addEvent(document, 'keydown', _handleKeyDown);
-            _addEvent(document, 'keyup', _handleKeyUp);
         }
     };
-}) ();
-
-Mousetrap.addEvent(window, 'load', Mousetrap.init);
+});
