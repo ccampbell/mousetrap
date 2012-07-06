@@ -19,7 +19,30 @@
  * @preserve @version 1.0
  * @url craig.is/killing/mice
  */
-window.Mousetrap = (function() {
+
+(function(definition, undefined) {
+
+    'use strict';
+
+    var Mousetrap = definition.call(undefined, this);
+
+    var define = this.define;
+    if(typeof define === 'function' && define.amd) {
+        define('mice', function() {
+            return Mousetrap;
+        });
+    } else {
+        this.Mousetrap = Mousetrap;
+    }
+
+}).call(this, function(global, undefined) {
+
+    'use strict';
+
+    var setTimeout = global.setTimeout,
+        clearTimeout = global.clearTimeout,
+        document = global.document,
+        HTMLElement = global.HTMLElement;
 
     /**
      * mapping of special keys to their corresponding keycodes
@@ -357,7 +380,7 @@ window.Mousetrap = (function() {
                 processed_sequence_callback = true;
 
                 // keep a list of which sequences were matches for later
-                do_not_reset[callbacks[i]['seq']] = 1;
+                do_not_reset[callbacks[i].seq] = 1;
                 callbacks[i].callback.call(document, e);
             } else if (!processed_sequence_callback && !_inside_sequence) {
                 // if there were no sequence matches but we are still here
@@ -555,6 +578,12 @@ window.Mousetrap = (function() {
         });
     }
 
+
+    // Bind events on document, don't need to wait for window-load or DOMReady for this
+    _addEvent(document, 'keydown', _handleKeyDown);
+    _addEvent(document, 'keyup', _handleKeyUp);
+
+
     return {
 
         /**
@@ -598,16 +627,6 @@ window.Mousetrap = (function() {
         },
 
         /**
-         * cross browser add event method
-         *
-         * @param {Element|HTMLDocument} element
-         * @param {string} name
-         * @param {Function} callback
-         * @returns void
-         */
-        addEvent: _addEvent,
-
-        /**
          * resets the library back to its initial state.  this is useful
          * if you want to clear out the current keyboard shortcuts and bind
          * new ones - for example if you switch to another page
@@ -617,18 +636,6 @@ window.Mousetrap = (function() {
         reset: function() {
             _callbacks = {};
             _direct_map = {};
-        },
-
-        /**
-         * starts the event listeners
-         *
-         * @returns void
-         */
-        init: function() {
-            _addEvent(document, 'keydown', _handleKeyDown);
-            _addEvent(document, 'keyup', _handleKeyUp);
         }
     };
-})();
-
-Mousetrap.addEvent(window, 'load', Mousetrap.init);
+});
