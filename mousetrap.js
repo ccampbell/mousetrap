@@ -165,17 +165,22 @@ window.Mousetrap = (function() {
      * @return {number}
      */
     function _keyCodeFromEvent(e) {
+
+        // add which for key events
+        // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
+        var char_code = typeof e.which == "number" ? e.which : e.keyCode;
+
         // right command on webkit, command on gecko
-        if (e.keyCode == 93 || e.keyCode == 224) {
+        if (char_code == 93 || char_code == 224) {
             return 91;
         }
 
         // map keypad numbers to top-of-keyboard numbers
-        if (e.keyCode >= 96 && e.keyCode <= 105){
-            return e.keyCode - 48;
+        if (char_code >= 96 && char_code <= 105){
+            return char_code - 48;
         }
 
-        return e.keyCode;
+        return char_code;
     }
 
     /**
@@ -630,6 +635,9 @@ window.Mousetrap = (function() {
          */
         init: function() {
             _addEvent(document, 'keydown', _handleKeyDown);
+            _addEvent(document, 'keypress', function(e) {
+                console.log(String.fromCharCode(e.which));
+            });
             _addEvent(document, 'keyup', _handleKeyUp);
         }
     };
