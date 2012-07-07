@@ -626,8 +626,6 @@
     // If the script is being loaded as an AMD module...
     if(typeof define != 'undefined') {
         
-        console.log('hello');
-        
         // Then define it as one, without making it global
         define(_Mousetrap);
     
