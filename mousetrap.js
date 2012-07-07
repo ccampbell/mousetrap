@@ -22,52 +22,69 @@
 window.Mousetrap = (function() {
 
     /**
-     * mapping of special keys to their corresponding keycodes
+     * mapping of special keycodes to their corresponding keys
      *
      * @type {Object}
      */
     var _MAP = {
-            'backspace': 8,
-            'tab': 9,
-            'enter': 13,
-            'return': 13,
-            'shift': 16,
-            'ctrl': 17,
-            'alt': 18,
-            'option': 18,
-            'capslock': 20,
-            'esc': 27,
-            'escape': 27,
-            'space': 32,
-            'pageup': 33,
-            'pagedown': 34,
-            'end': 35,
-            'home': 36,
-            'left': 37,
-            'up': 38,
-            'right': 39,
-            'down': 40,
-            'del': 46,
-            'meta': 91,
-            'command': 91,
-            ';': 186,
-            '=': 187,
-            ',': 188,
-            '-': 189,
-            '.': 190,
-            '/': 191,
-            '`': 192,
-            '[': 219,
-            '\\': 220,
-            ']': 221,
-            '\'': 222
+            8: 'backspace',
+            9: 'tab',
+            13: 'enter',
+            16: 'shift',
+            17: 'ctrl',
+            18: 'alt',
+            20: 'capslock',
+            27: 'esc',
+            32: 'space',
+            33: 'pageup',
+            34: 'pagedown',
+            35: 'end',
+            36: 'home',
+            37: 'left',
+            38: 'up',
+            39: 'right',
+            40: 'down',
+            46: 'del',
+            91: 'meta',
+            186: ';',
+            187: '=',
+            188: ',',
+            189: '-',
+            190: '.',
+            191: '/',
+            192: '`',
+            219: '[',
+            220: '\\',
+            221: ']',
+            222: '\''
         },
 
         /**
-         * mapping of keys that require shift to their non shift equivalents
+         * mapping of keys to their shift+key equivalents
          *
          * @type {Object}
          */
+        // _SHIFT_MAP = {
+        //     '`': '~',
+        //     '1': '!',
+        //     '2': '@',
+        //     '3': '#',
+        //     '4': '$',
+        //     '5': '%',
+        //     '6': '^',
+        //     '7': '&',
+        //     '8': '*',
+        //     '9': '(',
+        //     '0': ')',
+        //     '-': '_',
+        //     '=': '+',
+        //     ';': ':',
+        //     '\'': '\"',
+        //     ',': '<',
+        //     '.': '>',
+        //     '/': '?',
+        //     '\\': '|'
+        // },
         _SHIFT_MAP = {
             '~': '`',
             '!': '1',
@@ -88,6 +105,13 @@ window.Mousetrap = (function() {
             '>': '.',
             '?': '/',
             '|': '\\'
+        },
+
+        _SPECIAL_ALIASES = {
+            'option': 'alt',
+            'command': 'meta',
+            'return': 'enter',
+            'escape': 'esc'
         },
 
         /**
@@ -128,7 +152,7 @@ window.Mousetrap = (function() {
 
         /**
          * are we currently inside of a sequence?
-         * type of action ("keyup" or "keydown") or false
+         * type of action ("keyup" or "keydown" or "keypress") or false
          *
          * @type {boolean|string}
          */
@@ -138,9 +162,9 @@ window.Mousetrap = (function() {
      * loop through the f keys, f1 to f19 and add them to the map
      * programatically
      */
-    for (var i = 1; i < 20; ++i) {
-        _MAP['f' + i] = 111 + i;
-    }
+    // for (var i = 1; i < 20; ++i) {
+    //     _MAP[111 + i] = 'f' + i;
+    // }
 
     /**
      * cross browser add event method
@@ -166,21 +190,33 @@ window.Mousetrap = (function() {
      */
     function _keyCodeFromEvent(e) {
 
-        // add which for key events
-        // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
-        var char_code = typeof e.which == "number" ? e.which : e.keyCode;
-
         // right command on webkit, command on gecko
-        if (char_code == 93 || char_code == 224) {
+        if (e.which == 93 || e.which == 224) {
             return 91;
         }
 
         // map keypad numbers to top-of-keyboard numbers
-        if (char_code >= 96 && char_code <= 105){
-            return char_code - 48;
+        if (e.which >= 96 && e.which <= 105){
+            return e.which - 48;
         }
 
-        return char_code;
+        return e.which;
+    }
+
+    /**
+     * takes the event and returns the keycode
+     *
+     * @param {Event} e
+     * @return {number}
+     */
+    function _characterFromEvent(e) {
+
+        if (e.type != 'keypress' && _MAP[e.which]) {
+            return _MAP[e.which];
+        }
+
+        // if (e.type != 'keypress' && )
+        return String.fromCharCode(e.which).toLowerCase();
     }
 
     /**
@@ -247,25 +283,28 @@ window.Mousetrap = (function() {
      * @param {boolean=} remove - should we remove any matches
      * @returns {Array}
      */
-    function _getMatches(code, modifiers, action, remove) {
+    function _getMatches(character, modifiers, action, remove) {
         var i,
             callback,
             matches = [];
 
+        // console.log('character', character);
+        // console.log('modifiers', modifiers);
+
         // if there are no events related to this keycode
-        if (!_callbacks[code]) {
+        if (!_callbacks[character]) {
             return [];
         }
 
         // if a modifier key is coming up on its own we should allow it
-        if (action == 'keyup' && _isModifier(code)) {
-            modifiers = [code];
+        if (action == 'keyup' && _isModifier(character)) {
+            modifiers = [character];
         }
 
         // loop through all callbacks for the key that was pressed
         // and see if any of them match
-        for (i = 0; i < _callbacks[code].length; ++i) {
-            callback = _callbacks[code][i];
+        for (i = 0; i < _callbacks[character].length; ++i) {
+            callback = _callbacks[character][i];
 
             // if this is a sequence but it is not at the right level
             // then move onto the next match
@@ -280,7 +319,7 @@ window.Mousetrap = (function() {
                 // remove is used so if you change your mind and call bind a
                 // second time with a new function the first one is overwritten
                 if (remove) {
-                    _callbacks[code].splice(i, 1);
+                    _callbacks[character].splice(i, 1);
                 }
 
                 matches.push(callback);
@@ -300,19 +339,19 @@ window.Mousetrap = (function() {
         var modifiers = [];
 
         if (e.shiftKey) {
-            modifiers.push(_MAP.shift);
+            modifiers.push('shift');
         }
 
         if (e.altKey) {
-            modifiers.push(_MAP.alt);
+            modifiers.push('alt');
         }
 
         if (e.ctrlKey) {
-            modifiers.push(_MAP.ctrl);
+            modifiers.push('ctrl');
         }
 
         if (e.metaKey) {
-            modifiers.push(_MAP.command);
+            modifiers.push('meta');
         }
 
         return modifiers;
@@ -326,17 +365,24 @@ window.Mousetrap = (function() {
      * @param {Event} e
      * @returns void
      */
-    function _fireCallback(code, action, e) {
+    function _fireCallback(character, e) {
 
         // if this event should not happen stop here
         if (_stop(e)) {
             return;
         }
 
-        var callbacks = _getMatches(code, _eventModifiers(e), action),
+        // console.log(e.type, character);
+        // console.log(e.type, _characterFromEvent(e));
+        var callbacks = _getMatches(character, _eventModifiers(e), e.type),
             i,
             do_not_reset = {},
             processed_sequence_callback = false;
+
+        // try the non shift version if applicable
+        // if (callbacks.length === 0 && e.type !== 'keypress' && e.shiftKey && _SHIFT_MAP[character]) {
+            // callbacks = _getMatches(_SHIFT_MAP[character], modifiers, e.type);
+        // }
 
         // loop through matching callbacks for this key event
         for (i = 0; i < callbacks.length; ++i) {
@@ -351,14 +397,14 @@ window.Mousetrap = (function() {
 
                 // keep a list of which sequences were matches for later
                 do_not_reset[callbacks[i]['seq']] = 1;
-                callbacks[i].callback(e);
+                callbacks[i].callback(e, callbacks[i]['seq']);
                 continue;
             }
 
             // if there were no sequence matches but we are still here
             // that means this is a regular match so we should fire then break
             if (!processed_sequence_callback && !_inside_sequence) {
-                callbacks[i].callback(e);
+                callbacks[i].callback(e, callbacks[i]['combination']);
                 break;
             }
 
@@ -367,7 +413,7 @@ window.Mousetrap = (function() {
         // if you are inside of a sequence and the key you are pressing
         // is not a modifier key then we should reset all sequences
         // that were not matched by this key event
-        if (action == _inside_sequence && !_isModifier(code)) {
+        if (e.type == _inside_sequence && !_isModifier(character)) {
             _resetSequences(do_not_reset);
         }
     }
@@ -378,8 +424,23 @@ window.Mousetrap = (function() {
      * @param {Event} e
      * @returns void
      */
-    function _handleKeyDown(e) {
-        _fireCallback(_keyCodeFromEvent(e), 'keydown', e);
+    function _handleKey(e) {
+
+        // add which for key events
+        // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
+        e.which = typeof e.which == "number" ? e.which : e.keyCode;
+
+        var character = _characterFromEvent(e);
+        if (!character) {
+            return;
+        }
+
+        if (e.type === 'keyup' && _ignore_next_keyup === character) {
+            _ignore_next_keyup = false;
+            return;
+        }
+
+        _fireCallback(character, e);
     }
 
     /**
@@ -388,13 +449,13 @@ window.Mousetrap = (function() {
      * @param {Event} e
      * @returns void
      */
-    function _handleKeyUp(e) {
-        if (_ignore_next_keyup === e.keyCode) {
-            _ignore_next_keyup = false;
-            return;
-        }
-        _fireCallback(_keyCodeFromEvent(e), 'keyup', e);
-    }
+    // function _handleKeyUp(e) {
+    //     if (_ignore_next_keyup === e.keyCode) {
+    //         _ignore_next_keyup = false;
+    //         return;
+    //     }
+    //     _fireCallback(_keyCodeFromEvent(e), 'keyup', e);
+    // }
 
     /**
      * determines if the keycode specified is a modifier key or not
@@ -402,10 +463,8 @@ window.Mousetrap = (function() {
      * @param {number} code
      * @returns {boolean}
      */
-    function _isModifier(code) {
-
-        // 16, 17, 18, and 91 are modifier keys
-        return (code > 15 && code < 19) || code == 91;
+    function _isModifier(key) {
+        return key == 'shift' || key == 'ctrl' || key == 'alt' || key == 'meta';
     }
 
     /**
@@ -460,10 +519,10 @@ window.Mousetrap = (function() {
                 callback(e);
 
                 // we should ignore the next key up if the action is key down
-                // this is so if you finish a sequence and release the key
-                // the final key will not trigger a keyup
-                if (action === 'keydown') {
-                    _ignore_next_keyup = e.keyCode;
+                // or keypress.  this is so if you finish a sequence and
+                // release the key the final key will not trigger a keyup
+                if (action !== 'keyup') {
+                    _ignore_next_keyup = _characterFromEvent(e);
                 }
 
                 // weird race condition if a sequence ends with the key
@@ -517,14 +576,22 @@ window.Mousetrap = (function() {
             // if this is a key that requires shift to be pressed such as ?
             // or $ or * then we should set shift as the modifier and map the
             // key to the non shift version of the key
-            if (_SHIFT_MAP[key]) {
-                modifiers.push(_MAP.shift);
-                key = _SHIFT_MAP[key];
+            // if (_SHIFT_MAP[key]) {
+                // modifiers.push(_MAP.shift);
+                // key = _SHIFT_MAP[key];
+            // }
+
+            // normalize key names
+            if (_SPECIAL_ALIASES[key]) {
+                key = _SPECIAL_ALIASES[key];
             }
 
-            // determine the keycode for the key
-            // first check in the key map then fallback to character code
-            key = _MAP[key] || key.toUpperCase().charCodeAt(0);
+            // console.log(key);
+
+            if (action != 'keypress' && _SHIFT_MAP[key]) {
+                key = _SHIFT_MAP[key];
+                modifiers.push('shift');
+            }
 
             // if this key is a modifier then add it to the list of modifiers
             if (_isModifier(key)) {
@@ -552,7 +619,8 @@ window.Mousetrap = (function() {
             modifiers: modifiers,
             action: action,
             seq: sequence_name,
-            level: level
+            level: level,
+            combination: combination
         });
     }
 
@@ -571,8 +639,9 @@ window.Mousetrap = (function() {
     }
 
     // start!
-    _addEvent(document, 'keydown', _handleKeyDown);
-    _addEvent(document, 'keyup', _handleKeyUp);
+    _addEvent(document, 'keydown', _handleKey);
+    _addEvent(document, 'keyup', _handleKey);
+    _addEvent(document, 'keypress', _handleKey);
 
     return {
 
@@ -592,7 +661,7 @@ window.Mousetrap = (function() {
          * @returns void
          */
         bind: function(keys, callback, action) {
-            action = action || 'keydown';
+            action = action || 'keypress';
             _bindMultiple(keys instanceof Array ? keys : keys.split(','), callback, action);
             _direct_map[keys + ':' + action] = callback;
         },
@@ -605,7 +674,7 @@ window.Mousetrap = (function() {
          * @returns void
          */
         trigger: function(keys, action) {
-            _direct_map[keys + ':' + (action || 'keydown')]();
+            _direct_map[keys + ':' + (action || 'keypress')]();
         },
 
         /**
