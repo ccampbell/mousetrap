@@ -19,7 +19,7 @@
  * @preserve @version 1.0
  * @url craig.is/killing/mice
  */
-window.Mousetrap = (function() {
+(function() {
 
     /**
      * mapping of special keys to their corresponding keycodes
@@ -574,7 +574,7 @@ window.Mousetrap = (function() {
     _addEvent(document, 'keydown', _handleKeyDown);
     _addEvent(document, 'keyup', _handleKeyUp);
 
-    return {
+    var _Mousetrap = {
 
         /**
          * binds an event to mousetrap
@@ -620,4 +620,17 @@ window.Mousetrap = (function() {
             _direct_map = {};
         }
     };
+    
+    // If the script is being loaded as an AMD module
+    if(typeof define != 'undefined') {
+        
+        // Then define it as one
+        define('Mousetrap', [], function(){
+            return _Mousetrap;
+        });
+        
+    // Otherwise make it a global object
+    } else {
+        window.Mousetrap = _Mousetap;
+    }
 }) ();
