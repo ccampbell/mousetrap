@@ -185,59 +185,6 @@ window.Mousetrap = (function() {
         };
 
         /**
-         * finds all callbacks that match based on the keycode, modifiers,
-         * and action
-         *
-         * @param {number} code
-         * @param {Array} modifiers
-         * @param {string} action
-         * @param {boolean=} remove - should we remove any matches
-         * @returns {Array}
-         */
-        that._getMatches = function(code, modifiers, action, remove) {
-            var i,
-                callback,
-                matches = [];
-
-            // if there are no events related to that keycode
-            if (!that._callbacks[code]) {
-                return [];
-            }
-
-            // if a modifier key is coming up on its own we should allow it
-            if (action == 'keyup' && _isModifier(code)) {
-                modifiers = [code];
-            }
-
-            // loop through all callbacks for the key that was pressed
-            // and see if any of them match
-            for (i = 0; i < that._callbacks[code].length; ++i) {
-                callback = that._callbacks[code][i];
-
-                // if that is a sequence but it is not at the right level
-                // then move onto the next match
-                if (callback['seq'] && that._sequence_levels[callback['seq']] != callback['level']) {
-                    continue;
-                }
-
-                // if that is the same action and uses the same modifiers then it
-                // is a match
-                if (action == callback.action && _modifiersMatch(modifiers, callback.modifiers)) {
-
-                    // remove is used so if you change your mind and call bind a
-                    // second time with a new function the first one is overwritten
-                    if (remove) {
-                        that._callbacks[code].splice(i, 1);
-                    }
-
-                    matches.push(callback);
-                }
-            }
-
-            return matches;
-        }
-
-        /**
          * fires a callback for a matching keycode
          *
          * @param {number} code
@@ -252,7 +199,7 @@ window.Mousetrap = (function() {
                 return;
             }
 
-            var callbacks = that._getMatches(code, _eventModifiers(e), action),
+            var callbacks = _getMatches(that, code, _eventModifiers(e), action),
                 i,
                 do_not_reset = {},
                 processed_sequence_callback = false;
@@ -287,7 +234,7 @@ window.Mousetrap = (function() {
             // is not a modifier key then we should reset all sequences
             // that were not matched by that key event
             if (action == that._inside_sequence && !_isModifier(code)) {
-                that._resetSequences(do_not_reset);
+                _resetSequences(do_not_reset);
             }
         }
 
@@ -322,6 +269,52 @@ window.Mousetrap = (function() {
             }
         } else {
             that.addToElement((options.element || document));
+        }
+    };
+
+    Mousetrap.prototype = {
+        /**
+         * binds an event to mousetrap
+         *
+         * can be a single key, a combination of keys separated with +,
+         * a comma separated list of keys, an array of keys, or
+         * a sequence of keys separated by spaces
+         *
+         * be sure to list the modifier keys first to make sure that the
+         * correct key ends up getting bound (the last key in the pattern)
+         *
+         * @param {string|Array} keys
+         * @param {Function} callback
+         * @param {string} action - 'up' for keyup anything else assumes keydown
+         * @returns void
+         */
+        bind: function(keys, callback, action) {
+            action = action || 'keydown';
+            _bindMultiple(this, keys instanceof Array ? keys : keys.split(','), callback, action);
+            this._direct_map[keys + ':' + action] = callback;
+        },
+
+        /**
+         * triggers an event that has already been bound
+         *
+         * @param {string} keys
+         * @param {string} action
+         * @returns void
+         */
+        trigger: function(keys, action) {
+            this._direct_map[keys + ':' + (action || 'keydown')]();
+        },
+
+        /**
+         * resets the library back to its initial state.  this is useful
+         * if you want to clear out the current keyboard shortcuts and bind
+         * new ones - for example if you switch to another page
+         *
+         * @returns void
+         */
+        reset: function() {
+            this._callbacks = {};
+            this._direct_map = {};
         }
     };
 
@@ -438,7 +431,7 @@ window.Mousetrap = (function() {
         var _increaseSequence = function(e) {
                 mousetrap._inside_sequence = action;
                 ++mousetrap._sequence_levels[combo];
-                mousetrap._resetSequence();
+                _resetSequence(mousetrap);
             },
 
             /**
@@ -460,7 +453,7 @@ window.Mousetrap = (function() {
 
                 // weird race condition if a sequence ends with the key
                 // another sequence begins with
-                setTimeout(mousetrap._resetSequences, 10);
+                setTimeout(_resetSequencesCallback(mousetrap), 10);
             },
             i;
 
@@ -532,7 +525,7 @@ window.Mousetrap = (function() {
         }
 
         // remove an existing match if there is one
-        mousetrap._getMatches(key, modifiers, action, !!!sequence_name);
+        _getMatches(mousetrap, key, modifiers, action, !!!sequence_name);
 
         // add this call back to the array
         // if it is a sequence put it at the beginning
@@ -604,88 +597,109 @@ window.Mousetrap = (function() {
         return modifiers;
     }
 
-    Mousetrap.prototype = {
-        /**
-         * binds an event to mousetrap
-         *
-         * can be a single key, a combination of keys separated with +,
-         * a comma separated list of keys, an array of keys, or
-         * a sequence of keys separated by spaces
-         *
-         * be sure to list the modifier keys first to make sure that the
-         * correct key ends up getting bound (the last key in the pattern)
-         *
-         * @param {string|Array} keys
-         * @param {Function} callback
-         * @param {string} action - 'up' for keyup anything else assumes keydown
-         * @returns void
-         */
-        bind: function(keys, callback, action) {
-            action = action || 'keydown';
-            _bindMultiple(this, keys instanceof Array ? keys : keys.split(','), callback, action);
-            this._direct_map[keys + ':' + action] = callback;
-        },
+    /**
+     * finds all callbacks that match based on the keycode, modifiers,
+     * and action
+     *
+     * @param {number} code
+     * @param {Array} modifiers
+     * @param {string} action
+     * @param {boolean=} remove - should we remove any matches
+     * @returns {Array}
+     */
+    function _getMatches(mousetrap, code, modifiers, action, remove) {
+        var i,
+            callback,
+            matches = [];
 
-        /**
-         * triggers an event that has already been bound
-         *
-         * @param {string} keys
-         * @param {string} action
-         * @returns void
-         */
-        trigger: function(keys, action) {
-            this._direct_map[keys + ':' + (action || 'keydown')]();
-        },
-
-        /**
-         * resets the library back to its initial state.  this is useful
-         * if you want to clear out the current keyboard shortcuts and bind
-         * new ones - for example if you switch to another page
-         *
-         * @returns void
-         */
-        reset: function() {
-            this._callbacks = {};
-            this._direct_map = {};
-        },
-
-        /**
-         * resets all sequence counters except for the ones passed in
-         *
-         * @param {Object} do_not_reset
-         * @returns void
-         */
-        _resetSequences: function(do_not_reset) {
-            do_not_reset = do_not_reset || {};
-
-            var active_sequences = false;
-
-            for (var key in this._sequence_levels) {
-                if (!do_not_reset[key]) {
-                    this._sequence_levels[key] = 0;
-                    continue;
-                }
-                active_sequences = true;
-            }
-
-            if (!active_sequences) {
-                this._inside_sequence = false;
-            }
-        },
-
-        /**
-         * called to set a 1 second timeout on the specified sequence
-         *
-         * this is so after each key press in the sequence you have 1 second
-         * to press the next key before you have to start over
-         *
-         * @returns void
-         */
-        _resetSequence: function() {
-            clearTimeout(this._reset_timer);
-            this._reset_timer = setTimeout(this._resetSequences, 1000);
+        // if there are no events related to this keycode
+        if (!mousetrap._callbacks[code]) {
+            return [];
         }
-    };
+
+        // if a modifier key is coming up on its own we should allow it
+        if (action == 'keyup' && _isModifier(code)) {
+            modifiers = [code];
+        }
+
+        // loop through all callbacks for the key that was pressed
+        // and see if any of them match
+        for (i = 0; i < mousetrap._callbacks[code].length; ++i) {
+            callback = mousetrap._callbacks[code][i];
+
+            // if mousetrap is a sequence but it is not at the right level
+            // then move onto the next match
+            if (callback['seq'] && mousetrap._sequence_levels[callback['seq']] != callback['level']) {
+                continue;
+            }
+
+            // if mousetrap is the same action and uses the same modifiers then it
+            // is a match
+            if (action == callback.action && _modifiersMatch(modifiers, callback.modifiers)) {
+
+                // remove is used so if you change your mind and call bind a
+                // second time with a new function the first one is overwritten
+                if (remove) {
+                    mousetrap._callbacks[code].splice(i, 1);
+                }
+
+                matches.push(callback);
+            }
+        }
+
+        return matches;
+    }
+
+    /**
+     * resets all sequence counters except for the ones passed in
+     *
+     * @param {Mousetrap} mousetrap
+     * @param {Object} do_not_reset
+     * @returns void
+     */
+    function _resetSequences(mousetrap, do_not_reset) {
+        do_not_reset = do_not_reset || {};
+
+        var active_sequences = false;
+
+        for (var key in this._sequence_levels) {
+            if (!do_not_reset[key]) {
+                mousetrap._sequence_levels[key] = 0;
+                continue;
+            }
+            active_sequences = true;
+        }
+
+        if (!active_sequences) {
+            mousetrap._inside_sequence = false;
+        }
+    }
+
+    /**
+     * Calls _resetSequences
+     * 
+     * @param  {Mousetrap} mousetrap
+     * @returns {Function}
+     */
+    function _resetSequencesCallback(mousetrap) {
+        return function() {
+            _resetSequences(mousetrap);
+        }
+    }
+
+    /**
+     * called to set a 1 second timeout on the specified sequence
+     *
+     * this is so after each key press in the sequence you have 1 second
+     * to press the next key before you have to start over
+     *
+     * @param {Mousetrap} mousetrap
+     * @returns void
+     */
+    function _resetSequence(mousetrap) {
+        clearTimeout(mousetrap._reset_timer);
+        mousetrap._reset_timer = setTimeout(_resetSequencesCallback(mousetrap), 1000);
+    }
 
     return Mousetrap;
 
