@@ -283,7 +283,7 @@ window.Mousetrap = (function() {
      * @param {boolean=} remove - should we remove any matches
      * @returns {Array}
      */
-    function _getMatches(character, modifiers, action, remove) {
+    function _getMatches(character, modifiers, action, remove, combination) {
         var i,
             callback,
             matches = [];
@@ -318,7 +318,7 @@ window.Mousetrap = (function() {
 
                 // remove is used so if you change your mind and call bind a
                 // second time with a new function the first one is overwritten
-                if (remove) {
+                if (remove && callback['combination'] == combination) {
                     _callbacks[character].splice(i, 1);
                 }
 
@@ -606,7 +606,7 @@ window.Mousetrap = (function() {
         }
 
         // remove an existing match if there is one
-        _getMatches(key, modifiers, action, !!!sequence_name);
+        _getMatches(key, modifiers, action, !!!sequence_name, combination);
 
         // add this call back to the array
         // if it is a sequence put it at the beginning
