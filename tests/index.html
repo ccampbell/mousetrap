@@ -77,23 +77,35 @@
 <script src="peanutbutter.js"></script>
 
 <script>
+    PeanutButter.addTest('a', ['keypress']);
     PeanutButter.addTest('a', ['keydown', 'keyup']);
+
     PeanutButter.addTest('option+a', ['keydown', 'keyup']);
+
     PeanutButter.addTest('command+a', ['keydown']);
     PeanutButter.addTest('ctrl+shift+up', ['keydown', 'keyup']);
     PeanutButter.addTest('command+shift+k', ['keydown']);
+    PeanutButter.addTest('*', ['keypress']);
     PeanutButter.addTest('*', ['keydown', 'keyup']);
+    PeanutButter.addTest('?', ['keypress']);
     PeanutButter.addTest('?', ['keydown', 'keyup']);
 
     // sequences need to be one or the other, so they
     // can't happen in the same test
+    PeanutButter.addTest('* a', ['keypress']);
+
     PeanutButter.addTest('* a', ['keydown']);
 
     // key up with a modifier key is tough
     PeanutButter.addTest('* a', ['keyup']);
 
+    PeanutButter.addTest('d o n e', ['keypress']);
     PeanutButter.addTest('d o n e', ['keydown']);
     PeanutButter.addTest('d o n e', ['keyup']);
+
+    PeanutButter.addTest('up up down down', ['keypress']);
+    PeanutButter.addTest('up up down down', ['keydown']);
+    PeanutButter.addTest('up up down down', ['keyup']);
 
     // sequence with modifier
     PeanutButter.addTest('k command+u', ['keydown']);
