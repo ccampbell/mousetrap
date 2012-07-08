@@ -400,7 +400,7 @@ window.Mousetrap = (function() {
 
                 // keep a list of which sequences were matches for later
                 do_not_reset[callbacks[i]['seq']] = 1;
-                callbacks[i].callback(e, callbacks[i]['seq']);
+                callbacks[i].callback(e);
                 continue;
             }
 
@@ -519,7 +519,7 @@ window.Mousetrap = (function() {
              * @returns void
              */
             _callbackAndReset = function(e) {
-                callback(e);
+                callback(e, combo);
 
                 // we should ignore the next key up if the action is key down
                 // or keypress.  this is so if you finish a sequence and
