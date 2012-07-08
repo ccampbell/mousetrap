@@ -56,7 +56,7 @@
 </style>
 <body>
 <h1>Peanut Butter</h1>
-<p>For testing the mousetrap</p>
+<p>For testing mousetrap</p>
 <p>When the row is highlighted press the key(s).  If you can't get anything to happen for a certain test press the f key to mark it as a failure</p>
 <table>
     <thead>
@@ -81,6 +81,7 @@
     PeanutButter.addTest('a', ['keydown', 'keyup']);
 
     PeanutButter.addTest('A', ['keypress']);
+    PeanutButter.addTest(',', ['keydown', 'keyup']);
 
     // this works with keypress
     // PeanutButter.addTest('', ['keypress']);
@@ -111,8 +112,8 @@
     PeanutButter.addTest('d o n e', ['keydown']);
     PeanutButter.addTest('d o n e', ['keyup']);
 
-    PeanutButter.addTest('up up down down', ['keydown']);
-    PeanutButter.addTest('up up down down', ['keyup']);
+    PeanutButter.addTest('left right left right', ['keydown']);
+    PeanutButter.addTest('left right left right', ['keyup']);
 
     // sequence with modifier
     PeanutButter.addTest('k command+u', ['keydown']);
