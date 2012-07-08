@@ -584,21 +584,14 @@ window.Mousetrap = (function() {
         for (i = 0; i < keys.length; ++i) {
             key = keys[i];
 
-            // if this is a key that requires shift to be pressed such as ?
-            // or $ or * then we should set shift as the modifier and map the
-            // key to the non shift version of the key
-            // if (_SHIFT_MAP[key]) {
-                // modifiers.push(_MAP.shift);
-                // key = _SHIFT_MAP[key];
-            // }
-
             // normalize key names
             if (_SPECIAL_ALIASES[key]) {
                 key = _SPECIAL_ALIASES[key];
             }
 
-            // console.log(key);
-
+            // if this is not a keypress event then we should
+            // be smart about using shift keys
+            // this will only work for US keyboards however
             if (action != 'keypress' && _SHIFT_MAP[key]) {
                 key = _SHIFT_MAP[key];
                 modifiers.push('shift');
@@ -674,11 +667,10 @@ window.Mousetrap = (function() {
          *
          * @param {string|Array} keys
          * @param {Function} callback
-         * @param {string} action - 'up' for keyup anything else assumes keydown
+         * @param {string=} action - 'up' for keyup anything else assumes keydown
          * @returns void
          */
         bind: function(keys, callback, action) {
-            action = action || 'keypress';
             _bindMultiple(keys instanceof Array ? keys : keys != ',' ? keys.split(',') : keys, callback, action);
             _direct_map[keys + ':' + action] = callback;
         },
@@ -687,11 +679,11 @@ window.Mousetrap = (function() {
          * triggers an event that has already been bound
          *
          * @param {string} keys
-         * @param {string} action
+         * @param {string=} action
          * @returns void
          */
         trigger: function(keys, action) {
-            _direct_map[keys + ':' + (action || 'keypress')]();
+            _direct_map[keys + ':' + action]();
         },
 
         /**
