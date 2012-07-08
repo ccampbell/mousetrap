@@ -602,6 +602,12 @@ window.Mousetrap = (function() {
             }
         }
 
+        // modifier keys don't work as expected with keypress,
+        // switch to keydown
+        if (action === 'keypress' && modifiers.length) {
+            action = 'keydown';
+        }
+
         // make sure to initialize array if this is the first time
         // a callback is added for this key
         if (!_callbacks[key]) {
