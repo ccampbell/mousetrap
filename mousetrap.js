@@ -215,7 +215,10 @@ window.Mousetrap = (function() {
             return _MAP[e.which];
         }
 
-        // if (e.type != 'keypress' && )
+        if (e.type == 'keypress') {
+            return String.fromCharCode(e.which);
+        }
+
         return String.fromCharCode(e.which).toLowerCase();
     }
 
