@@ -46,6 +46,8 @@ window.Mousetrap = (function() {
             40: 'down',
             46: 'del',
             91: 'meta',
+            93: 'meta',
+            224: 'meta',
             186: ';',
             187: '=',
             188: ',',
