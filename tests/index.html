@@ -80,6 +80,13 @@
     PeanutButter.addTest('a', ['keypress']);
     PeanutButter.addTest('a', ['keydown', 'keyup']);
 
+    PeanutButter.addTest('A', ['keypress']);
+
+    // this works with keypress
+    // PeanutButter.addTest('', ['keypress']);
+
+    PeanutButter.addTest('shift+a', ['keydown', 'keyup']);
+
     PeanutButter.addTest('option+a', ['keydown', 'keyup']);
 
     PeanutButter.addTest('command+a', ['keydown']);
@@ -104,7 +111,6 @@
     PeanutButter.addTest('d o n e', ['keydown']);
     PeanutButter.addTest('d o n e', ['keyup']);
 
-    PeanutButter.addTest('up up down down', ['keypress']);
     PeanutButter.addTest('up up down down', ['keydown']);
     PeanutButter.addTest('up up down down', ['keyup']);
 
