@@ -162,9 +162,9 @@ window.Mousetrap = (function() {
      * loop through the f keys, f1 to f19 and add them to the map
      * programatically
      */
-    // for (var i = 1; i < 20; ++i) {
-    //     _MAP[111 + i] = 'f' + i;
-    // }
+    for (var i = 1; i < 20; ++i) {
+        _MAP[111 + i] = 'f' + i;
+    }
 
     /**
      * cross browser add event method
