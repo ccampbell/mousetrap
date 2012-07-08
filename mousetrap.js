@@ -408,7 +408,7 @@ window.Mousetrap = (function() {
             // that means this is a regular match so we should fire then break
             if (!processed_sequence_callback && !_inside_sequence) {
                 callbacks[i].callback(e, callbacks[i]['combination']);
-                break;
+                // break;
             }
 
         }
