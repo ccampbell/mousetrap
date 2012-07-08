@@ -421,6 +421,7 @@ window.Mousetrap = (function() {
         // if you are inside of a sequence and the key you are pressing
         // is not a modifier key then we should reset all sequences
         // that were not matched by this key event
+        // if (((_inside_sequence == 'keyup' && e.type != 'keyup') || (_inside_sequence != 'keyup' && e.type == 'keyup')) && !_isModifier(character)) {
         if (e.type == _inside_sequence && !_isModifier(character)) {
             _resetSequences(do_not_reset);
         }
