@@ -291,7 +291,6 @@ window.Mousetrap = (function() {
             callback,
             matches = [];
 
-        // console.log('character', character);
         // console.log('modifiers', modifiers);
 
         // if there are no events related to this keycode
@@ -315,9 +314,15 @@ window.Mousetrap = (function() {
                 continue;
             }
 
+            if (action != callback.action) {
+                continue;
+            }
             // if this is the same action and uses the same modifiers then it
             // is a match
-            if (action == callback.action && _modifiersMatch(modifiers, callback.modifiers)) {
+            // console.log('callback', callback);
+            // console.log(action, character, modifiers, callback.modifiers);
+
+            if (action === 'keypress' || _modifiersMatch(modifiers, callback.modifiers)) {
 
                 // remove is used so if you change your mind and call bind a
                 // second time with a new function the first one is overwritten
