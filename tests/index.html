@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<meta charset=utf-8>
+<style>
+    body {
+        font-family: helvetica, arial, sans-serif;
+        line-height: 20px;
+    }
+
+    table {
+        border: 1px solid #aaa;
+        padding: 5px;
+        border-collapse: collapse;
+    }
+
+    td, th {
+        border: 1px solid #ccc;
+        margin: 0px;
+        padding: 8px;
+        height: 25px;
+    }
+
+    .success {
+        color: green;
+    }
+
+    .ready {
+        background: #fff55e;
+        /*color: #efbf00;*/
+    }
+
+    .failure {
+        color: red;
+    }
+
+    .keypress, .keydown, .keyup {
+        color: #555;
+    }
+
+    .na {
+        font-size: 12px;
+        color: #ccc;
+    }
+
+    td {
+        text-align: center;
+    }
+
+    .result {
+        font-size: 40px;
+
+    }
+
+    .combo {
+        text-align: left;
+    }
+</style>
+<body>
+<h1>Peanut Butter</h1>
+<p>For testing the mousetrap</p>
+<p>When the row is highlighted press the key(s).  If you can't get anything to happen for a certain test press the f key to mark it as a failure</p>
+<table>
+    <thead>
+        <tr>
+            <th>keys</th>
+            <th>keypress</th>
+            <th>keydown</th>
+            <th>keyup</th>
+            <th>result</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<script src="jquery-1.7.2.min.js"></script>
+<script src="../mousetrap.js"></script>
+<script src="peanutbutter.js"></script>
+
+<script>
+    PeanutButter.addTest('a', ['keydown', 'keyup']);
+    PeanutButter.addTest('option+a', ['keydown', 'keyup']);
+    PeanutButter.addTest('command+a', ['keydown']);
+    PeanutButter.addTest('ctrl+shift+up', ['keydown', 'keyup']);
+    PeanutButter.addTest('command+shift+k', ['keydown']);
+    PeanutButter.addTest('*', ['keydown', 'keyup']);
+    PeanutButter.addTest('?', ['keydown', 'keyup']);
+
+    // sequences need to be one or the other, so they
+    // can't happen in the same test
+    PeanutButter.addTest('* a', ['keydown']);
+
+    // key up with a modifier key is tough
+    PeanutButter.addTest('* a', ['keyup']);
+
+    PeanutButter.addTest('d o n e', ['keydown']);
+    PeanutButter.addTest('d o n e', ['keyup']);
+
+    // sequence with modifier
+    PeanutButter.addTest('k command+u', ['keydown']);
+
+    // will not work in firefox
+    // there is currently no way to prevent default on each key in a sequence
+    // PeanutButter.addTest('command+k command+u', ['keyup']);
+
+    PeanutButter.spread();
+</script>
+</body>
