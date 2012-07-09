@@ -439,20 +439,6 @@ window.Mousetrap = (function() {
     }
 
     /**
-     * handles a keyup event
-     *
-     * @param {Event} e
-     * @returns void
-     */
-    // function _handleKeyUp(e) {
-    //     if (_ignore_next_keyup === e.keyCode) {
-    //         _ignore_next_keyup = false;
-    //         return;
-    //     }
-    //     _fireCallback(_keyCodeFromEvent(e), 'keyup', e);
-    // }
-
-    /**
      * determines if the keycode specified is a modifier key or not
      *
      * @param {string} key
