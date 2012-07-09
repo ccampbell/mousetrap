@@ -313,7 +313,7 @@ window.Mousetrap = (function() {
 
                 // remove is used so if you change your mind and call bind a
                 // second time with a new function the first one is overwritten
-                if (remove && callback['combination'] == combination) {
+                if (remove && callback['combo'] == combination) {
                     _callbacks[character].splice(i, 1);
                 }
 
@@ -600,7 +600,7 @@ window.Mousetrap = (function() {
             action: action,
             seq: sequence_name,
             level: level,
-            combination: combination
+            combo: combination
         });
     }
 
