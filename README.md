@@ -9,7 +9,7 @@ It is around **1.5kb** minified and gzipped, has no external dependencies, and h
 - Firefox
 - Chrome
 
-It has support for ``keyup`` and ``keydown`` events on specific keys, keyboard combinations, or key sequences.
+It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific keys, keyboard combinations, or key sequences.
 
 ## Getting started
 
@@ -42,6 +42,19 @@ It has support for ``keyup`` and ``keydown`` events on specific keys, keyboard c
         });
     </script>
     ```
+
+## Why Mousetrap?
+
+There are a number of other similar libraries out there so what makes this one different?
+
+- There are no external dependencies, no framework is required
+- You are not limited to ``keydown`` events (You can specify ``keypress``, ``keydown``, or ``keyup`` or let Mousetrap choose for you).
+- You can bind key events directly to special keys such as ``?`` or ``*``
+- It works with international keyboard layouts by intelligently choosing when to use ``keypress`` vs. ``keydown`` depending on what key you bind.
+- You can bind Gmail like key sequences in addition to regular keys and key combinations
+- You can programatically trigger key events with the ``trigger()`` method
+- It works with the numeric keypad on your keyboard
+- The code is well documented/commented
 
 ## Documentation
 
