@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<meta charset=utf-8>
+<link href="peanutbutter.css" rel="stylesheet">
+<body>
+<h1>Peanut Butter</h1>
+<p>For testing mousetrap</p>
+<p>When the row is highlighted press the key(s).  If you can't get anything to happen for a certain test press the f key to mark it as a failure</p>
+<p>This test is to test the default values if you don't specify an event type.  Basically it decides if it should default to keydown or keyup</p>
+<table>
+    <thead>
+        <tr>
+            <th>keys</th>
+            <th>keypress</th>
+            <th>keydown</th>
+            <th>keyup</th>
+            <th>result</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<script src="jquery-1.7.2.min.js"></script>
+<script src="../mousetrap.js"></script>
+<script src="peanutbutter.js"></script>
+
+<script>
+    PeanutButter.addTest('*', ['keypress'], true);
+    PeanutButter.addTest('$', ['keypress'], true);
+    PeanutButter.addTest('?', ['keypress'], true);
+    PeanutButter.addTest('a', ['keypress'], true);
+    PeanutButter.addTest('A', ['keypress'], true);
+    PeanutButter.addTest('7', ['keypress'], true);
+    PeanutButter.addTest('shift+\'', ['keydown'], true);
+    PeanutButter.addTest('shift+a', ['keydown'], true);
+    PeanutButter.addTest('shift+5', ['keydown'], true);
+    PeanutButter.addTest('command+shift+p', ['keydown'], true);
+    PeanutButter.addTest('a ; b', ['keypress'], true);
+    PeanutButter.addTest('g i', ['keypress'], true);
+    PeanutButter.addTest('* n', ['keypress'], true);
+    PeanutButter.addTest('g .', ['keypress'], true);
+    PeanutButter.addTest('. g', ['keydown'], true);
+    PeanutButter.addTest('space command', ['keydown'], true);
+    PeanutButter.addTest('left b a enter', ['keydown'], true);
+
+    PeanutButter.spread();
+</script>
+</body>
