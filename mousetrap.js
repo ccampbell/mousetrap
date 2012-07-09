@@ -264,8 +264,6 @@ window.Mousetrap = (function() {
             callback,
             matches = [];
 
-        // console.log('modifiers', modifiers);
-
         // if there are no events related to this keycode
         if (!_callbacks[character]) {
             return [];
@@ -292,8 +290,6 @@ window.Mousetrap = (function() {
             }
             // if this is the same action and uses the same modifiers then it
             // is a match
-            // console.log('callback', callback);
-            // console.log(action, character, modifiers, callback.modifiers);
 
             if (action === 'keypress' || _modifiersMatch(modifiers, callback.modifiers)) {
 
@@ -352,8 +348,6 @@ window.Mousetrap = (function() {
             return;
         }
 
-        // console.log(e.type, character);
-        // console.log(e.type, _characterFromEvent(e));
         var callbacks = _getMatches(character, _eventModifiers(e), e.type),
             i,
             do_not_reset = {},
