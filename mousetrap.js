@@ -179,27 +179,6 @@ window.Mousetrap = (function() {
      * takes the event and returns the keycode
      *
      * @param {Event} e
-     * @return {number}
-     */
-    function _keyCodeFromEvent(e) {
-
-        // right command on webkit, command on gecko
-        if (e.which == 93 || e.which == 224) {
-            return 91;
-        }
-
-        // map keypad numbers to top-of-keyboard numbers
-        if (e.which >= 96 && e.which <= 105){
-            return e.which - 48;
-        }
-
-        return e.which;
-    }
-
-    /**
-     * takes the event and returns the keycode
-     *
-     * @param {Event} e
      * @return {string}
      */
     function _characterFromEvent(e) {
