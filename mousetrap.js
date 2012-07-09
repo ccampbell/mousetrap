@@ -641,7 +641,7 @@ window.Mousetrap = (function() {
          * @returns void
          */
         bind: function(keys, callback, action) {
-            _bindMultiple(keys instanceof Array ? keys : keys != ',' ? keys.split(',') : keys, callback, action);
+            _bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
             _direct_map[keys + ':' + action] = callback;
         },
 
