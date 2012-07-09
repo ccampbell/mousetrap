@@ -67,7 +67,10 @@ window.Mousetrap = (function() {
         },
 
         /**
-         * mapping of keys to their shift+key equivalents
+         * this is a mapping of keys that require shift on a US keypad
+         * back to the non shift equivelents
+         *
+         * this is so you can use keyup events with these keys
          *
          * @type {Object}
          */
@@ -93,6 +96,12 @@ window.Mousetrap = (function() {
             '|': '\\'
         },
 
+        /**
+         * this is a list of special strings you can use to map
+         * to modifier keys when you specify your keyboard shortcuts
+         *
+         * @type {Object}
+         */
         _SPECIAL_ALIASES = {
             'option': 'alt',
             'command': 'meta',
@@ -191,15 +200,17 @@ window.Mousetrap = (function() {
      * @return {string}
      */
     function _characterFromEvent(e) {
-
+        // for non keypress events the special map is needed
         if (e.type != 'keypress' && _MAP[e.which]) {
             return _MAP[e.which];
         }
 
+        // for keypress events we should return the character as is
         if (e.type == 'keypress') {
             return String.fromCharCode(e.which);
         }
 
+        // for all other events convert it to lowercase
         return String.fromCharCode(e.which).toLowerCase();
     }
 
@@ -294,12 +305,15 @@ window.Mousetrap = (function() {
                 continue;
             }
 
+            // if the action we are looking for doesn't match the action we got
+            // then we should keep going
             if (action != callback.action) {
                 continue;
             }
-            // if this is the same action and uses the same modifiers then it
-            // is a match
 
+            // if this is a keypress event that means that we need to only
+            // look at the character, otherwise check the modifiers as
+            // well
             if (action === 'keypress' || _modifiersMatch(modifiers, callback.modifiers)) {
 
                 // remove is used so if you change your mind and call bind a
@@ -407,6 +421,8 @@ window.Mousetrap = (function() {
         e.which = typeof e.which == "number" ? e.which : e.keyCode;
 
         var character = _characterFromEvent(e);
+
+        // no character found then stop
         if (!character) {
             return;
         }
