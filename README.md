@@ -2,7 +2,7 @@
 
 Mousetrap is a simple library for handling keyboard shortcuts in Javascript. 
 
-It is around **1.4kb** minified and gzipped, has no external dependencies, and has been tested in the following browsers:
+It is around **1.5kb** minified and gzipped, has no external dependencies, and has been tested in the following browsers:
 
 - Internet Explorer 6+
 - Safari
