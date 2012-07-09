@@ -148,7 +148,7 @@ window.Mousetrap = (function() {
         /**
          * temporary state where we will ignore the next keyup
          *
-         * @type {boolean|number}
+         * @type {boolean|string}
          */
         _ignore_next_keyup = false,
 
@@ -209,7 +209,7 @@ window.Mousetrap = (function() {
      * takes the event and returns the keycode
      *
      * @param {Event} e
-     * @return {number}
+     * @return {string}
      */
     function _characterFromEvent(e) {
 
@@ -282,10 +282,11 @@ window.Mousetrap = (function() {
      * finds all callbacks that match based on the keycode, modifiers,
      * and action
      *
-     * @param {number} code
+     * @param {string} character
      * @param {Array} modifiers
      * @param {string} action
      * @param {boolean=} remove - should we remove any matches
+     * @param {string=} combination
      * @returns {Array}
      */
     function _getMatches(character, modifiers, action, remove, combination) {
@@ -370,8 +371,7 @@ window.Mousetrap = (function() {
     /**
      * fires a callback for a matching keycode
      *
-     * @param {number} code
-     * @param {string} action
+     * @param {string} character
      * @param {Event} e
      * @returns void
      */
@@ -471,7 +471,7 @@ window.Mousetrap = (function() {
     /**
      * determines if the keycode specified is a modifier key or not
      *
-     * @param {number} code
+     * @param {string} key
      * @returns {boolean}
      */
     function _isModifier(key) {
@@ -497,7 +497,7 @@ window.Mousetrap = (function() {
      * @param {string} combo - combo specified in bind call
      * @param {Array} keys
      * @param {Function} callback
-     * @param {string} action
+     * @param {string=} action
      * @returns void
      */
     function _bindSequence(combo, keys, callback, action) {
@@ -555,7 +555,7 @@ window.Mousetrap = (function() {
      *
      * @param {string} combination
      * @param {Function} callback
-     * @param {string} action
+     * @param {string=} action
      * @param {string=} sequence_name - name of sequence if part of sequence
      * @param {number=} level - what part of the sequence the command is
      * @returns void
@@ -639,7 +639,7 @@ window.Mousetrap = (function() {
      *
      * @param {Array} combinations
      * @param {Function} callback
-     * @param {string} action
+     * @param {string|undefined} action
      * @returns void
      */
     function _bindMultiple(combinations, callback, action) {
@@ -667,7 +667,7 @@ window.Mousetrap = (function() {
          *
          * @param {string|Array} keys
          * @param {Function} callback
-         * @param {string=} action - 'up' for keyup anything else assumes keydown
+         * @param {string=} action - 'keypress', 'keydown', or 'keyup'
          * @returns void
          */
         bind: function(keys, callback, action) {
