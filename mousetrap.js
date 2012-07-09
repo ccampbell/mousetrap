@@ -398,8 +398,8 @@ window.Mousetrap = (function() {
             // if there were no sequence matches but we are still here
             // that means this is a regular match so we should fire then break
             if (!processed_sequence_callback && !_inside_sequence) {
-                callbacks[i].callback(e, callbacks[i]['combination']);
                 // break;
+                callbacks[i].callback(e);
             }
 
         }
@@ -497,7 +497,7 @@ window.Mousetrap = (function() {
              * @returns void
              */
             _callbackAndReset = function(e) {
-                callback(e, combo);
+                callback(e);
 
                 // we should ignore the next key up if the action is key down
                 // or keypress.  this is so if you finish a sequence and
