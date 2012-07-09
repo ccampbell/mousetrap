@@ -548,7 +548,7 @@ window.Mousetrap = (function() {
             // if this is not a keypress event then we should
             // be smart about using shift keys
             // this will only work for US keyboards however
-            if (action != 'keypress' && _SHIFT_MAP[key]) {
+            if (action && action != 'keypress' && _SHIFT_MAP[key]) {
                 key = _SHIFT_MAP[key];
                 modifiers.push('shift');
             }
