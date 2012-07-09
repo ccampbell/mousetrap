@@ -12,6 +12,7 @@
 PeanutButter = (function() {
     var tests = [],
         test_data = [],
+        use_default = [],
         table_body = $("tbody"),
         _active_test,
         _next_test_timeout,
@@ -76,6 +77,16 @@ PeanutButter = (function() {
 
     function _done() {}
 
+    function _bindEventsForTest(i) {
+        if (use_default[i]) {
+            return Mousetrap.bind(tests[i], _handleKeyEvent);
+        }
+
+        $.each(test_data[i], function(j, event_name) {
+            Mousetrap.bind(tests[i], _handleKeyEvent, event_name);
+        });
+    }
+
     function _prepareTest(i) {
         $("tr").removeClass('ready');
 
@@ -84,9 +95,8 @@ PeanutButter = (function() {
         }
         _active_test = i;
         _resetMousetrap();
-        $.each(test_data[i], function(j, event_name) {
-            Mousetrap.bind(tests[i], _handleKeyEvent, event_name);
-        });
+
+        _bindEventsForTest(i);
 
         var tr = $("#test_" + i),
             window_height = $(window).height();
@@ -99,9 +109,10 @@ PeanutButter = (function() {
     }
 
     return {
-        addTest: function(combo, events) {
+        addTest: function(combo, events, use_default_event) {
             tests.push(combo);
             test_data.push(events);
+            use_default.push(use_default_event);
         },
 
         spread: function() {
