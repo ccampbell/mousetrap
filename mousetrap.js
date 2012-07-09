@@ -359,11 +359,6 @@ window.Mousetrap = (function() {
             do_not_reset = {},
             processed_sequence_callback = false;
 
-        // try the non shift version if applicable
-        // if (callbacks.length === 0 && e.type !== 'keypress' && e.shiftKey && _SHIFT_MAP[character]) {
-            // callbacks = _getMatches(_SHIFT_MAP[character], modifiers, e.type);
-        // }
-
         // loop through matching callbacks for this key event
         for (i = 0; i < callbacks.length; ++i) {
 
