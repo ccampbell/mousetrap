@@ -384,10 +384,8 @@ window.Mousetrap = (function() {
             // if there were no sequence matches but we are still here
             // that means this is a regular match so we should fire then break
             if (!processed_sequence_callback && !_inside_sequence) {
-                // break;
                 callbacks[i].callback(e);
             }
-
         }
 
         // if you are inside of a sequence and the key you are pressing
