@@ -101,6 +101,15 @@ window.Mousetrap = (function() {
         },
 
         /**
+         * variable to store the flipped version of _MAP from above
+         * needed to check if we should use keypress or not when no action
+         * is specified
+         *
+         * @type {Object|undefined}
+         */
+        _REVERSE_MAP,
+
+        /**
          * a list of all the callbacks setup via Mousetrap.bind()
          *
          * @type {Object}
@@ -434,6 +443,55 @@ window.Mousetrap = (function() {
     }
 
     /**
+     * reverses the map lookup so that we can look for specific keys
+     * to see what can and can't use keypress
+     *
+     * @return {Object}
+     */
+    function _getReverseMap() {
+        if (!_REVERSE_MAP) {
+            _REVERSE_MAP = {};
+            for (var key in _MAP) {
+
+                // pull out the numberic keypad from here cause keypress should
+                // be able to detec the keys from the character
+                if (key > 95 && key < 112) {
+                    continue;
+                }
+
+                if (_MAP.hasOwnProperty(key)) {
+                    _REVERSE_MAP[_MAP[key]] = key;
+                }
+            }
+        }
+        return _REVERSE_MAP;
+    }
+
+    /**
+     * picks the best action based on the key combination
+     *
+     * @param {string} key - character for key
+     * @param {Array} modifiers
+     * @param {string=} action passed in
+     */
+    function _pickBestAction(key, modifiers, action) {
+
+        // if no action was picked in we should try to pick the one
+        // that we think would work best for this key
+        if (!action) {
+            action = _getReverseMap()[key] ? 'keydown' : 'keypress';
+        }
+
+        // modifier keys don't work as expected with keypress,
+        // switch to keydown
+        if (action === 'keypress' && modifiers.length) {
+            action = 'keydown';
+        }
+
+        return action;
+    }
+
+    /**
      * binds a key sequence to an event
      *
      * @param {string} combo - combo specified in bind call
@@ -447,6 +505,12 @@ window.Mousetrap = (function() {
         // start off by adding a sequence level record for this combination
         // and setting the level to 0
         _sequence_levels[combo] = 0;
+
+        // if there is no action pick the best one for the first key
+        // in the sequence
+        if (!action) {
+            action = _pickBestAction(keys[0], []);
+        }
 
         /**
          * callback to increase the sequence level for this sequence and reset
@@ -545,11 +609,9 @@ window.Mousetrap = (function() {
             }
         }
 
-        // modifier keys don't work as expected with keypress,
-        // switch to keydown
-        if (action === 'keypress' && modifiers.length) {
-            action = 'keydown';
-        }
+        // depending on what the key combination is
+        // we will try to pick the best event for it
+        action = _pickBestAction(key, modifiers, action);
 
         // make sure to initialize array if this is the first time
         // a callback is added for this key
