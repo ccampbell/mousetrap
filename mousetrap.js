@@ -290,7 +290,7 @@ window.Mousetrap = (function() {
          */
         bind: function(keys, callback, action) {
             action = action || 'keydown';
-            _bindMultiple(this, keys instanceof Array ? keys : keys.split(','), callback, action);
+            _bindMultiple(this, keys instanceof Array ? keys : keys != ',' ? keys.split(',') : keys, callback, action);
             this._direct_map[keys + ':' + action] = callback;
         },
 
