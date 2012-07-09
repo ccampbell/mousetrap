@@ -43,7 +43,11 @@ PeanutButter = (function() {
 
     function _handleKeyEvent(e) {
         clearTimeout(_next_test_timeout);
-        e.preventDefault();
+        if (e.preventDefault) {
+            e.preventDefault();
+        } else {
+            e.returnValue = false;
+        }
         _pass(e.type, _active_test);
         _next_test_timeout = setTimeout(_prepareNextTest, 500);
     }
