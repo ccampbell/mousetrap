@@ -210,7 +210,7 @@ window.Mousetrap = (function() {
         }
 
         // stop for input, select, and textarea
-        return tag_name == 'INPUT' || tag_name == 'SELECT' || tag_name == 'TEXTAREA' || element.getAttribute('contenteditable');
+        return tag_name == 'INPUT' || tag_name == 'SELECT' || tag_name == 'TEXTAREA'/* || element.getAttribute('contenteditable')*/;
     }
 
     /**
