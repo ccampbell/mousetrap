@@ -26,7 +26,10 @@
 
 <script>
     PeanutButter.addTest('*', ['keypress'], true);
+    PeanutButter.addTest('+', ['keypress'], true);
+    PeanutButter.addTest('-', ['keypress'], true);
     PeanutButter.addTest('$', ['keypress'], true);
+    PeanutButter.addTest('[', ['keypress'], true);
     PeanutButter.addTest('?', ['keypress'], true);
     PeanutButter.addTest('a', ['keypress'], true);
     PeanutButter.addTest('A', ['keypress'], true);
@@ -39,7 +42,7 @@
     PeanutButter.addTest('g i', ['keypress'], true);
     PeanutButter.addTest('* n', ['keypress'], true);
     PeanutButter.addTest('g .', ['keypress'], true);
-    PeanutButter.addTest('. g', ['keydown'], true);
+    PeanutButter.addTest('. g', ['keypress'], true);
     PeanutButter.addTest('space command', ['keydown'], true);
     PeanutButter.addTest('left b a enter', ['keydown'], true);
 
