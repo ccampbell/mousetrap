@@ -702,9 +702,6 @@ window.Mousetrap = (function() {
          * a comma separated list of keys, an array of keys, or
          * a sequence of keys separated by spaces
          *
-         * be sure to list the modifier keys first to make sure that the
-         * correct key ends up getting unbound (the last key in the pattern)
-         *
          * the unbinding just sets the callback function of that keycombo as an empty function
          * and deletes the corresponding key in the _direct_map dict
          *
