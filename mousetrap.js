@@ -471,7 +471,7 @@ window.Mousetrap = (function() {
             for (var key in _MAP) {
 
                 // pull out the numberic keypad from here cause keypress should
-                // be able to detec the keys from the character
+                // be able to detect the keys from the character
                 if (key > 95 && key < 112) {
                     continue;
                 }
