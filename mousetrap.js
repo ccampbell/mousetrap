@@ -636,7 +636,7 @@ window.Mousetrap = (function() {
         }
 
         // remove an existing match if there is one
-        _getMatches(key, modifiers, action, !!!sequence_name, combination);
+        _getMatches(key, modifiers, action, !sequence_name, combination);
 
         // add this call back to the array
         // if it is a sequence put it at the beginning
