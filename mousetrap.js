@@ -698,12 +698,10 @@ window.Mousetrap = (function() {
         /**
          * unbinds an event to mousetrap
          *
-         * can be a single key, a combination of keys separated with +,
-         * a comma separated list of keys, an array of keys, or
-         * a sequence of keys separated by spaces
-         *
          * the unbinding just sets the callback function of that keycombo as an empty function
-         * and deletes the corresponding key in the _direct_map dict
+         * and deletes the corresponding key in the _direct_map dict.
+
+         * the keycombo+action has to be exactly the same as it was defined in the bind method
          *
          * @param {string|Array} keys
          * @param {string} action - 'up' for keyup anything else assumes keydown
