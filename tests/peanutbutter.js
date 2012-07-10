@@ -59,7 +59,7 @@ PeanutButter = (function() {
             class_name;
 
         $("td", test_row).each(function(i, td) {
-            if ($(td).html() == '-') {
+            if (i > 0 && $(td).html() == '-') {
                 success = false;
             }
         });
