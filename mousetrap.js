@@ -698,21 +698,22 @@ window.Mousetrap = (function() {
         /**
          * unbinds an event to mousetrap
          *
-         * the unbinding just sets the callback function of that keycombo as an empty function
-         * and deletes the corresponding key in the _direct_map dict.
-         * the keycombo+action has to be exactly the same as it was defined in the bind method
+         * the unbinding sets the callback function of the specified key combo
+         * to an empty function and deletes the corresponding key in the
+         * _direct_map dict.
+         *
+         * the keycombo+action has to be exactly the same as
+         * it was defined in the bind method
          *
          * @param {string|Array} keys
-         * @param {string} action - 'up' for keyup anything else assumes keydown
-         * @returns boolean
+         * @param {string} action
+         * @returns void
          */
         unbind: function(keys, action) {
-            if(_direct_map[keys + ':' + action]){
+            if (_direct_map[keys + ':' + action]) {
                 delete _direct_map[keys + ':' + action];
-                this.bind(keys, function(){}, action);
-                return true;
+                this.bind(keys, function() {}, action);
             }
-            return false;
         },
 
         /**
