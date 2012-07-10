@@ -710,16 +710,15 @@ window.Mousetrap = (function() {
          *
          * @param {string|Array} keys
          * @param {string} action - 'up' for keyup anything else assumes keydown
-         * @returns void
+         * @returns boolean
          */
         unbind: function(keys, action) {
-            action = action || 'keydown';
-            if(typeof _direct_map[keys + ':' + action] === 'function'){
-                delete _direct_map[keys + ':' + action]
-                this.bind(keys,function(){},action);
-                return true
+            if(_direct_map[keys + ':' + action]){
+                delete _direct_map[keys + ':' + action];
+                this.bind(keys, function(){}, action);
+                return true;
             }
-            return false
+            return false;
         },
 
         /**
