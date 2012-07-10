@@ -700,7 +700,6 @@ window.Mousetrap = (function() {
          *
          * the unbinding just sets the callback function of that keycombo as an empty function
          * and deletes the corresponding key in the _direct_map dict.
-
          * the keycombo+action has to be exactly the same as it was defined in the bind method
          *
          * @param {string|Array} keys
