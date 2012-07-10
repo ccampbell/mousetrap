@@ -48,7 +48,16 @@ window.Mousetrap = (function() {
             46: 'del',
             91: 'meta',
             93: 'meta',
-            224: 'meta',
+            224: 'meta'
+        },
+
+        /**
+         * mapping for special characters so they can support
+         * keydown and keyup events
+         *
+         * @type {Object}
+         */
+        _KEYCODE_MAP = {
             106: '*',
             107: '+',
             109: '-',
@@ -201,17 +210,22 @@ window.Mousetrap = (function() {
      * @return {string}
      */
     function _characterFromEvent(e) {
-        // for non keypress events the special map is needed
-        if (e.type != 'keypress' && _MAP[e.which]) {
-            return _MAP[e.which];
-        }
 
         // for keypress events we should return the character as is
         if (e.type == 'keypress') {
             return String.fromCharCode(e.which);
         }
 
-        // for all other events convert it to lowercase
+        // for non keypress events the special maps are needed
+        if (_MAP[e.which]) {
+            return _MAP[e.which];
+        }
+
+        if (_KEYCODE_MAP[e.which]) {
+            return _KEYCODE_MAP[e.which];
+        }
+
+        // if it is not in the special map
         return String.fromCharCode(e.which).toLowerCase();
     }
 
