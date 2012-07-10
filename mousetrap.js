@@ -24,6 +24,10 @@ window.Mousetrap = (function() {
     /**
      * mapping of special keycodes to their corresponding keys
      *
+     * everything in this dictionary cannot use keypress events
+     * so it has to be here to map to the correct keycodes for
+     * keyup/keydown events
+     *
      * @type {Object}
      */
     var _MAP = {
@@ -53,7 +57,9 @@ window.Mousetrap = (function() {
 
         /**
          * mapping for special characters so they can support
-         * keydown and keyup events
+         *
+         * this dictionary is only used incase you want to bind a
+         * keyup or keydown event to one of these keys
          *
          * @type {Object}
          */
@@ -81,6 +87,8 @@ window.Mousetrap = (function() {
          * back to the non shift equivelents
          *
          * this is so you can use keyup events with these keys
+         *
+         * note that this will only work on US keyboards
          *
          * @type {Object}
          */
