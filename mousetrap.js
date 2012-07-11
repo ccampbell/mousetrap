@@ -692,9 +692,9 @@ window.Mousetrap = (function() {
     }
 
     // start!
+    _addEvent(document, 'keypress', _handleKey);
     _addEvent(document, 'keydown', _handleKey);
     _addEvent(document, 'keyup', _handleKey);
-    _addEvent(document, 'keypress', _handleKey);
 
     return {
 
