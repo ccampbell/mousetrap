@@ -728,7 +728,7 @@ window.Mousetrap = (function() {
          * the keycombo+action has to be exactly the same as
          * it was defined in the bind method
          *
-         * @todo actually remove this from the _callbacks dictionary instead
+         * TODO: actually remove this from the _callbacks dictionary instead
          * of binding an empty function
          *
          * @param {string|Array} keys
