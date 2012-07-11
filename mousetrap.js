@@ -280,11 +280,11 @@ window.Mousetrap = (function() {
             key;
 
         for (key in _sequence_levels) {
-            if (!do_not_reset[key]) {
-                _sequence_levels[key] = 0;
+            if (do_not_reset[key]) {
+                active_sequences = true;
                 continue;
             }
-            active_sequences = true;
+            _sequence_levels[key] = 0;
         }
 
         if (!active_sequences) {
