@@ -212,7 +212,7 @@ window.Mousetrap = (function() {
     }
 
     /**
-     * takes the event and returns the keycode
+     * takes the event and returns the key character
      *
      * @param {Event} e
      * @return {string}
@@ -276,9 +276,10 @@ window.Mousetrap = (function() {
     function _resetSequences(do_not_reset) {
         do_not_reset = do_not_reset || {};
 
-        var active_sequences = false;
+        var active_sequences = false,
+            key;
 
-        for (var key in _sequence_levels) {
+        for (key in _sequence_levels) {
             if (!do_not_reset[key]) {
                 _sequence_levels[key] = 0;
                 continue;
