@@ -191,8 +191,8 @@ window.Mousetrap = (function() {
     /**
      * loop through to map numbers on the numeric keypad
      */
-    for (i = 96; i < 106; ++i) {
-        _MAP[i] = i - 96;
+    for (i = 0; i <= 9; ++i) {
+        _MAP[i + 96] = i;
     }
 
     /**
