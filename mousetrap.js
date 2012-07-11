@@ -88,7 +88,7 @@ window.Mousetrap = (function() {
          *
          * this is so you can use keyup events with these keys
          *
-         * note that this will only work on US keyboards
+         * note that this will only work reliably on US keyboards
          *
          * @type {Object}
          */
