@@ -381,6 +381,31 @@ window.Mousetrap = (function() {
     }
 
     /**
+     * actually calls the callback function
+     *
+     * if your callback function returns false this will use the jquery
+     * convention - prevent default and stop propogation on the event
+     *
+     * @param {Function}
+     * @param {Event}
+     * @returns void
+     */
+    function _callback(callback, e) {
+        if (callback(e) === false) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+
+            e.returnValue = false;
+            e.cancelBubble = true;
+        }
+    }
+
+    /**
      * fires a callback for a matching keycode
      *
      * @param {string} character
@@ -412,14 +437,14 @@ window.Mousetrap = (function() {
 
                 // keep a list of which sequences were matches for later
                 do_not_reset[callbacks[i]['seq']] = 1;
-                callbacks[i].callback(e);
+                _callback(callbacks[i].callback, e);
                 continue;
             }
 
             // if there were no sequence matches but we are still here
             // that means this is a regular match so we should fire then break
             if (!processed_sequence_callback && !_inside_sequence) {
-                callbacks[i].callback(e);
+                _callback(callbacks[i].callback, e);
             }
         }
 
@@ -572,7 +597,7 @@ window.Mousetrap = (function() {
              * @returns void
              */
             _callbackAndReset = function(e) {
-                callback(e);
+                _callback(callback, e);
 
                 // we should ignore the next key up if the action is key down
                 // or keypress.  this is so if you finish a sequence and
