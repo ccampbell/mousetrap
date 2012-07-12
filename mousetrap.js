@@ -518,7 +518,7 @@ window.Mousetrap = (function() {
             _REVERSE_MAP = {};
             for (var key in _MAP) {
 
-                // pull out the numberic keypad from here cause keypress should
+                // pull out the numeric keypad from here cause keypress should
                 // be able to detect the keys from the character
                 if (key > 95 && key < 112) {
                     continue;
