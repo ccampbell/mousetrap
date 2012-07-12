@@ -13,7 +13,7 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
 
 ## Getting started
 
-1.  Include mousetrap on your page before the closing ``<body>`` tag
+1.  Include mousetrap on your page before the closing ``</body>`` tag
 
     ```html
     <script src="/path/to/mousetrap.min.js"></script>
