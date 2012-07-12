@@ -387,8 +387,8 @@ window.Mousetrap = (function() {
      * if your callback function returns false this will use the jquery
      * convention - prevent default and stop propogation on the event
      *
-     * @param {Function}
-     * @param {Event}
+     * @param {Function} callback
+     * @param {Event} e
      * @returns void
      */
     function _fireCallback(callback, e) {
