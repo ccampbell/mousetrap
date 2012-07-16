@@ -30,6 +30,8 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
 
         // combinations
         Mousetrap.bind('command+shift+K', function() { console.log('command shift k'); });
+
+        // map multiple combinations to the same callback
         Mousetrap.bind(['command+k', 'ctrl+k'], function() {
             console.log('command k or control k');
 
