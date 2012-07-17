@@ -722,7 +722,7 @@ window.Mousetrap = (function() {
     _addEvent(document, 'keydown', _handleKey);
     _addEvent(document, 'keyup', _handleKey);
 
-    return {
+    var Mousetrap= {
 
         /**
          * binds an event to mousetrap
@@ -742,6 +742,7 @@ window.Mousetrap = (function() {
         bind: function(keys, callback, action) {
             _bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
             _direct_map[keys + ':' + action] = callback;
+            return Mousetrap;
         },
 
         /**
@@ -766,6 +767,7 @@ window.Mousetrap = (function() {
                 delete _direct_map[keys + ':' + action];
                 this.bind(keys, function() {}, action);
             }
+            return Mousetrap;
         },
 
         /**
@@ -777,6 +779,7 @@ window.Mousetrap = (function() {
          */
         trigger: function(keys, action) {
             _direct_map[keys + ':' + action]();
+            return Mousetrap;
         },
 
         /**
@@ -789,6 +792,8 @@ window.Mousetrap = (function() {
         reset: function() {
             _callbacks = {};
             _direct_map = {};
+            return Mousetrap;
         }
     };
+    return Mousetrap;
 }) ();
