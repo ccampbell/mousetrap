@@ -19,7 +19,8 @@
  * @version 1.1.2
  * @url craig.is/killing/mice
  */
-window.Mousetrap = (function() {
+define(
+(function() {
 
     /**
      * mapping of special keycodes to their corresponding keys
@@ -791,4 +792,5 @@ window.Mousetrap = (function() {
             _direct_map = {};
         }
     };
-}) ();
+}) ()
+);
