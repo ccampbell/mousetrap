@@ -742,6 +742,7 @@
         bind: function(keys, callback, action) {
             _bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
             _direct_map[keys + ':' + action] = callback;
+            return this;
         },
 
         /**
@@ -766,6 +767,7 @@
                 delete _direct_map[keys + ':' + action];
                 this.bind(keys, function() {}, action);
             }
+            return this;
         },
 
         /**
@@ -777,6 +779,7 @@
          */
         trigger: function(keys, action) {
             _direct_map[keys + ':' + action]();
+            return this;
         },
 
         /**
@@ -789,6 +792,7 @@
         reset: function() {
             _callbacks = {};
             _direct_map = {};
+            return this;
         }
     };
 
