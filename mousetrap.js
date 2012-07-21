@@ -728,8 +728,7 @@
          * binds an event to mousetrap
          *
          * can be a single key, a combination of keys separated with +,
-         * a comma separated list of keys, an array of keys, or
-         * a sequence of keys separated by spaces
+         * an array of keys, or a sequence of keys separated by spaces
          *
          * be sure to list the modifier keys first to make sure that the
          * correct key ends up getting bound (the last key in the pattern)
