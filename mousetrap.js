@@ -793,6 +793,20 @@
             _callbacks = {};
             _direct_map = {};
             return this;
+        },
+
+        /**
+         * extends the keyboard codes with custom mapping
+         *
+         * @returns void
+         */
+        extend: function (object) {
+            var key;
+            for (key in object) {
+                if (object.hasOwnProperty(key)) {
+                    _KEYCODE_MAP[key] = object[key];
+                }
+            }
         }
     };
 
