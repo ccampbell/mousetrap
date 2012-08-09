@@ -178,7 +178,17 @@
          *
          * @type {boolean|string}
          */
-        _inside_sequence = false;
+        _inside_sequence = false,
+
+        /**
+         * which classes should always fire events?
+         * some elements will by default not fire events. If they have a
+         * class listed here, they will always fire, even if exluded
+         * elsewhere.
+         *
+         * @type {Array}
+         */
+        _class_whitelist = ['mousetrap'];
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -245,11 +255,15 @@
      */
     function _stop(e) {
         var element = e.target || e.srcElement,
-            tag_name = element.tagName;
+            tag_name = element.tagName,
+            class_index;
 
-        // if the element has the class "mousetrap" then no need to stop
-        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
-            return false;
+        // if the element has a class in _class_whitelist
+        // then no need to stop
+        for (class_index in _class_whitelist) {
+            if ((' ' + element.className + ' ').indexOf(' ' + _class_whitelist[class_index] + ' ') > -1) {
+                return false;
+            }
         }
 
         // stop for input, select, and textarea
@@ -779,6 +793,43 @@
          */
         trigger: function(keys, action) {
             _direct_map[keys + ':' + action]();
+            return this;
+        },
+
+        /**
+         * add classes to the class whitelist
+         *
+         * if an element has a class listed in the class whitelist, it will
+         * always fire events, even if that element normally would not.
+         *
+         * @param {string|Array} classes
+         */
+        whitelist: function(classes) {
+            classes = classes instanceof Array ? classes | [classes];
+            classes.forEach(function(clazz) {
+                if (_class_whitelist.indexOf(clazz) === -1) {
+                    _class_whitelist.push(clazz);
+                }
+            }
+            return this;
+        },
+
+        /**
+         * remove classes from the class whitelist
+         *
+         * if an element has a class listed in the class whitelist, it will
+         * always fire events, even if that element normally would not.
+         *
+         * @param {string|Array} classes
+         */
+        unwhitelist: function(classes) {
+            classes = classes instanceof Array ? classes | [classes];
+            classes.forEach(function(clazz) {
+                var index = _class_whitelist.indexOf(clazz);
+                if (index !== -1) {
+                    _class_whitelist.slice(index, 1);
+                }
+            }
             return this;
         },
 
