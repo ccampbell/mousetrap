@@ -298,7 +298,7 @@
      *
      * @param {string} character
      * @param {Array} modifiers
-     * @param {Event} e
+     * @param {Event|Object} e
      * @param {boolean=} remove - should we remove any matches
      * @param {string=} combination
      * @returns {Array}
