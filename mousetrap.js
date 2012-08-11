@@ -298,15 +298,16 @@
      *
      * @param {string} character
      * @param {Array} modifiers
-     * @param {string} action
+     * @param {Event} e
      * @param {boolean=} remove - should we remove any matches
      * @param {string=} combination
      * @returns {Array}
      */
-    function _getMatches(character, modifiers, action, remove, combination) {
+    function _getMatches(character, modifiers, e, remove, combination) {
         var i,
             callback,
-            matches = [];
+            matches = [],
+            action = e.type;
 
         // if there are no events related to this keycode
         if (!_callbacks[character]) {
@@ -338,7 +339,7 @@
             // if this is a keypress event that means that we need to only
             // look at the character, otherwise check the modifiers as
             // well
-            if (action == 'keypress' || _modifiersMatch(modifiers, callback.modifiers)) {
+            if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
 
                 // remove is used so if you change your mind and call bind a
                 // second time with a new function the first one is overwritten
@@ -420,7 +421,7 @@
             return;
         }
 
-        var callbacks = _getMatches(character, _eventModifiers(e), e.type),
+        var callbacks = _getMatches(character, _eventModifiers(e), e),
             i,
             do_not_reset = {},
             processed_sequence_callback = false;
@@ -685,7 +686,7 @@
         }
 
         // remove an existing match if there is one
-        _getMatches(key, modifiers, action, !sequence_name, combination);
+        _getMatches(key, modifiers, {type: action}, !sequence_name, combination);
 
         // add this call back to the array
         // if it is a sequence put it at the beginning
