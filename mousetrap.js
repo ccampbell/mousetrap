@@ -336,9 +336,13 @@
                 continue;
             }
 
-            // if this is a keypress event that means that we need to only
-            // look at the character, otherwise check the modifiers as
-            // well
+            // if this is a keypress event and the meta key and control key
+            // are not pressed that means that we need to only look at the
+            // character, otherwise check the modifiers as well
+            //
+            // chrome will not fire a keypress if meta or control is down
+            // safari will fire a keypress if meta or meta+shift is down
+            // firefox will fire a keypress if meta or control is down
             if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
 
                 // remove is used so if you change your mind and call bind a
