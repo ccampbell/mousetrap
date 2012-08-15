@@ -16,7 +16,7 @@
  * Mousetrap is a simple keyboard shortcut library for Javascript with
  * no external dependencies
  *
- * @version 1.1.2
+ * @version 1.1.3
  * @url craig.is/killing/mice
  */
 (function() {
@@ -298,15 +298,16 @@
      *
      * @param {string} character
      * @param {Array} modifiers
-     * @param {string} action
+     * @param {Event|Object} e
      * @param {boolean=} remove - should we remove any matches
      * @param {string=} combination
      * @returns {Array}
      */
-    function _getMatches(character, modifiers, action, remove, combination) {
+    function _getMatches(character, modifiers, e, remove, combination) {
         var i,
             callback,
-            matches = [];
+            matches = [],
+            action = e.type;
 
         // if there are no events related to this keycode
         if (!_callbacks[character]) {
@@ -335,10 +336,14 @@
                 continue;
             }
 
-            // if this is a keypress event that means that we need to only
-            // look at the character, otherwise check the modifiers as
-            // well
-            if (action == 'keypress' || _modifiersMatch(modifiers, callback.modifiers)) {
+            // if this is a keypress event and the meta key and control key
+            // are not pressed that means that we need to only look at the
+            // character, otherwise check the modifiers as well
+            //
+            // chrome will not fire a keypress if meta or control is down
+            // safari will fire a keypress if meta or meta+shift is down
+            // firefox will fire a keypress if meta or control is down
+            if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
 
                 // remove is used so if you change your mind and call bind a
                 // second time with a new function the first one is overwritten
@@ -420,7 +425,7 @@
             return;
         }
 
-        var callbacks = _getMatches(character, _eventModifiers(e), e.type),
+        var callbacks = _getMatches(character, _eventModifiers(e), e),
             i,
             do_not_reset = {},
             processed_sequence_callback = false;
@@ -685,7 +690,7 @@
         }
 
         // remove an existing match if there is one
-        _getMatches(key, modifiers, action, !sequence_name, combination);
+        _getMatches(key, modifiers, {type: action}, !sequence_name, combination);
 
         // add this call back to the array
         // if it is a sequence put it at the beginning
@@ -728,8 +733,7 @@
          * binds an event to mousetrap
          *
          * can be a single key, a combination of keys separated with +,
-         * a comma separated list of keys, an array of keys, or
-         * a sequence of keys separated by spaces
+         * an array of keys, or a sequence of keys separated by spaces
          *
          * be sure to list the modifier keys first to make sure that the
          * correct key ends up getting bound (the last key in the pattern)
