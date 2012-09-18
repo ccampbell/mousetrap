@@ -238,25 +238,6 @@
     }
 
     /**
-     * should we stop this event before firing off callbacks
-     *
-     * @param {Event} e
-     * @return {boolean}
-     */
-    function _stop(e) {
-        var element = e.target || e.srcElement,
-            tag_name = element.tagName;
-
-        // if the element has the class "mousetrap" then no need to stop
-        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
-            return false;
-        }
-
-        // stop for input, select, and textarea
-        return tag_name == 'INPUT' || tag_name == 'SELECT' || tag_name == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
-    }
-
-    /**
      * checks if two arrays are equal
      *
      * @param {Array} modifiers1
@@ -421,7 +402,7 @@
     function _handleCharacter(character, e) {
 
         // if this event should not happen stop here
-        if (_stop(e)) {
+        if (Mousetrap.stopCallback(e)) {
             return;
         }
 
@@ -797,6 +778,25 @@
             _callbacks = {};
             _direct_map = {};
             return this;
+        },
+
+       /**
+        * should we stop this event before firing off callbacks
+        *
+        * @param {Event} e
+        * @return {boolean}
+        */
+        stopCallback: function(e) {
+            var element = e.target || e.srcElement,
+                tag_name = element.tagName;
+
+            // if the element has the class "mousetrap" then no need to stop
+            if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+                return false;
+            }
+
+            // stop for input, select, and textarea
+            return tag_name == 'INPUT' || tag_name == 'SELECT' || tag_name == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
         }
     };
 
