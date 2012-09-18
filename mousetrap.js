@@ -403,7 +403,7 @@
     function _handleCharacter(character, e) {
 
         // if this event should not happen stop here
-        if (Mousetrap.stopCallback(e)) {
+        if (Mousetrap.stopCallback(e, e.target || e.srcElement)) {
             return;
         }
 
@@ -786,11 +786,12 @@
         * should we stop this event before firing off callbacks
         *
         * @param {Event} e
+        * @param {Element} element
         * @return {boolean}
         */
-        stopCallback: function(e) {
             var element = e.target || e.srcElement,
                 tag_name = element.tagName;
+        stopCallback: function(e, element) {
 
             // if the element has the class "mousetrap" then no need to stop
             if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
