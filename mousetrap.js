@@ -789,8 +789,6 @@
         * @param {Element} element
         * @return {boolean}
         */
-            var element = e.target || e.srcElement,
-                tag_name = element.tagName;
         stopCallback: function(e, element) {
 
             // if the element has the class "mousetrap" then no need to stop
@@ -799,7 +797,7 @@
             }
 
             // stop for input, select, and textarea
-            return tag_name == 'INPUT' || tag_name == 'SELECT' || tag_name == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
+            return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
         }
     };
 
