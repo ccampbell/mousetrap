@@ -205,7 +205,8 @@
      */
     function _addEvent(object, type, callback) {
         if (object.addEventListener) {
-            return object.addEventListener(type, callback, false);
+            object.addEventListener(type, callback, false);
+            return;
         }
 
         object.attachEvent('on' + type, callback);
@@ -631,7 +632,8 @@
         // if this pattern is a sequence of keys then run through this method
         // to reprocess each pattern one key at a time
         if (sequence.length > 1) {
-            return _bindSequence(combination, sequence, callback, action);
+            _bindSequence(combination, sequence, callback, action);
+            return;
         }
 
         // take the keys from this pattern and figure out what the actual
