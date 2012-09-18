@@ -710,7 +710,7 @@
     _addEvent(document, 'keydown', _handleKey);
     _addEvent(document, 'keyup', _handleKey);
 
-    var mousetrap = {
+    var Mousetrap = {
 
         /**
          * binds an event to mousetrap
@@ -804,10 +804,10 @@
     };
 
     // expose mousetrap to the global object
-    window.Mousetrap = mousetrap;
+    window.Mousetrap = Mousetrap;
 
     // expose mousetrap as an AMD module
     if (typeof define == 'function' && define.amd) {
-        define('mousetrap', function() { return mousetrap; });
+        define('mousetrap', function() { return Mousetrap; });
     }
 }) ();
