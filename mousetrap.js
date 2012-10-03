@@ -205,7 +205,8 @@
      */
     function _addEvent(object, type, callback) {
         if (object.addEventListener) {
-            return object.addEventListener(type, callback, false);
+            object.addEventListener(type, callback, false);
+            return;
         }
 
         object.attachEvent('on' + type, callback);
@@ -235,25 +236,6 @@
 
         // if it is not in the special map
         return String.fromCharCode(e.which).toLowerCase();
-    }
-
-    /**
-     * should we stop this event before firing off callbacks
-     *
-     * @param {Event} e
-     * @return {boolean}
-     */
-    function _stop(e) {
-        var element = e.target || e.srcElement,
-            tag_name = element.tagName;
-
-        // if the element has the class "mousetrap" then no need to stop
-        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
-            return false;
-        }
-
-        // stop for input, select, and textarea
-        return tag_name == 'INPUT' || tag_name == 'SELECT' || tag_name == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
     }
 
     /**
@@ -421,7 +403,7 @@
     function _handleCharacter(character, e) {
 
         // if this event should not happen stop here
-        if (_stop(e)) {
+        if (Mousetrap.stopCallback(e, e.target || e.srcElement)) {
             return;
         }
 
@@ -652,7 +634,8 @@
         // if this pattern is a sequence of keys then run through this method
         // to reprocess each pattern one key at a time
         if (sequence.length > 1) {
-            return _bindSequence(combination, sequence, callback, action);
+            _bindSequence(combination, sequence, callback, action);
+            return;
         }
 
         // take the keys from this pattern and figure out what the actual
@@ -729,7 +712,7 @@
     _addEvent(document, 'keydown', _handleKey);
     _addEvent(document, 'keyup', _handleKey);
 
-    var mousetrap = {
+    var Mousetrap = {
 
         /**
          * binds an event to mousetrap
@@ -799,14 +782,32 @@
             _callbacks = {};
             _direct_map = {};
             return this;
+        },
+
+       /**
+        * should we stop this event before firing off callbacks
+        *
+        * @param {Event} e
+        * @param {Element} element
+        * @return {boolean}
+        */
+        stopCallback: function(e, element) {
+
+            // if the element has the class "mousetrap" then no need to stop
+            if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+                return false;
+            }
+
+            // stop for input, select, and textarea
+            return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
         }
     };
 
     // expose mousetrap to the global object
-    window.Mousetrap = mousetrap;
+    window.Mousetrap = Mousetrap;
 
     // expose mousetrap as an AMD module
     if (typeof define == 'function' && define.amd) {
-        define('mousetrap', function() { return mousetrap; });
+        define('mousetrap', function() { return Mousetrap; });
     }
 }) ();
