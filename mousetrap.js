@@ -733,14 +733,20 @@
          *
          * @param {string|Array} keys
          * @param {Function} callback
-         * @param {string=} action - 'keypress', 'keydown', or 'keyup'
+         * @param {object} options - includes optional arguments: 
+         *      action ('keypress', 'keydown', or 'keyup') - type of event to listen for,
+         *      includeEditable (boolean) - if set to true, the callback will fire even if the cursor is focused on an editable element (input, select, textarea)
          * @param {boolean|undefined} indicates whether to fire the callback on editable elements or not
          * @returns void
          */
-        bind: function(keys, callback, action, suppressOnEditable) {
+        bind: function(keys, callback, options) {
+            // if it's a string, treat options as action for backward compatibility
+            var action = typeof options === 'string' ? options : options && options.action;
             _bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
             _direct_map[keys + ':' + action] = callback;
-            suppressOnEditable && _suppressedCallbacks.push(callback);
+            if (!options || !options.includeEditable) {
+                _suppressedCallbacks.push(callback);
+            }
             return this;
         },
 
