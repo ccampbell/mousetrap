@@ -172,6 +172,14 @@
          */
         _ignore_next_keyup = false,
 
+
+        /**
+         * List of callbacks that should not be fired if invoked on input, select or textarea
+         *
+         * @type {boolean|string}
+         */
+        _suppressedCallbacks = [],
+
         /**
          * are we currently inside of a sequence?
          * type of action ("keyup" or "keydown" or "keypress") or false
@@ -379,14 +387,14 @@
      * @returns void
      */
     function _fireCallback(callback, e) {
-        if (callback(e) === false) {
-            if (e.preventDefault) {
-                e.preventDefault();
-            }
 
-            if (e.stopPropagation) {
-                e.stopPropagation();
-            }
+        if (_suppressedCallbacks.indexOf(callback) !== -1 && Mousetrap.stopCallback(e, e.target || e.srcElement)) {
+            return;
+        }
+        if (callback(e) === false) {
+
+            e.preventDefault && e.preventDefault();
+            e.stopPropagation && e.stopPropagation();
 
             e.returnValue = false;
             e.cancelBubble = true;
@@ -403,9 +411,9 @@
     function _handleCharacter(character, e) {
 
         // if this event should not happen stop here
-        if (Mousetrap.stopCallback(e, e.target || e.srcElement)) {
+        /*if (Mousetrap.stopCallback(e, e.target || e.srcElement)) {
             return;
-        }
+        }*/
 
         var callbacks = _getMatches(character, _eventModifiers(e), e),
             i,
@@ -725,12 +733,20 @@
          *
          * @param {string|Array} keys
          * @param {Function} callback
-         * @param {string=} action - 'keypress', 'keydown', or 'keyup'
+         * @param {object} options - includes optional arguments: 
+         *      action ('keypress', 'keydown', or 'keyup') - type of event to listen for,
+         *      includeEditable (boolean) - if set to true, the callback will fire even if the cursor is focused on an editable element (input, select, textarea)
+         * @param {boolean|undefined} indicates whether to fire the callback on editable elements or not
          * @returns void
          */
-        bind: function(keys, callback, action) {
+        bind: function(keys, callback, options) {
+            // if it's a string, treat options as action for backward compatibility
+            var action = typeof options === 'string' ? options : options && options.action;
             _bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
             _direct_map[keys + ':' + action] = callback;
+            if (!options || !options.includeEditable) {
+                _suppressedCallbacks.push(callback);
+            }
             return this;
         },
 
@@ -798,8 +814,8 @@
                 return false;
             }
 
-            // stop for input, select, and textarea
-            return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
+            // stop for input, select, textarea, or any other editable element
+            return element.tagName === 'INPUT' || element.tagName === 'SELECT' || element.tagName === 'TEXTAREA' || (element.isContentEditable && element.isContentEditable());
         }
     };
 
@@ -807,7 +823,7 @@
     window.Mousetrap = Mousetrap;
 
     // expose mousetrap as an AMD module
-    if (typeof define == 'function' && define.amd) {
+    if (typeof define === 'function' && define.amd) {
         define('mousetrap', function() { return Mousetrap; });
     }
 }) ();
