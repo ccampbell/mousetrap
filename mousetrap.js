@@ -378,8 +378,8 @@
      * @param {Event} e
      * @returns void
      */
-    function _fireCallback(callback, e) {
-        if (callback(e) === false) {
+    function _fireCallback(callback, e, shortcut) {
+        if (callback(e, shortcut) === false) {
             if (e.preventDefault) {
                 e.preventDefault();
             }
@@ -425,14 +425,14 @@
 
                 // keep a list of which sequences were matches for later
                 do_not_reset[callbacks[i].seq] = 1;
-                _fireCallback(callbacks[i].callback, e);
+                _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
                 continue;
             }
 
             // if there were no sequence matches but we are still here
             // that means this is a regular match so we should fire that
             if (!processed_sequence_callback && !_inside_sequence) {
-                _fireCallback(callbacks[i].callback, e);
+                _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
             }
         }
 
@@ -585,7 +585,7 @@
              * @returns void
              */
             _callbackAndReset = function(e) {
-                _fireCallback(callback, e);
+                _fireCallback(callback, e, combo);
 
                 // we should ignore the next key up if the action is key down
                 // or keypress.  this is so if you finish a sequence and
