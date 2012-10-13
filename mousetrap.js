@@ -378,14 +378,14 @@
      * @param {Event} e
      * @returns void
      */
-    function _fireCallback(callback, e, shortcut) {
+    function _fireCallback(callback, e, combo) {
 
         // if this event should not happen stop here
-        if (Mousetrap.stopCallback(e, e.target || e.srcElement, shortcut)) {
+        if (Mousetrap.stopCallback(e, e.target || e.srcElement, combo)) {
             return;
         }
 
-        if (callback(e, shortcut) === false) {
+        if (callback(e, combo) === false) {
             if (e.preventDefault) {
                 e.preventDefault();
             }
