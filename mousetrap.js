@@ -807,7 +807,7 @@
     window.Mousetrap = Mousetrap;
 
     // expose mousetrap as an AMD module
-    if (typeof define == 'function' && define.amd) {
+    if (typeof define === 'function' && define.amd) {
         define('mousetrap', function() { return Mousetrap; });
     }
 }) ();
