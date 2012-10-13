@@ -16,7 +16,7 @@
  * Mousetrap is a simple keyboard shortcut library for Javascript with
  * no external dependencies
  *
- * @version 1.1.3
+ * @version 1.1.4
  * @url craig.is/killing/mice
  */
 (function() {
@@ -454,7 +454,9 @@
 
         // normalize e.which for key events
         // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
-        e.which = typeof e.which == "number" ? e.which : e.keyCode;
+        if (typeof e.which !== 'number') {
+            e.which = e.keyCode;
+        }
 
         var character = _characterFromEvent(e);
 
