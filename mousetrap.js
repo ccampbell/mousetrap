@@ -379,6 +379,12 @@
      * @returns void
      */
     function _fireCallback(callback, e, shortcut) {
+
+        // if this event should not happen stop here
+        if (Mousetrap.stopCallback(e, e.target || e.srcElement, shortcut)) {
+            return;
+        }
+
         if (callback(e, shortcut) === false) {
             if (e.preventDefault) {
                 e.preventDefault();
@@ -401,12 +407,6 @@
      * @returns void
      */
     function _handleCharacter(character, e) {
-
-        // if this event should not happen stop here
-        if (Mousetrap.stopCallback(e, e.target || e.srcElement)) {
-            return;
-        }
-
         var callbacks = _getMatches(character, _eventModifiers(e), e),
             i,
             do_not_reset = {},
@@ -789,7 +789,7 @@
         * @param {Element} element
         * @return {boolean}
         */
-        stopCallback: function(e, element) {
+        stopCallback: function(e, element, combo) {
 
             // if the element has the class "mousetrap" then no need to stop
             if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
