@@ -808,8 +808,8 @@
                 return false;
             }
 
-            // stop for input, select, and textarea
-            return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
+            // stop for input, select, textarea, or any other editable element
+            return element.tagName === 'INPUT' || element.tagName === 'SELECT' || element.tagName === 'TEXTAREA' || (element.isContentEditable && element.isContentEditable());
         }
     };
 
@@ -817,7 +817,7 @@
     window.Mousetrap = Mousetrap;
 
     // expose mousetrap as an AMD module
-    if (typeof define == 'function' && define.amd) {
+    if (typeof define === 'function' && define.amd) {
         define('mousetrap', function() { return Mousetrap; });
     }
 }) ();
