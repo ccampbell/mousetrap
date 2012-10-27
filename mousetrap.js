@@ -621,10 +621,9 @@
      * @returns void
      */
     function _bindSingle(combination, callback, action, sequence_name, level) {
-
-        // make sure multiple spaces in a row become a single space
-        combination = combination.replace(/\s+/g, ' ');
-
+	        // make sure multiple spaces in a row become a single space
+		combination = combination.replace(/\s+/g, ' ');
+		
         var sequence = combination.split(' '),
             i,
             key,
@@ -702,9 +701,10 @@
      * @returns void
      */
     function _bindMultiple(combinations, callback, action) {
-        for (var i = 0; i < combinations.length; ++i) {
-            _bindSingle(combinations[i], callback, action);
-        }
+		for (var i = 0; i < combinations.length; ++i) {		
+		for (var name in combinations[i]) {
+  			_bindSingle(name, combinations[i][name], action);
+        }}
     }
 
     // start!
@@ -729,7 +729,7 @@
          * @returns void
          */
         bind: function(keys, callback, action) {
-            _bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
+			_bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
             _direct_map[keys + ':' + action] = callback;
             return this;
         },
