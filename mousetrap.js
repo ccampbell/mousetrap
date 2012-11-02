@@ -726,11 +726,15 @@
          * @param {string|Array} keys
          * @param {Function} callback
          * @param {string=} action - 'keypress', 'keydown', or 'keyup'
+         * @param {Object} context The 'this' object to invoke the callback on
          * @returns void
          */
-        bind: function(keys, callback, action) {
-            _bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
-            _direct_map[keys + ':' + action] = callback;
+        bind: function(keys, callback, action, context) {
+            var contextualCallback = function(e, combo) {
+                callback.call(context, e, combo);
+            };
+            _bindMultiple(keys instanceof Array ? keys : [keys], context ? contextualCallback : callback, action);
+            _direct_map[keys + ':' + action] = context ? contextualCallback : callback;
             return this;
         },
 
