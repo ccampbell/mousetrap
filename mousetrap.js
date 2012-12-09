@@ -178,7 +178,7 @@
          *
          * @type {boolean|string}
          */
-        _inside_sequence = false;
+        _sequence_type = false;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -270,7 +270,7 @@
         }
 
         if (!active_sequences) {
-            _inside_sequence = false;
+            _sequence_type = false;
         }
     }
 
@@ -436,7 +436,7 @@
 
             // if there were no sequence matches but we are still here
             // that means this is a regular match so we should fire that
-            if (!processed_sequence_callback && !_inside_sequence) {
+            if (!processed_sequence_callback && !_sequence_type) {
                 _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
             }
         }
@@ -444,7 +444,7 @@
         // if you are inside of a sequence and the key you are pressing
         // is not a modifier key then we should reset all sequences
         // that were not matched by this key event
-        if (e.type == _inside_sequence && !_isModifier(character)) {
+        if (e.type == _sequence_type && !_isModifier(character)) {
             _resetSequences(do_not_reset, max_level);
         }
     }
@@ -579,7 +579,7 @@
          * @returns void
          */
         var _increaseSequence = function(e) {
-                _inside_sequence = action;
+                _sequence_type = action;
                 ++_sequence_levels[combo];
                 _resetSequenceTimer();
             },
