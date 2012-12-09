@@ -255,14 +255,14 @@
      * @param {Object} do_not_reset
      * @returns void
      */
-    function _resetSequences(do_not_reset) {
+    function _resetSequences(do_not_reset, max_level) {
         do_not_reset = do_not_reset || {};
 
         var active_sequences = false,
             key;
 
         for (key in _sequence_levels) {
-            if (do_not_reset[key]) {
+            if (do_not_reset[key] && _sequence_levels[key] > max_level) {
                 active_sequences = true;
                 continue;
             }
@@ -410,6 +410,7 @@
         var callbacks = _getMatches(character, _eventModifiers(e), e),
             i,
             do_not_reset = {},
+            max_level = 0,
             processed_sequence_callback = false;
 
         // loop through matching callbacks for this key event
@@ -422,6 +423,10 @@
             // match the first one
             if (callbacks[i].seq) {
                 processed_sequence_callback = true;
+
+                // as we loop through keep track of the max
+                // any sequence at a lower level will be discarded
+                max_level = Math.max(max_level, callbacks[i].level);
 
                 // keep a list of which sequences were matches for later
                 do_not_reset[callbacks[i].seq] = 1;
@@ -440,7 +445,7 @@
         // is not a modifier key then we should reset all sequences
         // that were not matched by this key event
         if (e.type == _inside_sequence && !_isModifier(character)) {
-            _resetSequences(do_not_reset);
+            _resetSequences(do_not_reset, max_level);
         }
     }
 
