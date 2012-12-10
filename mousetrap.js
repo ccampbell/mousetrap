@@ -849,14 +849,23 @@
                                     z-index:1002;\
                                     overflow: auto;\
                                 }\
+                                .mousetrap_key\
+                                { color: red; }\
                             </style>\
                             <div id='light' class='white_content'>";
             
             for (var charSeq in _direct_map)
             {
                 //Get only the key seq part of the charSeq:condition tuple:
-                var shortcut = charSeq.slice(0, charSeq.lastIndexOf(":"))
-                mappingHtml += shortcut + ": Some explanation" + "<br>";
+                var shortcut = charSeq.slice(0, charSeq.lastIndexOf(":"));
+                var seqHTML = "<span class='mousetrap_key'>";
+                
+                //Change spaces to " then " like gmail does for sequences:
+                shortcut = shortcut.replace(/ /g, "</span> then <span class='mousetrap_key'>");
+                seqHTML += shortcut;
+                seqHTML += "</span>";
+                
+                mappingHtml += seqHTML + ": Some explanation" + "<br>";
             }
             
             mappingHtml += '</div><div id="fade" class="black_overlay"></div>';
