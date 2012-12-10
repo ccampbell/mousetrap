@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<meta charset=utf-8>
+<link href="peanutbutter.css" rel="stylesheet">
+<body>
+    <script src="jquery-1.7.2.min.js"></script>
+    <script src="../mousetrap.js"></script>
+        
+    <script>
+        $(document).ready(function() {
+            console.log("Started.");
+            Mousetrap.bind('4', function() { console.log('4'); });
+            Mousetrap.bind(':', function() { console.log('loler'); });
+            
+        
+            // combinations
+            Mousetrap.bind('command+shift+K', function() { console.log('command shift k'); });
+        
+            // map multiple combinations to the same callback
+            Mousetrap.bind(['command+k', 'ctrl+k'], function() {
+                console.log('command k or control k');
+        
+                // return false to prevent default browser behavior
+                // and stop event from bubbling
+                return false;
+            });
+        
+            // gmail style sequences
+            Mousetrap.bind('g i', function() { console.log('go to inbox'); });
+            Mousetrap.bind('* a', function() { console.log('select all'); });
+        
+            // konami code!
+            Mousetrap.bind('up up down down left right left right b a enter', function() {
+                console.log('konami code');
+            });
+    
+    
+            
+            var html = Mousetrap.showHelp();
+            $("#another_log").html(html);
+            
+        });
+        
+        
+        
+        function show_help()
+        {
+            console.log("I'm awesome");
+        }
+        
+        
+        
+    </script>
+    <div id="another_log">
+        
+    </div>
+    <textarea id="log">
+        
+    </textarea>
+</body>

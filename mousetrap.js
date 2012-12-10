@@ -178,7 +178,15 @@
          *
          * @type {boolean|string}
          */
-        _sequence_type = false;
+        _sequence_type = false,
+        
+        /**
+         * The shortcut help div that should be added and removed as we want
+         * to show or hide the help.
+         *
+         * @type {Object}
+         */
+        _help_div;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -805,11 +813,79 @@
 
             // stop for input, select, and textarea
             return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
-        }
+        },
+        
+        showHelp: function(e, combo)
+        {
+            //If _help_div is not null we're already showing help, so don't render it again:
+            if (_help_div)
+            {
+                return;
+            }
+            console.log("showing help");
+            //Create the textual mapping html:
+            mappingHtml = "<style>\
+                                .black_overlay{\
+                                    position: absolute;\
+                                    top: 0%;\
+                                    left: 0%;\
+                                    width: 100%;\
+                                    height: 100%;\
+                                    background-color: black;\
+                                    z-index:1001;\
+                                    -moz-opacity: 0.8;\
+                                    opacity:.80;\
+                                    filter: alpha(opacity=80);\
+                                }\
+                                .white_content {\
+                                    position: absolute;\
+                                    top: 25%;\
+                                    left: 25%;\
+                                    width: 50%;\
+                                    height: 50%;\
+                                    padding: 16px;\
+                                    border: 16px solid orange;\
+                                    background-color: white;\
+                                    z-index:1002;\
+                                    overflow: auto;\
+                                }\
+                            </style>\
+                            <div id='light' class='white_content'>";
+            
+            for (var charSeq in _direct_map)
+            {
+                //Get only the key seq part of the charSeq:condition tuple:
+                var shortcut = charSeq.slice(0, charSeq.lastIndexOf(":"))
+                mappingHtml += shortcut + ": Some explanation" + "<br>";
+            }
+            
+            mappingHtml += '</div><div id="fade" class="black_overlay"></div>';
+            _help_div = document.createElement("div");
+            _help_div.innerHTML = mappingHtml;
+            document.getElementsByTagName('body')[0].appendChild(_help_div);
+            
+            Mousetrap.bind('esc', Mousetrap.hideHelp);
+        },
+        
+        hideHelp: function(e, combo)
+        {
+            //If the _help_div doesn't exist we're not showing help and there is nothing
+            //to hide:
+            if (!_help_div)
+            {
+                return;
+            }
+            console.log("hiding");
+            document.getElementsByTagName('body')[0].removeChild(_help_div);
+            _help_div = null;
+        },
     };
 
     // expose mousetrap to the global object
     window.Mousetrap = Mousetrap;
+    
+    //Add the help lightbox shortcut:
+    Mousetrap.bind('?', Mousetrap.showHelp);
 
     // expose mousetrap as an AMD module
     if (typeof define === 'function' && define.amd) {
