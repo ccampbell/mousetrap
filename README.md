@@ -35,12 +35,12 @@ If you would like to donate to help support Mousetrap development use [Gittip](h
 
         // map multiple combinations to the same callback
         Mousetrap.bind(['command+k', 'ctrl+k'], function() {
-            console.log('command k or control k', undefined, "Multiple shortcuts share the help text.");
+            console.log('command k or control k');
 
             // return false to prevent default browser behavior
             // and stop event from bubbling
             return false;
-        });
+        }, undefined, "Multiple shortcuts share the help text.");
 
         // gmail style sequences
         Mousetrap.bind('g i', function() { console.log('go to inbox'); }, undefined, "Go to inbox");
