@@ -143,7 +143,7 @@
          *
          * @type {string}
         */
-        _CSS_HELP_STYLE = ".mousetrap_lightbox{font-family:arial,sans-serif;position:absolute;top:10%;left:15%;width:65%;height:65%;border-radius:10px;background-color:#222;opacity:0.85;z-index:1002;overflow:auto;color:#FFF;display:table;padding:40px;}#mousetrap_title{margin-left:20px;padding-bottom:10px;}#mousetrap_table{margin:7px;}#mousetrap_table > div{display:table-row;}#mousetrap_table > div > div{display:table-cell;padding:2px 4px;}#mousetrap_table > div > div:nth-child(1){width:50%;}#mousetrap_table > div > div:nth-child(3){width:47%;}.mousetrap_key{font-family:'courier new', monospace;font-size:120%;color:#FF0;}.mousetrap_sequence{text-align:right;}",
+        _CSS_HELP_STYLE = ".mousetrap_lightbox{font-family:arial,sans-serif;position:fixed;top:10%;left:15%;width:65%;height:65%;border-radius:10px;background-color:#222;opacity:0.85;z-index:1002;overflow:auto;color:#FFF;display:table;padding:25px;}#mousetrap_title{margin-left:20px;padding-bottom:10px;font-size:1.17em;font-weight:700;}#mousetrap_table{margin:7px;}#mousetrap_table > div{display:table-row;}#mousetrap_table > div > div{display:table-cell;padding:2px 4px;}#mousetrap_table > div > div:nth-child(1){width:50%;}#mousetrap_table > div > div:nth-child(3){width:47%;}.mousetrap_key{font-family:'courier new', monospace;font-size:120%;color:#FF0;}.mousetrap_sequence{text-align:right;}",
         
         
         /* Private Variables */
@@ -833,6 +833,7 @@
             _callbacks = {};
             _direct_map = {};
             _help_map = {};
+            Mousetrap.bind('?', Mousetrap.toggleHelp);
             return this;
         },
 
@@ -886,7 +887,7 @@
             }
             
             //Start the lighbox HTML showing title and starting the div table to make it look pretty:
-            mappingHtml = "<div class='mousetrap_lightbox'><h3 id='mousetrap_title'>Keyboard Shortcuts</h3>";
+            mappingHtml = "<div class='mousetrap_lightbox'><span id='mousetrap_title'>Keyboard Shortcuts</span>";
             mappingHtml += "<div id='mousetrap_table'>";
             
             //Add all the mappings with their respective class:
@@ -895,6 +896,11 @@
                 //Get only the char sequence part of the charSeq:condition tuple. slice and this cluncky
                 //construct are used to make sure that a sequence containing : also works fine (split is weird):
                 var shortcut = charSeq.slice(0, charSeq.lastIndexOf(":"));
+                if (shortcut === "?")
+                {
+                    continue;
+                }
+                
                 //Change spaces to " then " like gmail does for sequences:
                 shortcut = shortcut.replace(/ /g, "</span> then <span class='mousetrap_key'>");
                 shortcut = shortcut.replace(/\+/g, "</span> + <span class='mousetrap_key'>");
