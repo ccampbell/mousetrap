@@ -6,6 +6,7 @@
 <p>For testing mousetrap</p>
 <p>When the row is highlighted press the key(s).  If you can't get anything to happen for a certain test press the f key to mark it as a failure</p>
 <p>This test is to test the default values if you don't specify an event type.  Basically it decides if it should default to keydown or keyup</p>
+<p>Don't forget to test whether the auto generated help workd (press "?").</p>
 <table>
     <thead>
         <tr>
@@ -30,7 +31,6 @@
     PeanutButter.addTest('-', ['keypress'], true);
     PeanutButter.addTest('$', ['keypress'], true);
     PeanutButter.addTest('[', ['keypress'], true);
-    PeanutButter.addTest('?', ['keypress'], true);
     PeanutButter.addTest('a', ['keypress'], true);
     PeanutButter.addTest('A', ['keypress'], true);
     PeanutButter.addTest('7', ['keypress'], true);

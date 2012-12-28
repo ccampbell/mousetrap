@@ -10,6 +10,7 @@ It is around **1.7kb** minified and gzipped and **3kb** minified, has no externa
 - Chrome
 
 It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific keys, keyboard combinations, or key sequences.
+It also auto generates a help page similiar to GMail's which can be brought up when pressing "?".
 
 If you would like to donate to help support Mousetrap development use [Gittip](https://www.gittip.com/ccampbell).
 
@@ -26,12 +27,11 @@ If you would like to donate to help support Mousetrap development use [Gittip](h
     ```html
     <script>
         // single keys
-        Mousetrap.bind('4', function() { console.log('4'); });
-        Mousetrap.bind("?", function() { console.log('show shortcuts!'); });
-        Mousetrap.bind('esc', function() { console.log('escape'); }, 'keyup');
+        Mousetrap.bind('4', function() { console.log('4'); }, undefined, "Help text goes here!");
+        Mousetrap.bind('esc', function() { console.log('escape'); }, 'keyup', "This text will be shown when ? is pressed.");
 
         // combinations
-        Mousetrap.bind('command+shift+K', function() { console.log('command shift k'); });
+        Mousetrap.bind('command+shift+K', function() { console.log('command shift k'); }, undefined, "This also logs to console!");
 
         // map multiple combinations to the same callback
         Mousetrap.bind(['command+k', 'ctrl+k'], function() {
@@ -40,16 +40,16 @@ If you would like to donate to help support Mousetrap development use [Gittip](h
             // return false to prevent default browser behavior
             // and stop event from bubbling
             return false;
-        });
+        }, undefined, "Multiple shortcuts share the help text.");
 
         // gmail style sequences
-        Mousetrap.bind('g i', function() { console.log('go to inbox'); });
-        Mousetrap.bind('* a', function() { console.log('select all'); });
+        Mousetrap.bind('g i', function() { console.log('go to inbox'); }, undefined, "Go to inbox");
+        Mousetrap.bind('* a', function() { console.log('select all'); }, undefined, "Select all");
 
         // konami code!
         Mousetrap.bind('up up down down left right left right b a enter', function() {
             console.log('konami code');
-        });
+        }, undefined, "You get an extra life.");
     </script>
     ```
 
@@ -58,8 +58,9 @@ If you would like to donate to help support Mousetrap development use [Gittip](h
 There are a number of other similar libraries out there so what makes this one different?
 
 - There are no external dependencies, no framework is required
+- A help popup is automatically created for you. You can also override its css to change its appearance.
 - You are not limited to ``keydown`` events (You can specify ``keypress``, ``keydown``, or ``keyup`` or let Mousetrap choose for you).
-- You can bind key events directly to special keys such as ``?`` or ``*`` without having to specify ``shift+/`` or ``shift+8`` which are not consistent across all keyboards
+- You can bind key events directly to special keys such as ``!`` or ``*`` without having to specify ``shift+/`` or ``shift+8`` which are not consistent across all keyboards
 - It works with international keyboard layouts
 - You can bind Gmail like key sequences in addition to regular keys and key combinations
 - You can programatically trigger key events with the ``trigger()`` method

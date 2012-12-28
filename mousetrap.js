@@ -20,7 +20,8 @@
  * @url craig.is/killing/mice
  */
 (function() {
-
+    /* Constants */
+    
     /**
      * mapping of special keycodes to their corresponding keys
      *
@@ -135,6 +136,17 @@
          * @type {Object|undefined}
          */
         _REVERSE_MAP,
+        
+        /*
+         * CSS style for the help overlay. Look at the unminified_help.css file
+         * for the unminified version.
+         *
+         * @type {string}
+        */
+        _CSS_HELP_STYLE = ".mousetrap_lightbox{font-family:arial,sans-serif;position:fixed;top:10%;left:15%;width:65%;height:65%;border-radius:10px;background-color:#222;opacity:0.85;z-index:1002;overflow:auto;color:#FFF;display:table;padding:25px;}#mousetrap_title{margin-left:20px;padding-bottom:10px;font-size:1.17em;font-weight:700;}#mousetrap_table{margin:7px;}#mousetrap_table > div{display:table-row;}#mousetrap_table > div > div{display:table-cell;padding:2px 4px;}#mousetrap_table > div > div:nth-child(1){width:50%;}#mousetrap_table > div > div:nth-child(3){width:47%;}.mousetrap_key{font-family:'courier new', monospace;font-size:120%;color:#FF0;}.mousetrap_sequence{text-align:right;}",
+        
+        
+        /* Private Variables */
 
         /**
          * a list of all the callbacks setup via Mousetrap.bind()
@@ -178,7 +190,31 @@
          *
          * @type {boolean|string}
          */
-        _sequence_type = false;
+        _sequence_type = false,
+        
+        
+        /**
+         * Maps the char sequence and action to the help text, kinda mirroring _direct_map
+         *
+         * @type {Object}
+         **/
+        _help_map = {},
+        
+        /**
+         * The shortcut help div that should be added and removed as we want
+         * to show or hide the help.
+         *
+         * @type {Object}
+         */
+        _help_div,
+        
+        /**
+         * Whether the help CSS was added to the DOM already. This should only happen once and only
+         * if the help is ever actualy used so to not to pollute the DOM.
+         *
+         * @type {Boolean}
+         */
+        _help_css_was_added = false;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -733,9 +769,14 @@
          * @param {string=} action - 'keypress', 'keydown', or 'keyup'
          * @returns void
          */
-        bind: function(keys, callback, action) {
+        bind: function(keys, callback, action, helpText) {
             _bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
             _direct_map[keys + ':' + action] = callback;
+            
+            //Figure out help text - either the parameter or the bound function name:
+            helpText = helpText || callback.name;
+            _help_map[keys + ':' + action] = helpText;
+            
             return this;
         },
 
@@ -761,6 +802,11 @@
                 delete _direct_map[keys + ':' + action];
                 this.bind(keys, function() {}, action);
             }
+            
+            if (_help_map[keys + ':' + action]) {
+                delete _help_map[keys + ':' + action];
+            }
+            
             return this;
         },
 
@@ -786,6 +832,8 @@
         reset: function() {
             _callbacks = {};
             _direct_map = {};
+            _help_map = {};
+            Mousetrap.bind('?', Mousetrap.toggleHelp);
             return this;
         },
 
@@ -805,11 +853,93 @@
 
             // stop for input, select, and textarea
             return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
-        }
+        },
+        
+        /*
+        * Toggle the help overlay - show it if hidden and hide if it is shown.
+        */
+        toggleHelp: function(e, combo)
+        {
+            //If _help_div is not null we're already showing help, so hide it instead:
+            if (_help_div)
+            {
+                Mousetrap.hideHelp(e, combo);
+                return;
+            }
+            Mousetrap.showHelp(e, combo);
+        },
+        
+        /**
+        * Show auto generated help overlay.
+        * This creates a ton of HTML and appends it to the DOM.
+        */
+        showHelp: function(e, combo)
+        {
+            //Only add CSS once:
+            if (!_help_css_was_added)
+            {
+                //Add the style element to just after the head so that other style declaration
+                //or linked CSS can override it:
+                var styleElement = document.createElement("style");
+                styleElement.innerHTML = _CSS_HELP_STYLE;
+                document.head.insertBefore(styleElement, document.head.firstChild);
+                _help_css_was_added = true;
+            }
+            
+            //Start the lighbox HTML showing title and starting the div table to make it look pretty:
+            mappingHtml = "<div class='mousetrap_lightbox'><span id='mousetrap_title'>Keyboard Shortcuts</span>";
+            mappingHtml += "<div id='mousetrap_table'>";
+            
+            //Add all the mappings with their respective class:
+            for (var charSeq in _direct_map)
+            {
+                //Get only the char sequence part of the charSeq:condition tuple. slice and this cluncky
+                //construct are used to make sure that a sequence containing : also works fine (split is weird):
+                var shortcut = charSeq.slice(0, charSeq.lastIndexOf(":"));
+                if (shortcut === "?")
+                {
+                    continue;
+                }
+                
+                //Change spaces to " then " like gmail does for sequences:
+                shortcut = shortcut.replace(/ /g, "</span> then <span class='mousetrap_key'>");
+                shortcut = shortcut.replace(/\+/g, "</span> + <span class='mousetrap_key'>");
+                shortcut = shortcut.replace(/,/g, "</span> , <span class='mousetrap_key'>");
+                
+                var seqHTML = "<div><div class='mousetrap_sequence'><span class='mousetrap_key'>";
+                seqHTML += shortcut;
+                seqHTML += "</span></div><div>:</div>";
+                
+                var helpText = _help_map[charSeq];
+                
+                mappingHtml += seqHTML + "<div class='mousetrap_explanation'>" + helpText + "</div></div>";
+            }
+            
+            mappingHtml += '</div>';
+            _help_div = document.createElement("div");
+            _help_div.innerHTML = mappingHtml;
+            document.getElementsByTagName('body')[0].appendChild(_help_div);
+            
+        },
+        
+        hideHelp: function(e, combo)
+        {
+            //If the _help_div doesn't exist we're not showing help and there is nothing
+            //to hide:
+            if (!_help_div)
+            {
+                return;
+            }
+            document.getElementsByTagName('body')[0].removeChild(_help_div);
+            _help_div = null;
+        },
     };
 
     // expose mousetrap to the global object
     window.Mousetrap = Mousetrap;
+    
+    //Add the help lightbox shortcut:
+    Mousetrap.bind('?', Mousetrap.toggleHelp);
 
     // expose mousetrap as an AMD module
     if (typeof define === 'function' && define.amd) {
