@@ -143,7 +143,7 @@
          *
          * @type {string}
         */
-        _CSS_HELP_STYLE = ".mousetrap_lightbox{font-family:arial,sans-serif;position:absolute;top:10%;left:15%;width:65%;height:65%;border-radius:10px;background-color:#222;opacity:0.85;z-index:1002;overflow:auto;color:#FFF;display:table;padding:40px;}#mousetrap_title{margin-left:20px;padding-bottom:10px;}#mousetrap_table{width:75%;margin-left:15px;}#mousetrap_table > div{display:table-row;}#mousetrap_table > div > div{display:table-cell;}.mousetrap_key{font-family:'courier new', monospace;font-size:120%;color:#FF0;}.mousetrap_explanation{padding-left:4px;}.mousetrap_sequence{min-width:30%;text-align:right;}",
+        _CSS_HELP_STYLE = ".mousetrap_lightbox{font-family:arial,sans-serif;position:absolute;top:10%;left:15%;width:65%;height:65%;border-radius:10px;background-color:#222;opacity:0.85;z-index:1002;overflow:auto;color:#FFF;display:table;padding:40px;}#mousetrap_title{margin-left:20px;padding-bottom:10px;}#mousetrap_table{margin:7px;}#mousetrap_table > div{display:table-row;}#mousetrap_table > div > div{display:table-cell;padding:2px 4px;}#mousetrap_table > div > div:nth-child(1){width:50%;}#mousetrap_table > div > div:nth-child(3){width:47%;}.mousetrap_key{font-family:'courier new', monospace;font-size:120%;color:#FF0;}.mousetrap_sequence{text-align:right;}",
         
         
         /* Private Variables */
@@ -897,14 +897,16 @@
                 var shortcut = charSeq.slice(0, charSeq.lastIndexOf(":"));
                 //Change spaces to " then " like gmail does for sequences:
                 shortcut = shortcut.replace(/ /g, "</span> then <span class='mousetrap_key'>");
+                shortcut = shortcut.replace(/\+/g, "</span> + <span class='mousetrap_key'>");
+                shortcut = shortcut.replace(/,/g, "</span> , <span class='mousetrap_key'>");
                 
                 var seqHTML = "<div><div class='mousetrap_sequence'><span class='mousetrap_key'>";
                 seqHTML += shortcut;
-                seqHTML += "</div></span>";
+                seqHTML += "</span></div><div>:</div>";
                 
                 var helpText = _help_map[charSeq];
                 
-                mappingHtml += seqHTML + "<div class='mousetrap_explanation'>: " + helpText + "</div></div>";
+                mappingHtml += seqHTML + "<div class='mousetrap_explanation'>" + helpText + "</div></div>";
             }
             
             mappingHtml += '</div>';
