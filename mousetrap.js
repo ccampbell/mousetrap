@@ -329,9 +329,8 @@
 
                 // remove is used so if you change your mind and call bind a
                 // second time with a new function the first one is overwritten
-                // But don't stomp over a key if its in a sequence (&& !callback.seq). This 
-                // fixes an issue where a binding of a single key which is the first in a 
-                // sequence after the sequence has been defined.
+                // But don't remove a key if its in a sequence (&& !callback.seq). Side 
+                // effect: can't re-bind sequences.
                 if (remove && callback.combo == combination && !callback.seq) {
                     _callbacks[character].splice(i, 1);
                 }
