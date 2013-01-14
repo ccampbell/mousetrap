@@ -1,0 +1,48 @@
+<!-- fishbowl html -->
+<html>
+<head>
+	<title>Vegemite</title>
+	<script src="../mousetrap.js"></script>
+	<script src="jquery-1.7.2.min.js"></script>
+</head>
+<body>
+	<h2>Test to see if fireing key events in a sequence along the way works.</h2>
+
+	<h3> Test 1</h3>
+	Type the key sequence: <span class="querty">  </span>.</br>
+	Expect to see the letters highlight in order.	
+
+	<h3>Test 2</h3>
+	Next, type the key sequence: <span> q b e r t</span>.</br>
+	Expect only the "q" to highlight because qbery does not fire events but the q also matches query sequence.	
+
+</body>
+</html>
+
+<script>
+
+	testIndividualFiring("q w e r t y", true);
+	testIndividualFiring("q b e r t", false);
+
+	function testIndividualFiring(sequence, fire_individuals) {
+		var  individuals = sequence.split(' ');
+		for (i in individuals) {
+			Mousetrap.bind(individuals[i], logKey(individuals[i]));
+		}
+		Mousetrap.bind(sequence, logName(sequence), "keypress", fire_individuals);
+	}
+
+	function logKey(t) {
+		//$(".querty").append("<span class='"+t+"''>"+t+"</span>");
+		return function () {
+		//	$(t).css({"background-color": "red"});
+			console.log("key: " + t);
+		}
+	}
+
+	function logName(s) {
+		return function () {
+			console.log("NAme: " + s);
+		}
+	}
+</script>
