@@ -4,45 +4,101 @@
 	<title>Vegemite</title>
 	<script src="../mousetrap.js"></script>
 	<script src="jquery-1.7.2.min.js"></script>
+
+	<style>
+		.wrap {
+			padding: 4px; 
+		}
+		body {
+ 		   font-family: helvetica, arial, sans-serif;
+    		line-height: 20px;
+		}
+		blockquote { font-size: 9pt;}
+	</style>
 </head>
 <body>
-	<h2>Test to see if fireing key events in a sequence along the way works.</h2>
+	<h1>Vegemite</h1>
+	<hr/>
+	<h4>Tests to see if firing key events in a sequence along the way works. In the tests below the sequence and every key along the way have been individually bound. Hit the sequence keys to try it out. Colors clear after 4 seconds.
+	</h4>
+	<blockquote>
+		Note: Its called <a href="http://en.wikipedia.org/wiki/Vegemite">Vegemite</a> because the other tests are called Peanut Butter but in Australia Vegemite is a more popular sandwhich spread (and the author is Australian).
+	</blockquote>
+	<hr/>
 
-	<h3> Test 1</h3>
-	Type the key sequence: <span class="querty">  </span>.</br>
-	Expect to see the letters highlight in order.	
-
-	<h3>Test 2</h3>
-	Next, type the key sequence: <span> q b e r t</span>.</br>
-	Expect only the "q" to highlight because qbery does not fire events but the q also matches query sequence.	
+	<div id='tests'></div> 
 
 </body>
 </html>
 
 <script>
+	var numTest = 1,
+		resetTimer;
 
-	testIndividualFiring("q w e r t y", true);
-	testIndividualFiring("q b e r t", false);
+	testIndividualFiring("Fires whole sequence only as expected with no other interactions", 
+		"a b c", 
+		false);
+	testIndividualFiring("Fires all and sequence as expected with no other interactions", 
+		"1 2 3", 
+		true);
+	testIndividualFiring("The q, e, r, and t will high-light from qbert below because those are defined after and hence remove the ones here.", 
+		"q w e r t y", 
+		true);
+	testIndividualFiring("Expect only the 'q' to highlight because qbert does not fire events but the q also matches the previously defined 'q' in the qwerty sequence above.", 
+		"q b e r t", 
+		false);
 
-	function testIndividualFiring(sequence, fire_individuals) {
+	/////////////////////////////////
+	///      Test helpers
+	/////////////////////////////////
+	
+	function testIndividualFiring(description, sequence, fire_individuals) {
 		var  individuals = sequence.split(' ');
 		for (i in individuals) {
-			Mousetrap.bind(individuals[i], logKey(individuals[i]));
+			Mousetrap.bind(individuals[i], logKey(individuals[i], numTest));
 		}
-		Mousetrap.bind(sequence, logName(sequence), "keypress", fire_individuals);
+		Mousetrap.bind(sequence, logName(numTest), "keypress", fire_individuals);
+		drawTest(description, individuals, fire_individuals, numTest++);
 	}
 
-	function logKey(t) {
-		//$(".querty").append("<span class='"+t+"''>"+t+"</span>");
+	function drawTest(description, sequence, fire_individuals, num) {
+		$("#tests").append("<h3>Test " + num + "</h3>");
+		if (fire_individuals) {
+			$("#tests").append(description + "</p><b><span>Firing Sequence: </span></b>");
+		} else {
+			$("#tests").append(description + "</p><b><span>Static Sequence: </span></b>");
+		}
+
+		var span = $("<span class='wrap' id='s"+num+"'></span>");
+		for (c in sequence) {
+			span.append("<span style='font-family: courier' id='t" + num + "" + sequence[c] + "'> " + sequence[c] + "</span>");	
+		}
+		$("#tests").append(span);
+	}
+
+	function logKey(c, num) {
+		var id = "#t" + num + c;
 		return function () {
-		//	$(t).css({"background-color": "red"});
-			console.log("key: " + t);
+			$(id).css({"background-color": "orange"});
+			console.log("id: " + id);
+			setTimer();
 		}
 	}
 
-	function logName(s) {
+	function logName(num) {
 		return function () {
-			console.log("NAme: " + s);
+			$("#s" + num).css({"background-color": "lightblue"});
+			console.log("NAme: " + num);
+			setTimer();
 		}
+	}
+
+	function setTimer() {
+		clearTimeout(resetTimer);
+		resetTimer = setTimeout(clearColors, 4000);
+	}
+
+	function clearColors() {
+		$("span").css({"background-color": "white"});
 	}
 </script>
