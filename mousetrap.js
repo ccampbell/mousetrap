@@ -411,7 +411,9 @@
             i,
             do_not_reset = {},
             max_level = 0,
-            processed_sequence_callback = false;
+            processed_sequence_callback = false,
+            fire_individual_keys = false,
+            sequences_to_fire = [];
 
         // loop through matching callbacks for this key event
         for (i = 0; i < callbacks.length; ++i) {
@@ -422,23 +424,37 @@
             // callback for matching g cause otherwise you can only ever
             // match the first one
             if (callbacks[i].seq) {
+                // remember if any matching sequences requested to fire keys as it goes
+                if (callbacks[i].fire_individual_keys == true) {
+                    fire_individual_keys = true;
+                }
+                
                 processed_sequence_callback = true;
 
                 // as we loop through keep track of the max
                 // any sequence at a lower level will be discarded
                 max_level = Math.max(max_level, callbacks[i].level);
 
-                // keep a list of which sequences were matches for later
                 do_not_reset[callbacks[i].seq] = 1;
-                _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
+
+                // keep a list of which sequences were matches for later (below)
+                sequences_to_fire.push({the_callback: callbacks[i], the_event: e});
                 continue;
             }
 
             // if there were no sequence matches but we are still here
-            // that means this is a regular match so we should fire that
-            if (!processed_sequence_callback && !_sequence_type) {
+            // that means this is a regular match, or a sequence requested to fire keys
+            // indivually along the way, so we should fire this match.
+            if ((!processed_sequence_callback && !_sequence_type) || fire_individual_keys) {
                 _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
             }
+        }
+
+        // Fire the matches sequences. We do it here so that the if you are firing individual
+        // keys along the way, they get fired first (above) before the final sequence match does.
+        for (s in sequences_to_fire) {
+            var c = sequences_to_fire[s];
+            _fireCallback(c.the_callback.callback, c.the_event, c.the_callback.combo);
         }
 
         // if you are inside of a sequence and the key you are pressing
@@ -559,8 +575,7 @@
      * @param {string=} action
      * @returns void
      */
-    function _bindSequence(combo, keys, callback, action) {
-
+    function _bindSequence(combo, keys, callback, action, fire_individual_keys) {
         // start off by adding a sequence level record for this combination
         // and setting the level to 0
         _sequence_levels[combo] = 0;
@@ -611,7 +626,7 @@
         // function.  for any key leading up to the final one it should
         // increase the sequence. after the final, it should reset all sequences
         for (i = 0; i < keys.length; ++i) {
-            _bindSingle(keys[i], i < keys.length - 1 ? _increaseSequence : _callbackAndReset, action, combo, i);
+            _bindSingle(keys[i], i < keys.length - 1 ? _increaseSequence : _callbackAndReset, action, combo, i, fire_individual_keys);
         }
     }
 
@@ -625,7 +640,7 @@
      * @param {number=} level - what part of the sequence the command is
      * @returns void
      */
-    function _bindSingle(combination, callback, action, sequence_name, level) {
+    function _bindSingle(combination, callback, action, sequence_name, level, fire_individual_keys) {
 
         // make sure multiple spaces in a row become a single space
         combination = combination.replace(/\s+/g, ' ');
@@ -639,7 +654,7 @@
         // if this pattern is a sequence of keys then run through this method
         // to reprocess each pattern one key at a time
         if (sequence.length > 1) {
-            _bindSequence(combination, sequence, callback, action);
+            _bindSequence(combination, sequence, callback, action, fire_individual_keys);
             return;
         }
 
@@ -694,7 +709,8 @@
             action: action,
             seq: sequence_name,
             level: level,
-            combo: combination
+            combo: combination,
+            fire_individual_keys: fire_individual_keys
         });
     }
 
@@ -706,9 +722,9 @@
      * @param {string|undefined} action
      * @returns void
      */
-    function _bindMultiple(combinations, callback, action) {
+    function _bindMultiple(combinations, callback, action, fire_individual_keys) {
         for (var i = 0; i < combinations.length; ++i) {
-            _bindSingle(combinations[i], callback, action);
+            _bindSingle(combinations[i], callback, action, undefined, undefined, fire_individual_keys);
         }
     }
 
@@ -733,8 +749,8 @@
          * @param {string=} action - 'keypress', 'keydown', or 'keyup'
          * @returns void
          */
-        bind: function(keys, callback, action) {
-            _bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
+        bind: function(keys, callback, action, fire_individual_keys) {
+            _bindMultiple(keys instanceof Array ? keys : [keys], callback, action, fire_individual_keys);
             _direct_map[keys + ':' + action] = callback;
             return this;
         },
