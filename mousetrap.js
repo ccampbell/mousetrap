@@ -712,6 +712,25 @@
         }
     }
 
+    /**
+     * unbinds multiple combinations 
+     * 
+     * TODO: actually remove this from the _callbacks dictionary instead
+     * of binding an empty function
+     *
+     * @param {Array} combinations
+     * @param {string|undefined} action
+     * @returns void
+     */
+    function _unbindMultiple(combinations, action) {
+        for (var i = 0; i < combinations.length; ++i) {
+            if (_direct_map[combinations[i] + ':' + action]) {
+                delete _direct_map[combinations[i] + ':' + action];
+                _bindSingle(combinations[i], function() {}, action);
+            }
+        }
+    }
+
     // start!
     _addEvent(document, 'keypress', _handleKey);
     _addEvent(document, 'keydown', _handleKey);
@@ -749,18 +768,12 @@
          * the keycombo+action has to be exactly the same as
          * it was defined in the bind method
          *
-         * TODO: actually remove this from the _callbacks dictionary instead
-         * of binding an empty function
-         *
          * @param {string|Array} keys
          * @param {string} action
          * @returns void
          */
         unbind: function(keys, action) {
-            if (_direct_map[keys + ':' + action]) {
-                delete _direct_map[keys + ':' + action];
-                this.bind(keys, function() {}, action);
-            }
+	        _unbindMultiple(keys instanceof Array ? keys : [keys], action);
             return this;
         },
 
