@@ -772,7 +772,9 @@
          * @returns void
          */
         trigger: function(keys, action) {
-            _direct_map[keys + ':' + action]();
+            if (_direct_map[keys + ':' + action]) {
+                _direct_map[keys + ':' + action]();
+            }
             return this;
         },
 
