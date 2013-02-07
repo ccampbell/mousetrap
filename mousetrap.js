@@ -713,8 +713,8 @@
     }
 
     /**
-     * unbinds multiple combinations 
-     * 
+     * unbinds multiple combinations
+     *
      * TODO: actually remove this from the _callbacks dictionary instead
      * of binding an empty function
      *
@@ -723,10 +723,11 @@
      * @returns void
      */
     function _unbindMultiple(combinations, action) {
+        var do_nothing = function() {};
         for (var i = 0; i < combinations.length; ++i) {
             if (_direct_map[combinations[i] + ':' + action]) {
                 delete _direct_map[combinations[i] + ':' + action];
-                _bindSingle(combinations[i], function() {}, action);
+                _bindSingle(combinations[i], do_nothing, action);
             }
         }
     }
