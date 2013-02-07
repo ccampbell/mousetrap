@@ -19,7 +19,7 @@
  * @version 1.2.2
  * @url craig.is/killing/mice
  */
-(function() {
+;(function() {
 
     /**
      * mapping of special keycodes to their corresponding keys
