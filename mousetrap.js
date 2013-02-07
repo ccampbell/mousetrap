@@ -148,7 +148,7 @@
          *
          * @type {Object}
          */
-        _direct_map = {},
+        _directMap = {},
 
         /**
          * keeps track of what level each sequence is at since multiple
@@ -156,21 +156,21 @@
          *
          * @type {Object}
          */
-        _sequence_levels = {},
+        _sequenceLevels = {},
 
         /**
          * variable to store the setTimeout call
          *
          * @type {null|number}
          */
-        _reset_timer,
+        _resetTimer,
 
         /**
          * temporary state where we will ignore the next keyup
          *
          * @type {boolean|string}
          */
-        _ignore_next_keyup = false,
+        _ignoreNextKeyup = false,
 
         /**
          * are we currently inside of a sequence?
@@ -178,7 +178,7 @@
          *
          * @type {boolean|string}
          */
-        _sequence_type = false;
+        _sequenceType = false;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -252,25 +252,25 @@
     /**
      * resets all sequence counters except for the ones passed in
      *
-     * @param {Object} do_not_reset
+     * @param {Object} doNotReset
      * @returns void
      */
-    function _resetSequences(do_not_reset, max_level) {
-        do_not_reset = do_not_reset || {};
+    function _resetSequences(doNotReset, maxLevel) {
+        doNotReset = doNotReset || {};
 
-        var active_sequences = false,
+        var activeSequences = false,
             key;
 
-        for (key in _sequence_levels) {
-            if (do_not_reset[key] && _sequence_levels[key] > max_level) {
-                active_sequences = true;
+        for (key in _sequenceLevels) {
+            if (doNotReset[key] && _sequenceLevels[key] > maxLevel) {
+                activeSequences = true;
                 continue;
             }
-            _sequence_levels[key] = 0;
+            _sequenceLevels[key] = 0;
         }
 
-        if (!active_sequences) {
-            _sequence_type = false;
+        if (!activeSequences) {
+            _sequenceType = false;
         }
     }
 
@@ -308,7 +308,7 @@
 
             // if this is a sequence but it is not at the right level
             // then move onto the next match
-            if (callback.seq && _sequence_levels[callback.seq] != callback.level) {
+            if (callback.seq && _sequenceLevels[callback.seq] != callback.level) {
                 continue;
             }
 
@@ -409,9 +409,9 @@
     function _handleCharacter(character, e) {
         var callbacks = _getMatches(character, _eventModifiers(e), e),
             i,
-            do_not_reset = {},
-            max_level = 0,
-            processed_sequence_callback = false;
+            doNotReset = {},
+            maxLevel = 0,
+            processedSequenceCallback = false;
 
         // loop through matching callbacks for this key event
         for (i = 0; i < callbacks.length; ++i) {
@@ -422,21 +422,21 @@
             // callback for matching g cause otherwise you can only ever
             // match the first one
             if (callbacks[i].seq) {
-                processed_sequence_callback = true;
+                processedSequenceCallback = true;
 
                 // as we loop through keep track of the max
                 // any sequence at a lower level will be discarded
-                max_level = Math.max(max_level, callbacks[i].level);
+                maxLevel = Math.max(maxLevel, callbacks[i].level);
 
                 // keep a list of which sequences were matches for later
-                do_not_reset[callbacks[i].seq] = 1;
+                doNotReset[callbacks[i].seq] = 1;
                 _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
                 continue;
             }
 
             // if there were no sequence matches but we are still here
             // that means this is a regular match so we should fire that
-            if (!processed_sequence_callback && !_sequence_type) {
+            if (!processedSequenceCallback && !_sequenceType) {
                 _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
             }
         }
@@ -444,8 +444,8 @@
         // if you are inside of a sequence and the key you are pressing
         // is not a modifier key then we should reset all sequences
         // that were not matched by this key event
-        if (e.type == _sequence_type && !_isModifier(character)) {
-            _resetSequences(do_not_reset, max_level);
+        if (e.type == _sequenceType && !_isModifier(character)) {
+            _resetSequences(doNotReset, maxLevel);
         }
     }
 
@@ -470,8 +470,8 @@
             return;
         }
 
-        if (e.type == 'keyup' && _ignore_next_keyup == character) {
-            _ignore_next_keyup = false;
+        if (e.type == 'keyup' && _ignoreNextKeyup == character) {
+            _ignoreNextKeyup = false;
             return;
         }
 
@@ -497,8 +497,8 @@
      * @returns void
      */
     function _resetSequenceTimer() {
-        clearTimeout(_reset_timer);
-        _reset_timer = setTimeout(_resetSequences, 1000);
+        clearTimeout(_resetTimer);
+        _resetTimer = setTimeout(_resetSequences, 1000);
     }
 
     /**
@@ -563,7 +563,7 @@
 
         // start off by adding a sequence level record for this combination
         // and setting the level to 0
-        _sequence_levels[combo] = 0;
+        _sequenceLevels[combo] = 0;
 
         // if there is no action pick the best one for the first key
         // in the sequence
@@ -579,8 +579,8 @@
          * @returns void
          */
         var _increaseSequence = function(e) {
-                _sequence_type = action;
-                ++_sequence_levels[combo];
+                _sequenceType = action;
+                ++_sequenceLevels[combo];
                 _resetSequenceTimer();
             },
 
@@ -598,7 +598,7 @@
                 // or keypress.  this is so if you finish a sequence and
                 // release the key the final key will not trigger a keyup
                 if (action !== 'keyup') {
-                    _ignore_next_keyup = _characterFromEvent(e);
+                    _ignoreNextKeyup = _characterFromEvent(e);
                 }
 
                 // weird race condition if a sequence ends with the key
@@ -621,11 +621,11 @@
      * @param {string} combination
      * @param {Function} callback
      * @param {string=} action
-     * @param {string=} sequence_name - name of sequence if part of sequence
+     * @param {string=} sequenceName - name of sequence if part of sequence
      * @param {number=} level - what part of the sequence the command is
      * @returns void
      */
-    function _bindSingle(combination, callback, action, sequence_name, level) {
+    function _bindSingle(combination, callback, action, sequenceName, level) {
 
         // make sure multiple spaces in a row become a single space
         combination = combination.replace(/\s+/g, ' ');
@@ -680,7 +680,7 @@
         }
 
         // remove an existing match if there is one
-        _getMatches(key, modifiers, {type: action}, !sequence_name, combination);
+        _getMatches(key, modifiers, {type: action}, !sequenceName, combination);
 
         // add this call back to the array
         // if it is a sequence put it at the beginning
@@ -688,11 +688,11 @@
         //
         // this is important because the way these are processed expects
         // the sequence ones to come first
-        _callbacks[key][sequence_name ? 'unshift' : 'push']({
+        _callbacks[key][sequenceName ? 'unshift' : 'push']({
             callback: callback,
             modifiers: modifiers,
             action: action,
-            seq: sequence_name,
+            seq: sequenceName,
             level: level,
             combo: combination
         });
@@ -723,11 +723,11 @@
      * @returns void
      */
     function _unbindMultiple(combinations, action) {
-        var do_nothing = function() {};
+        var doNothing = function() {};
         for (var i = 0; i < combinations.length; ++i) {
-            if (_direct_map[combinations[i] + ':' + action]) {
-                delete _direct_map[combinations[i] + ':' + action];
-                _bindSingle(combinations[i], do_nothing, action);
+            if (_directMap[combinations[i] + ':' + action]) {
+                delete _directMap[combinations[i] + ':' + action];
+                _bindSingle(combinations[i], doNothing, action);
             }
         }
     }
@@ -755,7 +755,7 @@
          */
         bind: function(keys, callback, action) {
             _bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
-            _direct_map[keys + ':' + action] = callback;
+            _directMap[keys + ':' + action] = callback;
             return this;
         },
 
@@ -764,7 +764,7 @@
          *
          * the unbinding sets the callback function of the specified key combo
          * to an empty function and deletes the corresponding key in the
-         * _direct_map dict.
+         * _directMap dict.
          *
          * the keycombo+action has to be exactly the same as
          * it was defined in the bind method
@@ -786,8 +786,8 @@
          * @returns void
          */
         trigger: function(keys, action) {
-            if (_direct_map[keys + ':' + action]) {
-                _direct_map[keys + ':' + action]();
+            if (_directMap[keys + ':' + action]) {
+                _directMap[keys + ':' + action]();
             }
             return this;
         },
@@ -801,7 +801,7 @@
          */
         reset: function() {
             _callbacks = {};
-            _direct_map = {};
+            _directMap = {};
             return this;
         },
 
