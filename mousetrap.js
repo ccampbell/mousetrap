@@ -627,6 +627,9 @@
      */
     function _bindSingle(combination, callback, action, sequenceName, level) {
 
+        // store a direct mapped reference for use with Mousetrap.trigger
+        _directMap[combination + ':' + action] = callback;
+
         // make sure multiple spaces in a row become a single space
         combination = combination.replace(/\s+/g, ' ');
 
@@ -712,26 +715,6 @@
         }
     }
 
-    /**
-     * unbinds multiple combinations
-     *
-     * TODO: actually remove this from the _callbacks dictionary instead
-     * of binding an empty function
-     *
-     * @param {Array} combinations
-     * @param {string|undefined} action
-     * @returns void
-     */
-    function _unbindMultiple(combinations, action) {
-        var doNothing = function() {};
-        for (var i = 0; i < combinations.length; ++i) {
-            if (_directMap[combinations[i] + ':' + action]) {
-                delete _directMap[combinations[i] + ':' + action];
-                _bindSingle(combinations[i], doNothing, action);
-            }
-        }
-    }
-
     // start!
     _addEvent(document, 'keypress', _handleKey);
     _addEvent(document, 'keydown', _handleKey);
@@ -754,8 +737,8 @@
          * @returns void
          */
         bind: function(keys, callback, action) {
-            _bindMultiple(keys instanceof Array ? keys : [keys], callback, action);
-            _directMap[keys + ':' + action] = callback;
+            keys = keys instanceof Array ? keys : [keys];
+            _bindMultiple(keys, callback, action);
             return this;
         },
 
@@ -766,6 +749,9 @@
          * to an empty function and deletes the corresponding key in the
          * _directMap dict.
          *
+         * TODO: actually remove this from the _callbacks dictionary instead
+         * of binding an empty function
+         *
          * the keycombo+action has to be exactly the same as
          * it was defined in the bind method
          *
@@ -773,9 +759,8 @@
          * @param {string} action
          * @returns void
          */
-        unbind: function(keys, action){
-            _unbindMultiple(keys instanceof Array ? keys : [keys], action);
-            return this;
+        unbind: function(keys, action) {
+            return Mousetrap.bind(keys, function() {}, action);
         },
 
         /**
