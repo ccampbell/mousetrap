@@ -578,7 +578,7 @@
          * @param {Event} e
          * @returns void
          */
-        var _increaseSequence = function(e) {
+        var _increaseSequence = function() {
                 _sequenceType = action;
                 ++_sequenceLevels[combo];
                 _resetSequenceTimer();
