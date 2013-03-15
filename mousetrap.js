@@ -773,7 +773,7 @@
          */
         trigger: function(keys, action) {
             if (_directMap[keys + ':' + action]) {
-                _directMap[keys + ':' + action]();
+                _directMap[keys + ':' + action]({}, keys);
             }
             return this;
         },
