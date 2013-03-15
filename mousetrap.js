@@ -810,11 +810,15 @@
         }
     };
 
-    // expose mousetrap to the global object
-    window.Mousetrap = Mousetrap;
+    if (typeof module === 'object' && typeof module.exports === 'object') {
+        module.exports = Mousetrap;
+    } else {
+        // expose mousetrap to the global object
+        window.Mousetrap = Mousetrap;
 
-    // expose mousetrap as an AMD module
-    if (typeof define === 'function' && define.amd) {
-        define(Mousetrap);
+        // expose mousetrap as an AMD module
+        if (typeof define === 'function' && define.amd) {
+            define(Mousetrap);
+        }
     }
 }) ();
