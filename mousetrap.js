@@ -797,7 +797,7 @@
         * @param {Element} element
         * @return {boolean}
         */
-        stopCallback: function(e, element, combo) {
+        stopCallback: function(e, element) {
 
             // if the element has the class "mousetrap" then no need to stop
             if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
