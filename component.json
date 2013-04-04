@@ -2,7 +2,7 @@
   "name": "mousetrap",
   "version": "1.3.2",
   "description": "Simple library for handling keyboard shortcuts in Javascript",
-  "main": [ "mousetrap.js" ],
+  "main": "mousetrap.js",
   "scripts": {
     "test": "open tests/index.html"
   },
