@@ -315,11 +315,44 @@
         if (!activeSequences) {
             _sequenceType = false;
             if (_recordedSequenceCallback) {
+                _normalizeSequence(_recordedSequence);
                 _recordedSequenceCallback(_recordedSequence);
+
+                // reset all record-related state
                 _recordedSequence = [];
                 _recordedSequenceCallback = null;
                 _currentRecordedKeys = [];
             }
+        }
+    }
+
+    /**
+     * ensures each combo in a sequence is in a predictable order and formats
+     * key combos to be '+'-delimited
+     *
+     * modifies the sequence in-place
+     *
+     * @param {Array} sequence
+     * @returns void
+     */
+    function _normalizeSequence(sequence) {
+        var i;
+
+        for (i = 0; i < sequence.length; ++i) {
+            sequence[i].sort(function(x, y) {
+                // modifier keys always come first, in alphabetical order
+                if (x.length > 1 && y.length === 1) {
+                    return -1;
+                } else if (x.length === 1 && y.length > 1) {
+                    return 1;
+                }
+
+                // character keys come next (list should contain no duplicates,
+                // so no need for equality check)
+                return x > y ? 1 : -1;
+            });
+
+            sequence[i] = sequence[i].join('+');
         }
     }
 
@@ -474,7 +507,7 @@
             // once a key is released, all keys that were held down at the time
             // count as a keypress
             } else if (e.type == 'keyup' && _currentRecordedKeys.length > 0) {
-                _recordedSequence.push(_currentRecordedKeys.join('+'));
+                _recordedSequence.push(_currentRecordedKeys);
                 _currentRecordedKeys = [];
                 _resetSequenceTimer();
             }
