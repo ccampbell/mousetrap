@@ -834,10 +834,9 @@
          * completed
          *
          * @param {Function} callback
-         * @param {number} timeout
          * @returns void
          */
-        record: function(callback, timeout) {
+        record: function(callback) {
             _recordedSequenceCallback = callback;
         },
 
