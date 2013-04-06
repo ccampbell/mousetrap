@@ -192,9 +192,17 @@
          * a callback to invoke after capturing a sequence when
          * Mousetrap.record() is called
          *
-         * @type {Function|undefined}
+         * @type {Function|null}
          */
-        _recordedSequenceCallback;
+        _recordedSequenceCallback = null,
+
+        /**
+         * temporary state where we maintain the last recorded key event (either keydown or
+         * keypress)
+         *
+         * @type {string|null}
+         */
+        _lastRecordedKeyEvent = null;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -309,7 +317,8 @@
             if (_recordedSequenceCallback) {
                 _recordedSequenceCallback(_recordedSequence);
                 _recordedSequence = [];
-                _recordedSequenceCallback = undefined;
+                _recordedSequenceCallback = null;
+                _lastRecordedKeyEvent = null;
             }
         }
     }
@@ -455,9 +464,19 @@
             processedSequenceCallback = false;
 
         // remember this character if we're currently recording a sequence
-        if (e.type == 'keypress' && _recordedSequenceCallback) {
-            _recordedSequence.push(modifiers.concat([character]).join('+'));
-            _resetSequenceTimer(500);
+        if (_recordedSequenceCallback) {
+            if (e.type == 'keypress') {
+                _recordedSequence.push(modifiers.concat([character]).join('+'));
+                _resetSequenceTimer(500);
+
+            // only record a keyup if there was no intervening keypress event (which would mean that
+            // a modifier key was pressed on its own)
+            } else if (e.type == 'keyup' && _lastRecordedKeyEvent == 'keydown') {
+                _recordedSequence.push(character);
+                _resetSequenceTimer(500);
+            }
+
+            _lastRecordedKeyEvent = e.type;
         }
 
         // loop through matching callbacks for this key event
