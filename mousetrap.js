@@ -197,12 +197,12 @@
         _recordedSequenceCallback = null,
 
         /**
-         * temporary state where we maintain the last recorded key event (either keydown or
-         * keypress)
+         * a list of all of the keys currently held down, while recording a
+         * sequence
          *
-         * @type {string|null}
+         * @type {Array}
          */
-        _lastRecordedKeyEvent = null;
+        _currentRecordedKeys = [];
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -318,7 +318,7 @@
                 _recordedSequenceCallback(_recordedSequence);
                 _recordedSequence = [];
                 _recordedSequenceCallback = null;
-                _lastRecordedKeyEvent = null;
+                _currentRecordedKeys = [];
             }
         }
     }
@@ -465,18 +465,19 @@
 
         // remember this character if we're currently recording a sequence
         if (_recordedSequenceCallback) {
-            if (e.type == 'keypress') {
-                _recordedSequence.push(modifiers.concat([character]).join('+'));
-                _resetSequenceTimer();
+            if (e.type == 'keydown') {
+                for (i = 0; i < modifiers.length; ++i) {
+                    _recordKey(modifiers[i]);
+                }
+                _recordKey(character);
 
-            // only record a keyup if there was no intervening keypress event (which would mean that
-            // a modifier key was pressed on its own)
-            } else if (e.type == 'keyup' && _lastRecordedKeyEvent == 'keydown') {
-                _recordedSequence.push(character);
+            // once a key is released, all keys that were held down at the time
+            // count as a keypress
+            } else if (e.type == 'keyup' && _currentRecordedKeys.length > 0) {
+                _recordedSequence.push(_currentRecordedKeys.join('+'));
+                _currentRecordedKeys = [];
                 _resetSequenceTimer();
             }
-
-            _lastRecordedKeyEvent = e.type;
         }
 
         // loop through matching callbacks for this key event
@@ -512,6 +513,18 @@
         // that were not matched by this key event
         if (e.type == _sequenceType && !_isModifier(character)) {
             _resetSequences(doNotReset, maxLevel);
+        }
+    }
+
+    /**
+     * marks a character key as held down while recording a sequence
+     *
+     * @param {string} key
+     * @returns void
+     */
+    function _recordKey(key) {
+        if (_currentRecordedKeys.indexOf(key) === -1) {
+            _currentRecordedKeys.push(key);
         }
     }
 
