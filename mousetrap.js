@@ -467,13 +467,13 @@
         if (_recordedSequenceCallback) {
             if (e.type == 'keypress') {
                 _recordedSequence.push(modifiers.concat([character]).join('+'));
-                _resetSequenceTimer(500);
+                _resetSequenceTimer();
 
             // only record a keyup if there was no intervening keypress event (which would mean that
             // a modifier key was pressed on its own)
             } else if (e.type == 'keyup' && _lastRecordedKeyEvent == 'keydown') {
                 _recordedSequence.push(character);
-                _resetSequenceTimer(500);
+                _resetSequenceTimer();
             }
 
             _lastRecordedKeyEvent = e.type;
@@ -555,18 +555,16 @@
     }
 
     /**
-     * called to set a timeout on the specified sequence
+     * called to set a 1 second timeout on the specified sequence
      *
-     * this is so after each key press in the sequence you have limited time
-     * (default: 1 second) to press the next key before you have to start over
+     * this is so after each key press in the sequence you have 1 second
+     * to press the next key before you have to start over
      *
-     * @params {number} timeout
      * @returns void
      */
-    function _resetSequenceTimer(timeout) {
-        timeout = timeout || 1000;
+    function _resetSequenceTimer() {
         clearTimeout(_resetTimer);
-        _resetTimer = setTimeout(_resetSequences, timeout);
+        _resetTimer = setTimeout(_resetSequences, 1000);
     }
 
     /**
