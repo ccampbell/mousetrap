@@ -179,7 +179,22 @@
          *
          * @type {boolean|string}
          */
-        _sequenceType = false;
+        _sequenceType = false,
+
+        /**
+         * the sequence currently being recorded
+         *
+         * @type {Array}
+         */
+        _recordedSequence = [],
+
+        /**
+         * a callback to invoke after capturing a sequence when
+         * Mousetrap.record() is called
+         *
+         * @type {Function|undefined}
+         */
+        _recordedSequenceCallback;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -291,6 +306,11 @@
 
         if (!activeSequences) {
             _sequenceType = false;
+            if (_recordedSequenceCallback) {
+                _recordedSequenceCallback(_recordedSequence);
+                _recordedSequence = [];
+                _recordedSequenceCallback = undefined;
+            }
         }
     }
 
@@ -427,11 +447,18 @@
      * @returns void
      */
     function _handleCharacter(character, e) {
-        var callbacks = _getMatches(character, _eventModifiers(e), e),
+        var modifiers = _eventModifiers(e),
+            callbacks = _getMatches(character, modifiers, e),
             i,
             doNotReset = {},
             maxLevel = 0,
             processedSequenceCallback = false;
+
+        // remember this character if we're currently recording a sequence
+        if (e.type == 'keypress' && _recordedSequenceCallback) {
+            _recordedSequence.push(modifiers.concat([character]).join('+'));
+            _resetSequenceTimer(500);
+        }
 
         // loop through matching callbacks for this key event
         for (i = 0; i < callbacks.length; ++i) {
@@ -509,16 +536,18 @@
     }
 
     /**
-     * called to set a 1 second timeout on the specified sequence
+     * called to set a timeout on the specified sequence
      *
-     * this is so after each key press in the sequence you have 1 second
-     * to press the next key before you have to start over
+     * this is so after each key press in the sequence you have limited time
+     * (default: 1 second) to press the next key before you have to start over
      *
+     * @params {number} timeout
      * @returns void
      */
-    function _resetSequenceTimer() {
+    function _resetSequenceTimer(timeout) {
+        timeout = timeout || 1000;
         clearTimeout(_resetTimer);
-        _resetTimer = setTimeout(_resetSequences, 1000);
+        _resetTimer = setTimeout(_resetSequences, timeout);
     }
 
     /**
@@ -781,6 +810,18 @@
          */
         unbind: function(keys, action) {
             return Mousetrap.bind(keys, function() {}, action);
+        },
+
+        /**
+         * records the next sequence and passes it to a callback once it's
+         * completed
+         *
+         * @param {Function} callback
+         * @param {number} timeout
+         * @returns void
+         */
+        record: function(callback, timeout) {
+            _recordedSequenceCallback = callback;
         },
 
         /**

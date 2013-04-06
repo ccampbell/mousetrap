@@ -10,7 +10,13 @@
  * @author Craig Campbell <iamcraigcampbell@gmail.com>
  */
 PeanutButter = (function() {
-    var tests = [],
+    // stuff related to 'record' tests
+    var recordButton = $("button.test-record"),
+        recordResult = $("div.test-record-result"),
+
+        // stuff related to 'bind' tests
+        bindButton = $("button.test-bind"),
+        tests = [],
         test_data = [],
         use_default = [],
         table_body = $("tbody"),
@@ -67,7 +73,7 @@ PeanutButter = (function() {
         class_name = success ? 'success' : 'failure';
         $(".result", test_row).html('<span class="' + class_name + '">•</span>');
 
-        _prepareTest(_active_test + 1);
+        _prepareBindTest(_active_test + 1);
     }
 
     function _resetMousetrap() {
@@ -87,7 +93,7 @@ PeanutButter = (function() {
         });
     }
 
-    function _prepareTest(i) {
+    function _prepareBindTest(i) {
         $("tr").removeClass('ready');
 
         if (i > tests.length - 1) {
@@ -108,6 +114,43 @@ PeanutButter = (function() {
         _presses = 0;
     }
 
+    function _formatSequenceAsHtml(sequence) {
+        var combos = [],
+            i;
+
+        for (i = 0; i < sequence.length; ++i) {
+            combos.push('<span>' + _formatKeysAsHtml(sequence[i].split('+')) + '</span>');
+        }
+
+        return combos.join(' ');
+    }
+
+    function _formatKeysAsHtml(keys) {
+        var htmlKeys = [],
+            i;
+
+        for (i = 0; i < keys.length; ++i) {
+            htmlKeys.push('<kbd>' + keys[i] + '</kbd>');
+        }
+
+        return htmlKeys.join('+');
+    }
+
+    function _prepareRecordTest() {
+        recordButton.prop('disabled', true);
+        recordButton.text('Recording');
+
+        Mousetrap.record(function(sequence) {
+            recordResult.html(_formatSequenceAsHtml(sequence));
+            recordButton.prop('disabled', false);
+            recordButton.text('Record');
+        });
+
+        // take focus away from the button so that Mousetrap will actually
+        // capture keystrokes
+        recordButton.blur();
+    }
+
     return {
         addTest: function(combo, events, use_default_event) {
             tests.push(combo);
@@ -120,7 +163,8 @@ PeanutButter = (function() {
                 _addToTable(test, test_data[i], i);
             });
 
-            _prepareTest(0);
+            recordButton.click(_prepareRecordTest);
+            bindButton.click(function() { _prepareBindTest(0) });
         }
     };
 }) ();
