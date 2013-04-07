@@ -556,9 +556,16 @@
      * @returns void
      */
     function _recordKey(key) {
-        if (_currentRecordedKeys.indexOf(key) === -1) {
-            _currentRecordedKeys.push(key);
+        var i;
+
+        // one-off implementation of Array.indexOf, since IE6-9 don't support it
+        for (i = 0; i < _currentRecordedKeys.length; ++i) {
+            if (_currentRecordedKeys[i] === key) {
+                return;
+            }
         }
+
+        _currentRecordedKeys.push(key);
     }
 
     /**
