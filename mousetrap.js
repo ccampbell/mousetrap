@@ -202,7 +202,15 @@
          *
          * @type {Array}
          */
-        _currentRecordedKeys = [];
+        _currentRecordedKeys = [],
+
+        /**
+         * temporary state where we remember if we've already captured a
+         * character key in the current combo
+         *
+         * @type {boolean}
+         */
+        _recordedCharacterKey;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -499,6 +507,10 @@
         // remember this character if we're currently recording a sequence
         if (_recordedSequenceCallback) {
             if (e.type == 'keydown') {
+                if (character.length === 1 && _recordedCharacterKey) {
+                    _recordCurrentCombo();
+                }
+
                 for (i = 0; i < modifiers.length; ++i) {
                     _recordKey(modifiers[i]);
                 }
@@ -507,9 +519,7 @@
             // once a key is released, all keys that were held down at the time
             // count as a keypress
             } else if (e.type == 'keyup' && _currentRecordedKeys.length > 0) {
-                _recordedSequence.push(_currentRecordedKeys);
-                _currentRecordedKeys = [];
-                _resetSequenceTimer();
+                _recordCurrentCombo();
             }
         }
 
@@ -566,6 +576,23 @@
         }
 
         _currentRecordedKeys.push(key);
+
+        if (key.length === 1) {
+            _recordedCharacterKey = true;
+        }
+    }
+
+    /**
+     * marks whatever key combination that's been recorded so far as finished
+     * and gets ready for the next combo
+     *
+     * @returns void
+     */
+    function _recordCurrentCombo() {
+        _recordedSequence.push(_currentRecordedKeys);
+        _currentRecordedKeys = [];
+        _recordedCharacterKey = false;
+        _resetSequenceTimer();
     }
 
     /**
