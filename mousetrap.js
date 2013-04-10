@@ -475,7 +475,7 @@
      * @param {Event} e
      * @returns void
      */
-    function _handleKey(e) {
+    function _handleKeyEvent(e) {
 
         // normalize e.which for key events
         // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
@@ -736,9 +736,9 @@
     }
 
     // start!
-    _addEvent(document, 'keypress', _handleKey);
-    _addEvent(document, 'keydown', _handleKey);
-    _addEvent(document, 'keyup', _handleKey);
+    _addEvent(document, 'keypress', _handleKeyEvent);
+    _addEvent(document, 'keydown', _handleKeyEvent);
+    _addEvent(document, 'keyup', _handleKeyEvent);
 
     var Mousetrap = {
 
