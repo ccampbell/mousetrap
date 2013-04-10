@@ -420,56 +420,6 @@
     }
 
     /**
-     * handles a character key event
-     *
-     * @param {string} character
-     * @param {Event} e
-     * @returns void
-     */
-    function _handleKey(character, modifiers, e) {
-        var callbacks = _getMatches(character, modifiers, e),
-            i,
-            doNotReset = {},
-            maxLevel = 0,
-            processedSequenceCallback = false;
-
-        // loop through matching callbacks for this key event
-        for (i = 0; i < callbacks.length; ++i) {
-
-            // fire for all sequence callbacks
-            // this is because if for example you have multiple sequences
-            // bound such as "g i" and "g t" they both need to fire the
-            // callback for matching g cause otherwise you can only ever
-            // match the first one
-            if (callbacks[i].seq) {
-                processedSequenceCallback = true;
-
-                // as we loop through keep track of the max
-                // any sequence at a lower level will be discarded
-                maxLevel = Math.max(maxLevel, callbacks[i].level);
-
-                // keep a list of which sequences were matches for later
-                doNotReset[callbacks[i].seq] = 1;
-                _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
-                continue;
-            }
-
-            // if there were no sequence matches but we are still here
-            // that means this is a regular match so we should fire that
-            if (!processedSequenceCallback && !_sequenceType) {
-                _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
-            }
-        }
-
-        // if you are inside of a sequence and the key you are pressing
-        // is not a modifier key then we should reset all sequences
-        // that were not matched by this key event
-        if (e.type == _sequenceType && !_isModifier(character)) {
-            _resetSequences(doNotReset, maxLevel);
-        }
-    }
-
-    /**
      * handles a keydown event
      *
      * @param {Event} e
@@ -495,7 +445,7 @@
             return;
         }
 
-        _handleKey(character, _eventModifiers(e), e);
+        Mousetrap.handleKey(character, _eventModifiers(e), e);
     }
 
     /**
@@ -826,6 +776,57 @@
 
             // stop for input, select, and textarea
             return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
+        },
+
+        /**
+         * handles a character key event
+         *
+         * @param {string} character
+         * @param {Array} modifiers
+         * @param {Event} e
+         * @returns void
+         */
+        handleKey: function(character, modifiers, e) {
+            var callbacks = _getMatches(character, modifiers, e),
+                i,
+                doNotReset = {},
+                maxLevel = 0,
+                processedSequenceCallback = false;
+
+            // loop through matching callbacks for this key event
+            for (i = 0; i < callbacks.length; ++i) {
+
+                // fire for all sequence callbacks
+                // this is because if for example you have multiple sequences
+                // bound such as "g i" and "g t" they both need to fire the
+                // callback for matching g cause otherwise you can only ever
+                // match the first one
+                if (callbacks[i].seq) {
+                    processedSequenceCallback = true;
+
+                    // as we loop through keep track of the max
+                    // any sequence at a lower level will be discarded
+                    maxLevel = Math.max(maxLevel, callbacks[i].level);
+
+                    // keep a list of which sequences were matches for later
+                    doNotReset[callbacks[i].seq] = 1;
+                    _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
+                    continue;
+                }
+
+                // if there were no sequence matches but we are still here
+                // that means this is a regular match so we should fire that
+                if (!processedSequenceCallback && !_sequenceType) {
+                    _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
+                }
+            }
+
+            // if you are inside of a sequence and the key you are pressing
+            // is not a modifier key then we should reset all sequences
+            // that were not matched by this key event
+            if (e.type == _sequenceType && !_isModifier(character)) {
+                _resetSequences(doNotReset, maxLevel);
+            }
         }
     };
 
