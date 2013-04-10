@@ -426,8 +426,8 @@
      * @param {Event} e
      * @returns void
      */
-    function _handleKey(character, e) {
-        var callbacks = _getMatches(character, _eventModifiers(e), e),
+    function _handleKey(character, modifiers, e) {
+        var callbacks = _getMatches(character, modifiers, e),
             i,
             doNotReset = {},
             maxLevel = 0,
@@ -495,7 +495,7 @@
             return;
         }
 
-        _handleKey(character, e);
+        _handleKey(character, _eventModifiers(e), e);
     }
 
     /**
