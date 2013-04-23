@@ -548,6 +548,47 @@
     }
 
     /**
+     * get the key and modifier for human-readable key combo
+     *
+     * @param {string} combination - the human-readable key/combo
+     * @param {string=} action - 'keypress', 'keydown', or 'keyup'
+     * @return {Object}
+     */
+    function _getKey(combination, action) {
+        var key,
+            keys,
+            modifiers = [];
+
+        // take the keys from this pattern and figure out what the actual
+        // pattern is all about
+        keys = combination === '+' ? ['+'] : combination.split('+');
+
+        for (i = 0; i < keys.length; ++i) {
+            key = keys[i];
+
+            // normalize key names
+            if (_SPECIAL_ALIASES[key]) {
+                key = _SPECIAL_ALIASES[key];
+            }
+
+            // if this is not a keypress event then we should
+            // be smart about using shift keys
+            // this will only work for US keyboards however
+            if (action && action != 'keypress' && _SHIFT_MAP[key]) {
+                key = _SHIFT_MAP[key];
+                modifiers.push('shift');
+            }
+
+            // if this key is a modifier then add it to the list of modifiers
+            if (_isModifier(key)) {
+                modifiers.push(key);
+            }
+        }
+
+        return {key: key, modifiers: modifiers};
+    }
+
+    /**
      * picks the best action based on the key combination
      *
      * @param {string} key - character for key
@@ -657,8 +698,8 @@
         var sequence = combination.split(' '),
             i,
             key,
-            keys,
-            modifiers = [];
+            keycombo,
+            modifiers;
 
         // if this pattern is a sequence of keys then run through this method
         // to reprocess each pattern one key at a time
@@ -667,31 +708,9 @@
             return;
         }
 
-        // take the keys from this pattern and figure out what the actual
-        // pattern is all about
-        keys = combination === '+' ? ['+'] : combination.split('+');
-
-        for (i = 0; i < keys.length; ++i) {
-            key = keys[i];
-
-            // normalize key names
-            if (_SPECIAL_ALIASES[key]) {
-                key = _SPECIAL_ALIASES[key];
-            }
-
-            // if this is not a keypress event then we should
-            // be smart about using shift keys
-            // this will only work for US keyboards however
-            if (action && action != 'keypress' && _SHIFT_MAP[key]) {
-                key = _SHIFT_MAP[key];
-                modifiers.push('shift');
-            }
-
-            // if this key is a modifier then add it to the list of modifiers
-            if (_isModifier(key)) {
-                modifiers.push(key);
-            }
-        }
+        keycombo = _getKey(combination, action);
+        key = keycombo.key;
+        modifiers = keycombo.modifiers;
 
         // depending on what the key combination is
         // we will try to pick the best event for it
@@ -827,6 +846,23 @@
 
             // stop for input, select, and textarea
             return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
+        },
+
+        /**
+         * whether a key is bound or not
+         *
+         * @param {string} combination
+         * @param {string} action
+         * @return {boolean}
+         */
+        isBound: function(combination, action) {
+            var sequence = combination.split(' ');
+            if (sequence.length > 1) {
+                return combination in _sequenceLevels;
+            }
+            var keycombo = _getKey(combination, action);
+            action = action || _pickBestAction(keycombo.key, keycombo.modifiers);
+            return (_getMatches(keycombo.key, keycombo.modifiers, {type: action})).length > 0;
         },
 
         /**
