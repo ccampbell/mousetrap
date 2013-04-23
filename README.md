@@ -53,6 +53,18 @@ If you would like to donate to help support Mousetrap development use [Gittip](h
     </script>
     ```
 
+3. Test a key binding
+
+        ```html
+        <script>
+            Mousetrap.bind('g i', function () { console.log('go to inbox'); });
+            // test if the key combo is bound
+            Mousetrap.isBound('g i'); // return true
+
+            Mousetrap.bind('*', function () { console.log('star'); }, 'keydown');
+            // test if the key combo is bound
+            Mousetrap.isBound('*', 'keydown'); // return true
+
 ## Why Mousetrap?
 
 There are a number of other similar libraries out there so what makes this one different?
