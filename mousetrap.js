@@ -826,7 +826,7 @@
             }
 
             // stop for input, select, and textarea
-            return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
+            return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || element.tagName == 'OBJECT' || element.tagName == 'EMBED' || (element.contentEditable && element.contentEditable == 'true');
         },
 
         /**
