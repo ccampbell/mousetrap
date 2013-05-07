@@ -434,12 +434,12 @@
             maxLevel = 0,
             processedSequenceCallback = false;
 
-		// Calculate the maxLevel for sequences so we can only execute the longest callback sequence
-		for (i = 0; i < callbacks.length; ++i) {
-			if (callbacks[i].seq) {
-				maxLevel = Math.max(maxLevel, callbacks[i].level);
-			}
-		}
+        // Calculate the maxLevel for sequences so we can only execute the longest callback sequence
+        for (i = 0; i < callbacks.length; ++i) {
+            if (callbacks[i].seq) {
+                maxLevel = Math.max(maxLevel, callbacks[i].level);
+            }
+        }
 
 		// loop through matching callbacks for this key event
         for (i = 0; i < callbacks.length; ++i) {
@@ -451,13 +451,13 @@
             // match the first one
             if (callbacks[i].seq) {
 
-				// Only fire callbacks for the maxLevel, in order to prevent also firing
-				// subsequences (e.g. 'a option b' AND 'option b' will be fired when only
-				// 'a option b' should be fired). Any sequence at a lower level will be
-				// discarded.
-				if(callbacks[i].level != maxLevel) {
-					continue;
-				}
+                // Only fire callbacks for the maxLevel, in order to prevent also firing
+                // subsequences (e.g. 'a option b' AND 'option b' will be fired when only
+                // 'a option b' should be fired). Any sequence at a lower level will be
+                // discarded.
+                if(callbacks[i].level != maxLevel) {
+                    continue;
+                }
 
                 processedSequenceCallback = true;
 
