@@ -444,12 +444,14 @@
 
 		// loop through matching callbacks for this key event
         for (i = 0; i < callbacks.length; ++i) {
+
             // fire for all sequence callbacks
             // this is because if for example you have multiple sequences
             // bound such as "g i" and "g t" they both need to fire the
             // callback for matching g cause otherwise you can only ever
             // match the first one
             if (callbacks[i].seq) {
+
 				// Only fire callbacks for the maxLevel, in order to prevent also firing
 				// subsequences (e.g. 'a option b' AND 'option b' will be fired when only
 				// 'a option b' should be fired). Any sequence at a lower level will be
