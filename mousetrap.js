@@ -451,10 +451,14 @@
             // match the first one
             if (callbacks[i].seq) {
 
-                // Only fire callbacks for the maxLevel, in order to prevent also firing
-                // subsequences (e.g. 'a option b' AND 'option b' will be fired when only
-                // 'a option b' should be fired). Any sequence at a lower level will be
-                // discarded.
+                // only fire callbacks for the maxLevel to prevent
+                // subsequences from also firing
+                //
+                // for example 'a option b' should not cause 'option b' to fire
+                // even though 'option b' is part of the other sequence
+                //
+                // any sequences that do not match here will be discarded
+                // below by the _resetSequences call
                 if (callbacks[i].level != maxLevel) {
                     continue;
                 }
