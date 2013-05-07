@@ -432,8 +432,7 @@
             i,
             doNotReset = {},
             maxLevel = 0,
-            processedSequenceCallback = false,
-            isModifier = _isModifier(character);
+            processedSequenceCallback = false;
 
 		// Calculate the maxLevel for sequences so we can only execute the longest callback sequence
 		for (i = 0; i < callbacks.length; ++i) {
@@ -476,22 +475,17 @@
         }
 
         // if the key you pressed matches the type of sequence without
-        // being a modifier (ie "keyup" or "keypress") or it is a modifier
-        // that is part of the sequence then we should reset all sequences
-        // that were not matched by this event
+        // being a modifier (ie "keyup" or "keypress") then we should
+        // reset all sequences that were not matched by this event
         //
         // this is so, for example, if you have the sequence "h a t" and you
         // type "h e a r t" it does not match.  in this case the "e" will
         // cause the sequence to reset
         //
-        // modifier keys are normally ignored because you can have a sequence
+        // modifier keys are ignored because you can have a sequence
         // that contains modifiers such as "enter ctrl+space" and in most
-        // cases the modifier key will be pressed before the next key, but if
-        // the modifier is used as part of the sequence such as "a option b"
-        // then it should also cause any other sequences to reset
-        var eventTypeMatchesSequence = e.type == _sequenceType && !isModifier;
-        var modifierIsPartOfSequence = processedSequenceCallback && isModifier;
-        if (eventTypeMatchesSequence || modifierIsPartOfSequence) {
+        // cases the modifier key will be pressed before the next key
+        if (e.type == _sequenceType && !_isModifier(character)) {
             _resetSequences(doNotReset, maxLevel);
         }
     }
