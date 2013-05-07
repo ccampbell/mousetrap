@@ -455,7 +455,7 @@
                 // subsequences (e.g. 'a option b' AND 'option b' will be fired when only
                 // 'a option b' should be fired). Any sequence at a lower level will be
                 // discarded.
-                if(callbacks[i].level != maxLevel) {
+                if (callbacks[i].level != maxLevel) {
                     continue;
                 }
 
