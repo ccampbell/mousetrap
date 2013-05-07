@@ -477,9 +477,9 @@
         // cases the modifier key will be pressed before the next key, but if
         // the modifier is used as part of the sequence such as "a option b"
         // then it should also cause any other sequences to reset
-        var keyTypeMatchesSequence = e.type == _sequenceType && !isModifier;
+        var eventTypeMatchesSequence = e.type == _sequenceType && !isModifier;
         var modifierIsPartOfSequence = processedSequenceCallback && isModifier;
-        if (keyTypeMatchesSequence || modifierIsPartOfSequence) {
+        if (eventTypeMatchesSequence || modifierIsPartOfSequence) {
             _resetSequences(doNotReset, maxLevel);
         }
     }
