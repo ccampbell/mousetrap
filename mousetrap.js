@@ -435,20 +435,30 @@
             processedSequenceCallback = false,
             isModifier = _isModifier(character);
 
-        // loop through matching callbacks for this key event
-        for (i = 0; i < callbacks.length; ++i) {
+		// Calculate the maxLevel for sequences so we can only execute the longest callback sequence
+		for (i = 0; i < callbacks.length; ++i) {
+			if (callbacks[i].seq) {
+				maxLevel = Math.max(maxLevel, callbacks[i].level);
+			}
+		}
 
+		// loop through matching callbacks for this key event
+        for (i = 0; i < callbacks.length; ++i) {
             // fire for all sequence callbacks
             // this is because if for example you have multiple sequences
             // bound such as "g i" and "g t" they both need to fire the
             // callback for matching g cause otherwise you can only ever
             // match the first one
             if (callbacks[i].seq) {
-                processedSequenceCallback = true;
+				// Only fire callbacks for the maxLevel, in order to prevent also firing
+				// subsequences (e.g. 'a option b' AND 'option b' will be fired when only
+				// 'a option b' should be fired). Any sequence at a lower level will be
+				// discarded.
+				if(callbacks[i].level != maxLevel) {
+					continue;
+				}
 
-                // as we loop through keep track of the max
-                // any sequence at a lower level will be discarded
-                maxLevel = Math.max(maxLevel, callbacks[i].level);
+                processedSequenceCallback = true;
 
                 // keep a list of which sequences were matches for later
                 doNotReset[callbacks[i].seq] = 1;
