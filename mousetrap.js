@@ -441,7 +441,7 @@
             }
         }
 
-		// loop through matching callbacks for this key event
+        // loop through matching callbacks for this key event
         for (i = 0; i < callbacks.length; ++i) {
 
             // fire for all sequence callbacks
