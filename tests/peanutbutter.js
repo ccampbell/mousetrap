@@ -67,7 +67,7 @@ PeanutButter = (function() {
         class_name = success ? 'success' : 'failure';
         $(".result", test_row).html('<span class="' + class_name + '">•</span>');
 
-        _prepareBindTest(_active_test + 1);
+        _prepareTest(_active_test + 1);
     }
 
     function _resetMousetrap() {
@@ -87,7 +87,7 @@ PeanutButter = (function() {
         });
     }
 
-    function _prepareBindTest(i) {
+    function _prepareTest(i) {
         $("tr").removeClass('ready');
 
         if (i > tests.length - 1) {
@@ -120,7 +120,7 @@ PeanutButter = (function() {
                 _addToTable(test, test_data[i], i);
             });
 
-            _prepareBindTest(0);
+            _prepareTest(0);
         }
     };
 }) ();
