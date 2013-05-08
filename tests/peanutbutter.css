@@ -16,16 +16,6 @@ td, th {
     height: 25px;
 }
 
-kbd {
-    background-color: #ccc;
-    display: inline-block;
-    padding: 0.5ex 1em;
-}
-
-.test-record-result span:nth-child(n+2) {
-    margin-left: 10px;
-}
-
 .success {
     color: green;
 }
