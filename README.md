@@ -53,21 +53,6 @@ If you would like to donate to help support Mousetrap development use [Gittip](h
     </script>
     ```
 
-3. You can also use Mousetrap to record keyboard sequences and play them back:
-
-    ```html
-    <button onclick="recordSequence()">Record</button>
-
-    <script>
-        function recordSequence() {
-            Mousetrap.record(function(sequence) {
-                // sequence is an array like ['ctrl+k', 'c']
-                alert('You pressed: ' + sequence.join(' '));
-            });
-        }
-    </script>
-    ```
-
 ## Why Mousetrap?
 
 There are a number of other similar libraries out there so what makes this one different?
