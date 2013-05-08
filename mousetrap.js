@@ -276,14 +276,14 @@
      * @param {Object} doNotReset
      * @returns void
      */
-    function _resetSequences(doNotReset, maxLevel) {
+    function _resetSequences(doNotReset) {
         doNotReset = doNotReset || {};
 
         var activeSequences = false,
             key;
 
         for (key in _sequenceLevels) {
-            if (doNotReset[key] && _sequenceLevels[key] > maxLevel) {
+            if (doNotReset[key]) {
                 activeSequences = true;
                 continue;
             }
@@ -491,7 +491,7 @@
         // that contains modifiers such as "enter ctrl+space" and in most
         // cases the modifier key will be pressed before the next key
         if (e.type == _sequenceType && !_isModifier(character)) {
-            _resetSequences(doNotReset, maxLevel);
+            _resetSequences(doNotReset);
         }
     }
 
