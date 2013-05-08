@@ -17,7 +17,7 @@
  * Mousetrap is a simple keyboard shortcut library for Javascript with
  * no external dependencies
  *
- * @version 1.3.2
+ * @version 1.3.3
  * @url craig.is/killing/mice
  */
 (function() {
@@ -125,7 +125,8 @@
             'option': 'alt',
             'command': 'meta',
             'return': 'enter',
-            'escape': 'esc'
+            'escape': 'esc',
+            'mod': /Mac|iPod|iPhone|iPad/.test(navigator.platform) ? 'meta' : 'ctrl'
         },
 
         /**
@@ -179,38 +180,7 @@
          *
          * @type {boolean|string}
          */
-        _sequenceType = false,
-
-        /**
-         * the sequence currently being recorded
-         *
-         * @type {Array}
-         */
-        _recordedSequence = [],
-
-        /**
-         * a callback to invoke after capturing a sequence when
-         * Mousetrap.record() is called
-         *
-         * @type {Function|null}
-         */
-        _recordedSequenceCallback = null,
-
-        /**
-         * a list of all of the keys currently held down, while recording a
-         * sequence
-         *
-         * @type {Array}
-         */
-        _currentRecordedKeys = [],
-
-        /**
-         * temporary state where we remember if we've already captured a
-         * character key in the current combo
-         *
-         * @type {boolean}
-         */
-        _recordedCharacterKey;
+        _sequenceType = false;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -306,14 +276,14 @@
      * @param {Object} doNotReset
      * @returns void
      */
-    function _resetSequences(doNotReset, maxLevel) {
+    function _resetSequences(doNotReset) {
         doNotReset = doNotReset || {};
 
         var activeSequences = false,
             key;
 
         for (key in _sequenceLevels) {
-            if (doNotReset[key] && _sequenceLevels[key] > maxLevel) {
+            if (doNotReset[key]) {
                 activeSequences = true;
                 continue;
             }
@@ -322,45 +292,6 @@
 
         if (!activeSequences) {
             _sequenceType = false;
-            if (_recordedSequenceCallback) {
-                _normalizeSequence(_recordedSequence);
-                _recordedSequenceCallback(_recordedSequence);
-
-                // reset all record-related state
-                _recordedSequence = [];
-                _recordedSequenceCallback = null;
-                _currentRecordedKeys = [];
-            }
-        }
-    }
-
-    /**
-     * ensures each combo in a sequence is in a predictable order and formats
-     * key combos to be '+'-delimited
-     *
-     * modifies the sequence in-place
-     *
-     * @param {Array} sequence
-     * @returns void
-     */
-    function _normalizeSequence(sequence) {
-        var i;
-
-        for (i = 0; i < sequence.length; ++i) {
-            sequence[i].sort(function(x, y) {
-                // modifier keys always come first, in alphabetical order
-                if (x.length > 1 && y.length === 1) {
-                    return -1;
-                } else if (x.length === 1 && y.length > 1) {
-                    return 1;
-                }
-
-                // character keys come next (list should contain no duplicates,
-                // so no need for equality check)
-                return x > y ? 1 : -1;
-            });
-
-            sequence[i] = sequence[i].join('+');
         }
     }
 
@@ -493,33 +424,21 @@
      * handles a character key event
      *
      * @param {string} character
+     * @param {Array} modifiers
      * @param {Event} e
      * @returns void
      */
-    function _handleCharacter(character, e) {
-        var modifiers = _eventModifiers(e),
-            callbacks = _getMatches(character, modifiers, e),
+    function _handleKey(character, modifiers, e) {
+        var callbacks = _getMatches(character, modifiers, e),
             i,
             doNotReset = {},
             maxLevel = 0,
             processedSequenceCallback = false;
 
-        // remember this character if we're currently recording a sequence
-        if (_recordedSequenceCallback) {
-            if (e.type == 'keydown') {
-                if (character.length === 1 && _recordedCharacterKey) {
-                    _recordCurrentCombo();
-                }
-
-                for (i = 0; i < modifiers.length; ++i) {
-                    _recordKey(modifiers[i]);
-                }
-                _recordKey(character);
-
-            // once a key is released, all keys that were held down at the time
-            // count as a keypress
-            } else if (e.type == 'keyup' && _currentRecordedKeys.length > 0) {
-                _recordCurrentCombo();
+        // Calculate the maxLevel for sequences so we can only execute the longest callback sequence
+        for (i = 0; i < callbacks.length; ++i) {
+            if (callbacks[i].seq) {
+                maxLevel = Math.max(maxLevel, callbacks[i].level);
             }
         }
 
@@ -532,11 +451,20 @@
             // callback for matching g cause otherwise you can only ever
             // match the first one
             if (callbacks[i].seq) {
-                processedSequenceCallback = true;
 
-                // as we loop through keep track of the max
-                // any sequence at a lower level will be discarded
-                maxLevel = Math.max(maxLevel, callbacks[i].level);
+                // only fire callbacks for the maxLevel to prevent
+                // subsequences from also firing
+                //
+                // for example 'a option b' should not cause 'option b' to fire
+                // even though 'option b' is part of the other sequence
+                //
+                // any sequences that do not match here will be discarded
+                // below by the _resetSequences call
+                if (callbacks[i].level != maxLevel) {
+                    continue;
+                }
+
+                processedSequenceCallback = true;
 
                 // keep a list of which sequences were matches for later
                 doNotReset[callbacks[i].seq] = 1;
@@ -551,48 +479,20 @@
             }
         }
 
-        // if you are inside of a sequence and the key you are pressing
-        // is not a modifier key then we should reset all sequences
-        // that were not matched by this key event
+        // if the key you pressed matches the type of sequence without
+        // being a modifier (ie "keyup" or "keypress") then we should
+        // reset all sequences that were not matched by this event
+        //
+        // this is so, for example, if you have the sequence "h a t" and you
+        // type "h e a r t" it does not match.  in this case the "e" will
+        // cause the sequence to reset
+        //
+        // modifier keys are ignored because you can have a sequence
+        // that contains modifiers such as "enter ctrl+space" and in most
+        // cases the modifier key will be pressed before the next key
         if (e.type == _sequenceType && !_isModifier(character)) {
-            _resetSequences(doNotReset, maxLevel);
+            _resetSequences(doNotReset);
         }
-    }
-
-    /**
-     * marks a character key as held down while recording a sequence
-     *
-     * @param {string} key
-     * @returns void
-     */
-    function _recordKey(key) {
-        var i;
-
-        // one-off implementation of Array.indexOf, since IE6-9 don't support it
-        for (i = 0; i < _currentRecordedKeys.length; ++i) {
-            if (_currentRecordedKeys[i] === key) {
-                return;
-            }
-        }
-
-        _currentRecordedKeys.push(key);
-
-        if (key.length === 1) {
-            _recordedCharacterKey = true;
-        }
-    }
-
-    /**
-     * marks whatever key combination that's been recorded so far as finished
-     * and gets ready for the next combo
-     *
-     * @returns void
-     */
-    function _recordCurrentCombo() {
-        _recordedSequence.push(_currentRecordedKeys);
-        _currentRecordedKeys = [];
-        _recordedCharacterKey = false;
-        _resetSequenceTimer();
     }
 
     /**
@@ -601,7 +501,7 @@
      * @param {Event} e
      * @returns void
      */
-    function _handleKey(e) {
+    function _handleKeyEvent(e) {
 
         // normalize e.which for key events
         // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
@@ -621,7 +521,7 @@
             return;
         }
 
-        _handleCharacter(character, e);
+        Mousetrap.handleKey(character, _eventModifiers(e), e);
     }
 
     /**
@@ -862,9 +762,9 @@
     }
 
     // start!
-    _addEvent(document, 'keypress', _handleKey);
-    _addEvent(document, 'keydown', _handleKey);
-    _addEvent(document, 'keyup', _handleKey);
+    _addEvent(document, 'keypress', _handleKeyEvent);
+    _addEvent(document, 'keydown', _handleKeyEvent);
+    _addEvent(document, 'keyup', _handleKeyEvent);
 
     var Mousetrap = {
 
@@ -910,17 +810,6 @@
         },
 
         /**
-         * records the next sequence and passes it to a callback once it's
-         * completed
-         *
-         * @param {Function} callback
-         * @returns void
-         */
-        record: function(callback) {
-            _recordedSequenceCallback = callback;
-        },
-
-        /**
          * triggers an event that has already been bound
          *
          * @param {string} keys
@@ -963,7 +852,12 @@
 
             // stop for input, select, and textarea
             return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true');
-        }
+        },
+
+        /**
+         * exposes _handleKey publicly so it can be overwritten by extensions
+         */
+        handleKey: _handleKey
     };
 
     // expose mousetrap to the global object
