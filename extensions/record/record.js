@@ -1,3 +1,8 @@
+/**
+ * This extension allows you to record a sequence using Mousetrap.
+ *
+ * @author Dan Tao <daniel.tao@gmail.com>
+ */
 (function(Mousetrap) {
   /**
    * the sequence currently being recorded
@@ -7,16 +12,14 @@
   var _recordedSequence = [],
 
       /**
-       * a callback to invoke after capturing a sequence when
-       * Mousetrap.record() is called
+       * a callback to invoke after recording a sequence
        *
        * @type {Function|null}
        */
       _recordedSequenceCallback = null,
 
       /**
-       * a list of all of the keys currently held down, while recording a
-       * sequence
+       * a list of all of the keys currently held down
        *
        * @type {Array}
        */
@@ -38,7 +41,8 @@
       _recordTimer = null,
 
       /**
-       * the original handleKey method to override
+       * the original handleKey method to override when Mousetrap.record() is
+       * called
        *
        * @type {Function}
        */
@@ -147,12 +151,12 @@
     if (_recordedSequenceCallback) {
       _normalizeSequence(_recordedSequence);
       _recordedSequenceCallback(_recordedSequence);
-
-      // reset all recorded state
-      _recordedSequence = [];
-      _recordedSequenceCallback = null;
-      _currentRecordedKeys = [];
     }
+
+    // reset all recorded state
+    _recordedSequence = [];
+    _recordedSequenceCallback = null;
+    _currentRecordedKeys = [];
 
     Mousetrap.handleKey = _origHandleKey;
   }
@@ -160,8 +164,8 @@
   /**
    * called to set a 1 second timeout on the current recording
    *
-   * this is so after each key press in the sequence you have 1 second
-   * to press the next key before you have to start over
+   * this is so after each key press in the sequence the recording will wait for
+   * 1 more second before executing the callback
    *
    * @returns void
    */
