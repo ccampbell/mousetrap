@@ -474,7 +474,7 @@
 
             // if there were no sequence matches but we are still here
             // that means this is a regular match so we should fire that
-            if (!processedSequenceCallback && !_sequenceType) {
+            if (!processedSequenceCallback) {
                 _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
             }
         }
