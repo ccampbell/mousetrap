@@ -1,3 +1,4 @@
+/* jshint es5: true, browser: true, expr: true */
 /* globals describe, chai, it, sinon, Mousetrap, KeyEvent, Event */
 describe('Mousetrap.bind', function() {
     var expect = chai.expect;
@@ -90,7 +91,7 @@ describe('Mousetrap.bind', function() {
         expect(spy2.callCount).to.equal(1, 'new callback was called');
     });
 
-    it('binding an array of keys works', function() {
+    it('binding an array of keys', function() {
         var spy = sinon.spy();
         Mousetrap.bind(['a', 'b', 'c'], spy);
 
@@ -116,7 +117,7 @@ describe('Mousetrap.bind', function() {
         expect(spy.args[2][1]).to.equal('c', 'callback should have matched for c');
     });
 
-    it('binding special characters works', function() {
+    it('binding special characters', function() {
         var spy = sinon.spy();
         Mousetrap.bind('*', spy);
 
@@ -127,4 +128,69 @@ describe('Mousetrap.bind', function() {
         expect(spy.callCount).to.equal(1, 'callback fired once');
         expect(spy.args[0][1]).to.equal('*', 'callback should have matched for *');
     });
+
+    it('binding key combinations', function() {
+        var spy = sinon.spy();
+        Mousetrap.bind('command+o', spy);
+        var event = new KeyEvent({
+            keyCode: 79,
+            modifiers: ['meta']
+        }, 'keydown');
+
+        event.fire(document);
+        expect(spy.callCount).to.equal(1, 'callback fired once for command+o');
+        expect(spy.args[0][1]).to.equal('command+o', 'keyboard string returned is correct');
+    });
+
+    it('binding key combos with multiple modifiers', function() {
+        var spy = sinon.spy();
+        Mousetrap.bind('command+shift+o', spy);
+        var event = new KeyEvent({
+            keyCode: 79,
+            modifiers: ['meta']
+        }, 'keydown');
+        event.fire(document);
+        expect(spy.callCount).to.equal(0, 'callback not fired for command+o');
+
+        event = new KeyEvent({
+            keyCode: 79,
+            modifiers: ['meta']
+        }, 'keydown');
+
+        event.fire(document);
+    });
+
+    it('return false should prevent default and stop propagation', function() {
+        var spy = sinon.spy(function() {
+            return false;
+        });
+
+        Mousetrap.bind('command+s', spy);
+        var event = new KeyEvent({
+            keyCode: 83,
+            modifiers: ['meta']
+        }, 'keydown');
+        event.fire(document);
+
+        expect(spy.callCount).to.equal(1, 'callback should have fired');
+        expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
+        expect(spy.args[0][0].cancelBubble).to.be.true;
+        expect(spy.args[0][0].defaultPrevented).to.be.true;
+
+        // try without return false
+        spy = sinon.spy();
+        Mousetrap.bind('command+s', spy);
+        event = new KeyEvent({
+            keyCode: 83,
+            modifiers: ['meta']
+        }, 'keydown');
+        event.fire(document);
+
+        expect(spy.callCount).to.equal(1, 'callback should have fired');
+        expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
+        expect(spy.args[0][0].cancelBubble).to.be.false;
+        expect(spy.args[0][0].defaultPrevented).to.be.false;
+    });
+
+    it.skip('binding sequences works');
 });
