@@ -10,10 +10,9 @@ describe('Mousetrap.bind', function() {
 
         var charCode = 'Z'.charCodeAt(0);
 
-        var event = new KeyEvent({
+        new KeyEvent({
             charCode: charCode
-        });
-        event.fire(document);
+        }).fire(document);
 
         // really slow for some reason
         // expect(spy).to.have.been.calledOnce;
@@ -21,17 +20,15 @@ describe('Mousetrap.bind', function() {
         expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
         expect(spy.args[0][1]).to.equal('z', 'second argument should be key combo');
 
-        event = new KeyEvent({
+        new KeyEvent({
             charCode: charCode
-        }, 'keydown');
-        event.fire(document);
+        }, 'keydown').fire(document);
 
         expect(spy.callCount).to.equal(1, 'callback should not fire from keydown');
 
-        event = new KeyEvent({
+        new KeyEvent({
             charCode: charCode
-        }, 'keyup');
-        event.fire(document);
+        }, 'keyup').fire(document);
 
         expect(spy.callCount).to.equal(1, 'callback should not fire from keyup');
     });
@@ -41,10 +38,10 @@ describe('Mousetrap.bind', function() {
 
         Mousetrap.bind('z', spy);
 
-        var event = new KeyEvent({
+        new KeyEvent({
             charCode: 'B'.charCodeAt(0)
-        });
-        event.fire(document);
+        }).fire(document);
+
         expect(spy.callCount).to.equal(0);
     });
 
@@ -67,11 +64,11 @@ describe('Mousetrap.bind', function() {
 
             spy.reset();
 
-            var event = new KeyEvent({
+            new KeyEvent({
                 charCode: charCode,
                 modifiers: [modifier]
-            });
-            event.fire(document);
+            }).fire(document);
+
             expect(spy.callCount).to.equal(0);
         }
     });
@@ -82,10 +79,9 @@ describe('Mousetrap.bind', function() {
         Mousetrap.bind('x', spy1);
         Mousetrap.bind('x', spy2);
 
-        var event = new KeyEvent({
+        new KeyEvent({
             charCode: 'X'.charCodeAt(0)
-        });
-        event.fire(document);
+        }).fire(document);
 
         expect(spy1.callCount).to.equal(0, 'original callback was not called');
         expect(spy2.callCount).to.equal(1, 'new callback was called');
@@ -95,24 +91,24 @@ describe('Mousetrap.bind', function() {
         var spy = sinon.spy();
         Mousetrap.bind(['a', 'b', 'c'], spy);
 
-        var event = new KeyEvent({
+        new KeyEvent({
             charCode: 'A'.charCodeAt(0)
-        });
-        event.fire(document);
+        }).fire(document);
+
         expect(spy.callCount).to.equal(1, 'new callback was called');
         expect(spy.args[0][1]).to.equal('a', 'callback should have matched for a');
 
-        event = new KeyEvent({
+        new KeyEvent({
             charCode: 'B'.charCodeAt(0)
-        });
-        event.fire(document);
+        }).fire(document);
+
         expect(spy.callCount).to.equal(2, 'new callback was called twice');
         expect(spy.args[1][1]).to.equal('b', 'callback should have matched for b');
 
-        event = new KeyEvent({
+        new KeyEvent({
             charCode: 'C'.charCodeAt(0)
-        });
-        event.fire(document);
+        }).fire(document);
+
         expect(spy.callCount).to.equal(3, 'new callback was called three times');
         expect(spy.args[2][1]).to.equal('c', 'callback should have matched for c');
     });
@@ -121,10 +117,10 @@ describe('Mousetrap.bind', function() {
         var spy = sinon.spy();
         Mousetrap.bind('*', spy);
 
-        var event = new KeyEvent({
+        new KeyEvent({
             charCode: '*'.charCodeAt(0)
-        });
-        event.fire(document);
+        }).fire(document);
+
         expect(spy.callCount).to.equal(1, 'callback fired once');
         expect(spy.args[0][1]).to.equal('*', 'callback should have matched for *');
     });
@@ -132,12 +128,11 @@ describe('Mousetrap.bind', function() {
     it('binding key combinations', function() {
         var spy = sinon.spy();
         Mousetrap.bind('command+o', spy);
-        var event = new KeyEvent({
+        new KeyEvent({
             keyCode: 79,
             modifiers: ['meta']
-        }, 'keydown');
+        }, 'keydown').fire(document);
 
-        event.fire(document);
         expect(spy.callCount).to.equal(1, 'callback fired once for command+o');
         expect(spy.args[0][1]).to.equal('command+o', 'keyboard string returned is correct');
     });
@@ -145,19 +140,16 @@ describe('Mousetrap.bind', function() {
     it('binding key combos with multiple modifiers', function() {
         var spy = sinon.spy();
         Mousetrap.bind('command+shift+o', spy);
-        var event = new KeyEvent({
+        new KeyEvent({
             keyCode: 79,
             modifiers: ['meta']
-        }, 'keydown');
-        event.fire(document);
+        }, 'keydown').fire(document);
         expect(spy.callCount).to.equal(0, 'callback not fired for command+o');
 
-        event = new KeyEvent({
+        new KeyEvent({
             keyCode: 79,
             modifiers: ['meta']
-        }, 'keydown');
-
-        event.fire(document);
+        }, 'keydown').fire(document);
     });
 
     it('return false should prevent default and stop propagation', function() {
@@ -166,11 +158,10 @@ describe('Mousetrap.bind', function() {
         });
 
         Mousetrap.bind('command+s', spy);
-        var event = new KeyEvent({
+        new KeyEvent({
             keyCode: 83,
             modifiers: ['meta']
-        }, 'keydown');
-        event.fire(document);
+        }, 'keydown').fire(document);
 
         expect(spy.callCount).to.equal(1, 'callback should have fired');
         expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
@@ -180,11 +171,10 @@ describe('Mousetrap.bind', function() {
         // try without return false
         spy = sinon.spy();
         Mousetrap.bind('command+s', spy);
-        event = new KeyEvent({
+        new KeyEvent({
             keyCode: 83,
             modifiers: ['meta']
-        }, 'keydown');
-        event.fire(document);
+        }, 'keydown').fire(document);
 
         expect(spy.callCount).to.equal(1, 'callback should have fired');
         expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
@@ -192,5 +182,28 @@ describe('Mousetrap.bind', function() {
         expect(spy.args[0][0].defaultPrevented).to.be.false;
     });
 
-    it.skip('binding sequences works');
+    it('binding sequences', function() {
+        var spy = sinon.spy();
+        Mousetrap.bind('g i', spy);
+
+        new KeyEvent({
+            charCode: 'G'.charCodeAt(0)
+        }).fire(document);
+        expect(spy.callCount).to.equal(0, 'callback should not have fired');
+
+        new KeyEvent({
+            charCode: 'I'.charCodeAt(0)
+        }).fire(document);
+        expect(spy.callCount).to.equal(1, 'callback should have fired');
+    });
+
+    it.skip('key within sequence should not fire');
+
+    it.skip('keyup at end of sequence should not fire');
+
+    it.skip('broken sequences');
+
+    it.skip('sequence timeout');
+
+    it.skip('check defaults');
 });
