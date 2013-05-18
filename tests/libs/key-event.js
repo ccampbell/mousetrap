@@ -44,5 +44,80 @@
         element.fireEvent('on' + this.type, event);
     };
 
+    // simulates complete key event as if the user pressed the key in the browser
+    // triggers a keydown, then a keypress, then a keyup
+    KeyEvent.simulate = function(charCode, keyCode, modifiers, element, repeat) {
+        if (modifiers === undefined) {
+            modifiers = [];
+        }
+
+        if (element === undefined) {
+            element = document;
+        }
+
+        if (repeat === undefined) {
+            repeat = 1;
+        }
+
+        var modifierToKeyCode = {
+            'shift': 16,
+            'ctrl': 17,
+            'alt': 18,
+            'meta': 91
+        };
+
+        var modifiersToInclude = [];
+        var keyEvents = [];
+
+        // modifiers would go down first
+        for (var i = 0; i < modifiers.length; i++) {
+            modifiersToInclude.push(modifiers[i]);
+            keyEvents.push(new KeyEvent({
+                charCode: 0,
+                keyCode: modifierToKeyCode[modifiers[i]],
+                modifiers: modifiersToInclude
+            }, 'keydown'));
+        }
+
+        // @todo factor in duration for these
+        while (repeat > 0) {
+            keyEvents.push(new KeyEvent({
+                charCode: 0,
+                keyCode: keyCode,
+                modifiers: modifiersToInclude
+            }, 'keydown'));
+
+            keyEvents.push(new KeyEvent({
+                charCode: charCode,
+                keyCode: charCode,
+                modifiers: modifiersToInclude
+            }, 'keypress'));
+
+            repeat--;
+        }
+
+        keyEvents.push(new KeyEvent({
+            charCode: 0,
+            keyCode: keyCode,
+            modifiers: modifiersToInclude
+        }, 'keyup'));
+
+        // now lift up the modifier keys
+        for (i = 0; i < modifiersToInclude.length; i++) {
+            var modifierKeyCode = modifierToKeyCode[modifiersToInclude[i]];
+            modifiersToInclude.splice(i, 1);
+            keyEvents.push(new KeyEvent({
+                charCode: 0,
+                keyCode: modifierKeyCode,
+                modifiers: modifiersToInclude
+            }, 'keyup'));
+        }
+
+        for (i = 0; i < keyEvents.length; i++) {
+            // console.log('firing', keyEvents[i].type, keyEvents[i].keyCode, keyEvents[i].charCode);
+            keyEvents[i].fire(element);
+        }
+    };
+
     window.KeyEvent = KeyEvent;
 }) ();
