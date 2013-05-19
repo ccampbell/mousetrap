@@ -16,8 +16,13 @@
     <script>mocha.setup('bdd')</script>
     <script src="test.mousetrap.js"></script>
     <script>
-        mocha.checkLeaks();
         mocha.globals(['Mousetrap']);
-        mocha.run();
+
+        if (window.mochaPhantomJS) {
+            window.mochaPhantomJS.run();
+        }
+        else if (!window.PHANTOMJS) {
+            mocha.run();
+        }
     </script>
 </body>
