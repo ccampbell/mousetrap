@@ -66,6 +66,12 @@
             'meta': 91
         };
 
+        // if the key is a modifier then take it out of the regular
+        // keypress/keydown
+        if (keyCode == 16 || keyCode == 17 || keyCode == 18 || keyCode == 91) {
+            repeat = 0;
+        }
+
         var modifiersToInclude = [];
         var keyEvents = [];
 
