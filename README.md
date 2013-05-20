@@ -66,6 +66,35 @@ There are a number of other similar libraries out there so what makes this one d
 - It works with the numeric keypad on your keyboard
 - The code is well documented/commented
 
+## Tests
+
+Unit tests run via <a href="http://visionmedia.github.io/mocha" target="_blank">mocha</a>.
+
+### Running in browser
+
+Download the repo and go to `tests/mousetrap.html` in your browser.
+
+### Running with Grunt and PhantomJS
+
+1.  Install grunt-cli
+
+    ```bash
+    npm install -g grunt-cli
+    ```
+
+2.  Install npm packages
+
+    ```bash
+    cd /path/to/repo
+    npm install
+    ```
+
+3.  Run tests
+
+    ```bash
+    grunt mocha
+    ```
+
 ## Documentation
 
 Full documentation can be found at http://craig.is/killing/mice
