@@ -1,12 +1,11 @@
 /* jshint es5: true, browser: true, expr: true */
 /* globals describe, afterEach, chai, it, sinon, Mousetrap, KeyEvent, Event */
+var expect = chai.expect;
+afterEach(function() {
+    Mousetrap.reset();
+});
+
 describe('Mousetrap.bind', function() {
-    var expect = chai.expect;
-
-    afterEach(function() {
-        Mousetrap.reset();
-    });
-
     describe('basic', function() {
         it('z key fires when pressing z', function() {
             var spy = sinon.spy();
@@ -414,6 +413,26 @@ describe('Mousetrap.bind', function() {
 });
 
 describe('Mousetrap.unbind', function() {
-    it.skip('unbind works');
-    it.skip('unbind accepts an array');
+    it('unbind works', function() {
+        var spy = sinon.spy();
+        Mousetrap.bind('a', spy);
+        KeyEvent.simulate('a'.charCodeAt(0), 65);
+        expect(spy.callCount).to.equal(1, 'callback for a should fire');
+
+        Mousetrap.unbind('a');
+        KeyEvent.simulate('a'.charCodeAt(0), 65);
+        expect(spy.callCount).to.equal(1, 'callback for a should not fire after unbind');
+    });
+
+    it('unbind accepts an array', function() {
+        var spy = sinon.spy();
+        Mousetrap.bind(['a', 'b', 'c'], spy);
+        KeyEvent.simulate('a'.charCodeAt(0), 65);
+        KeyEvent.simulate('b'.charCodeAt(0), 66);
+        KeyEvent.simulate('c'.charCodeAt(0), 67);
+        expect(spy.callCount).to.equal(3, 'callback should have fired 3 times');
+
+        Mousetrap.unbind(['a', 'b', 'c']);
+        expect(spy.callCount).to.equal(3, 'callback should not fire after unbind');
+    });
 });
