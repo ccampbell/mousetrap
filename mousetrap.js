@@ -730,7 +730,7 @@
         combination = combination.replace(/\s+/g, ' ');
 
         var sequence = combination.split(' '),
-            data;
+            info;
 
         // if this pattern is a sequence of keys then run through this method
         // to reprocess each pattern one key at a time
@@ -739,14 +739,14 @@
             return;
         }
 
-        data = _getKeyInfo(combination, action);
+        info = _getKeyInfo(combination, action);
 
         // make sure to initialize array if this is the first time
         // a callback is added for this key
-        _callbacks[data.key] = _callbacks[data.key] || [];
+        _callbacks[info.key] = _callbacks[info.key] || [];
 
         // remove an existing match if there is one
-        _getMatches(data.key, data.modifiers, {type: data.action}, !sequenceName, combination);
+        _getMatches(info.key, info.modifiers, {type: info.action}, !sequenceName, combination);
 
         // add this call back to the array
         // if it is a sequence put it at the beginning
@@ -754,10 +754,10 @@
         //
         // this is important because the way these are processed expects
         // the sequence ones to come first
-        _callbacks[data.key][sequenceName ? 'unshift' : 'push']({
+        _callbacks[info.key][sequenceName ? 'unshift' : 'push']({
             callback: callback,
-            modifiers: data.modifiers,
-            action: data.action,
+            modifiers: info.modifiers,
+            action: info.action,
             seq: sequenceName,
             level: level,
             combo: combination
