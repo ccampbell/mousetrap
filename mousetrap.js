@@ -662,6 +662,20 @@
     }
 
     /**
+     * Converts from a string key combination to an array
+     *
+     * @param  {string} combination like "command+shift+l"
+     * @return {Array}
+     */
+    function _keysFromString(combination) {
+        if (combination === '+') {
+            return ['+'];
+        }
+
+        return combination.split('+');
+    }
+
+    /**
      * Gets info for a specific key combination
      *
      * @param  {string} combination key combination ("command+s" or "a" or "*")
@@ -676,7 +690,7 @@
 
         // take the keys from this pattern and figure out what the actual
         // pattern is all about
-        keys = combination === '+' ? ['+'] : combination.split('+');
+        keys = _keysFromString(combination);
 
         for (i = 0; i < keys.length; ++i) {
             key = keys[i];
