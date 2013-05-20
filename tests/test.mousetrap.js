@@ -280,6 +280,17 @@ describe('Mousetrap.bind', function() {
             expect(spy.callCount).to.equal(1, 'callback for "b a t" sequence should fire on keyup');
         });
 
+        it('extra spaces in sequences should be ignored', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('b   a  t', spy);
+
+            KeyEvent.simulate('b'.charCodeAt(0), 66);
+            KeyEvent.simulate('a'.charCodeAt(0), 65);
+            KeyEvent.simulate('t'.charCodeAt(0), 84);
+
+            expect(spy.callCount).to.equal(1, 'callback for "b a t" sequence should fire');
+        });
+
         it('modifiers and sequences play nicely', function() {
             var spy1 = sinon.spy();
             var spy2 = sinon.spy();
