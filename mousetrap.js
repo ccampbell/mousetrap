@@ -662,35 +662,17 @@
     }
 
     /**
-     * binds a single keyboard combination
+     * Gets info for a specific key combination
      *
-     * @param {string} combination
-     * @param {Function} callback
-     * @param {string=} action
-     * @param {string=} sequenceName - name of sequence if part of sequence
-     * @param {number=} level - what part of the sequence the command is
-     * @returns void
+     * @param  {string} combination key combination ("command+s" or "a" or "*")
+     * @param  {string=} action
+     * @returns {Object}
      */
-    function _bindSingle(combination, callback, action, sequenceName, level) {
-
-        // store a direct mapped reference for use with Mousetrap.trigger
-        _directMap[combination + ':' + action] = callback;
-
-        // make sure multiple spaces in a row become a single space
-        combination = combination.replace(/\s+/g, ' ');
-
-        var sequence = combination.split(' '),
-            i,
+    function _getKeyInfo(combination, action) {
+        var keys,
             key,
-            keys,
+            i,
             modifiers = [];
-
-        // if this pattern is a sequence of keys then run through this method
-        // to reprocess each pattern one key at a time
-        if (sequence.length > 1) {
-            _bindSequence(combination, sequence, callback, action);
-            return;
-        }
 
         // take the keys from this pattern and figure out what the actual
         // pattern is all about
@@ -722,14 +704,49 @@
         // we will try to pick the best event for it
         action = _pickBestAction(key, modifiers, action);
 
-        // make sure to initialize array if this is the first time
-        // a callback is added for this key
-        if (!_callbacks[key]) {
-            _callbacks[key] = [];
+        return {
+            key: key,
+            modifiers: modifiers,
+            action: action
+        };
+    }
+
+    /**
+     * binds a single keyboard combination
+     *
+     * @param {string} combination
+     * @param {Function} callback
+     * @param {string=} action
+     * @param {string=} sequenceName - name of sequence if part of sequence
+     * @param {number=} level - what part of the sequence the command is
+     * @returns void
+     */
+    function _bindSingle(combination, callback, action, sequenceName, level) {
+
+        // store a direct mapped reference for use with Mousetrap.trigger
+        _directMap[combination + ':' + action] = callback;
+
+        // make sure multiple spaces in a row become a single space
+        combination = combination.replace(/\s+/g, ' ');
+
+        var sequence = combination.split(' '),
+            data;
+
+        // if this pattern is a sequence of keys then run through this method
+        // to reprocess each pattern one key at a time
+        if (sequence.length > 1) {
+            _bindSequence(combination, sequence, callback, action);
+            return;
         }
 
+        data = _getKeyInfo(combination, action);
+
+        // make sure to initialize array if this is the first time
+        // a callback is added for this key
+        _callbacks[data.key] = _callbacks[data.key] || [];
+
         // remove an existing match if there is one
-        _getMatches(key, modifiers, {type: action}, !sequenceName, combination);
+        _getMatches(data.key, data.modifiers, {type: data.action}, !sequenceName, combination);
 
         // add this call back to the array
         // if it is a sequence put it at the beginning
@@ -737,10 +754,10 @@
         //
         // this is important because the way these are processed expects
         // the sequence ones to come first
-        _callbacks[key][sequenceName ? 'unshift' : 'push']({
+        _callbacks[data.key][sequenceName ? 'unshift' : 'push']({
             callback: callback,
-            modifiers: modifiers,
-            action: action,
+            modifiers: data.modifiers,
+            action: data.action,
             seq: sequenceName,
             level: level,
             combo: combination
