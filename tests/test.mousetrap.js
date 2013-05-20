@@ -1,9 +1,9 @@
 /* jshint es5: true, browser: true, expr: true */
-/* globals describe, beforeEach, chai, it, sinon, Mousetrap, KeyEvent, Event */
+/* globals describe, afterEach, chai, it, sinon, Mousetrap, KeyEvent, Event */
 describe('Mousetrap.bind', function() {
     var expect = chai.expect;
 
-    beforeEach(function() {
+    afterEach(function() {
         Mousetrap.reset();
     });
 
@@ -139,7 +139,21 @@ describe('Mousetrap.bind', function() {
             expect(spy.args[0][0].defaultPrevented).to.be.false;
         });
 
-        it.skip('capslock key is ignored');
+        it('capslock key is ignored', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('a', spy);
+
+            KeyEvent.simulate('a'.charCodeAt(0), 65);
+            expect(spy.callCount).to.equal(1, 'callback should fire for lowercase a');
+
+            spy.reset();
+            KeyEvent.simulate('A'.charCodeAt(0), 65);
+            expect(spy.callCount).to.equal(1, 'callback should fire for capslock A');
+
+            spy.reset();
+            KeyEvent.simulate('A'.charCodeAt(0), 65, ['shift']);
+            expect(spy.callCount).to.equal(0, 'callback should not fire fort shift+a');
+        });
     });
 
     describe('special characters', function() {
@@ -254,6 +268,19 @@ describe('Mousetrap.bind', function() {
             expect(spy2.callCount).to.equal(1, 'callback for "b a t" sequence should fire');
         });
 
+        it('keyup sequences should work', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('b a t', spy, 'keyup');
+
+            KeyEvent.simulate('b'.charCodeAt(0), 66);
+            KeyEvent.simulate('a'.charCodeAt(0), 65);
+
+            // hold the last key down for a while
+            KeyEvent.simulate('t'.charCodeAt(0), 84, [], document, 10);
+
+            expect(spy.callCount).to.equal(1, 'callback for "b a t" sequence should fire on keyup');
+        });
+
         it('modifiers and sequences play nicely', function() {
             var spy1 = sinon.spy();
             var spy2 = sinon.spy();
@@ -296,13 +323,93 @@ describe('Mousetrap.bind', function() {
             expect(spy2.callCount).to.equal(1, '"a option b" should fire');
         });
 
-        it.skip('broken sequences');
+        it.skip('rebinding same sequence should override previous');
 
-        it.skip('sequence timeout');
+        it('broken sequences', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('h a t', spy);
+
+            KeyEvent.simulate('h'.charCodeAt(0), 72);
+            KeyEvent.simulate('e'.charCodeAt(0), 69);
+            KeyEvent.simulate('a'.charCodeAt(0), 65);
+            KeyEvent.simulate('r'.charCodeAt(0), 82);
+            KeyEvent.simulate('t'.charCodeAt(0), 84);
+
+            expect(spy.callCount).to.equal(0, 'sequence for "h a t" should not fire for "h e a r t"');
+        });
+
+        it('sequence timer resets', function() {
+            var spy = sinon.spy();
+            var clock = sinon.useFakeTimers();
+
+            Mousetrap.bind('h a t', spy);
+
+            KeyEvent.simulate('h'.charCodeAt(0), 72);
+            clock.tick(600);
+            KeyEvent.simulate('a'.charCodeAt(0), 65);
+            clock.tick(900);
+            KeyEvent.simulate('t'.charCodeAt(0), 84);
+
+            expect(spy.callCount).to.equal(1, 'sequence should fire after waiting');
+            clock.restore();
+        });
+
+        it('sequences timeout', function() {
+            var spy = sinon.spy();
+            var clock = sinon.useFakeTimers();
+
+            Mousetrap.bind('g t', spy);
+            KeyEvent.simulate('g'.charCodeAt(0), 71);
+            clock.tick(1000);
+            KeyEvent.simulate('t'.charCodeAt(0), 84);
+
+            expect(spy.callCount).to.equal(0, 'sequence callback should not fire');
+            clock.restore();
+        });
     });
 
     describe('default actions', function() {
-        it.skip('"a" key uses "keypress"');
+        var keys = {
+            keypress: [
+                ['a', 65],
+                ['A', 65, ['shift']],
+                ['7', 55],
+                ['?', 191],
+                ['*', 56],
+                ['+', 187],
+                ['$', 52],
+                ['[', 219],
+                ['.', 190]
+            ],
+            keydown: [
+                ['shift+\'', 222, ['shift']],
+                ['shift+a', 65, ['shift']],
+                ['shift+5', 53, ['shift']],
+                ['command+shift+p', 80, ['meta', 'shift']],
+                ['space', 32],
+                ['left', 37]
+            ]
+        };
+
+        function getCallback(key, keyCode, type, modifiers) {
+            return function() {
+                var spy = sinon.spy();
+                Mousetrap.bind(key, spy);
+
+                KeyEvent.simulate(key.charCodeAt(0), keyCode, modifiers);
+                expect(spy.callCount).to.equal(1);
+                expect(spy.args[0][0].type).to.equal(type);
+            };
+        }
+
+        for (var type in keys) {
+            for (var i = 0; i < keys[type].length; i++) {
+                var key = keys[type][i][0];
+                var keyCode = keys[type][i][1];
+                var modifiers = keys[type][i][2] || [];
+                it('"' + key + '" uses "' + type + '"', getCallback(key, keyCode, type, modifiers));
+            }
+        }
     });
 });
 
