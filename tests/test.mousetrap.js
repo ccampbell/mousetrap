@@ -280,6 +280,17 @@ describe('Mousetrap.bind', function() {
             expect(spy.callCount).to.equal(1, 'callback for "b a t" sequence should fire on keyup');
         });
 
+        it('extra spaces in sequences should be ignored', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('b   a  t', spy);
+
+            KeyEvent.simulate('b'.charCodeAt(0), 66);
+            KeyEvent.simulate('a'.charCodeAt(0), 65);
+            KeyEvent.simulate('t'.charCodeAt(0), 84);
+
+            expect(spy.callCount).to.equal(1, 'callback for "b a t" sequence should fire');
+        });
+
         it('modifiers and sequences play nicely', function() {
             var spy1 = sinon.spy();
             var spy2 = sinon.spy();
@@ -322,7 +333,19 @@ describe('Mousetrap.bind', function() {
             expect(spy2.callCount).to.equal(1, '"a option b" should fire');
         });
 
-        it.skip('rebinding same sequence should override previous');
+        it.skip('rebinding same sequence should override previous', function() {
+            var spy1 = sinon.spy();
+            var spy2 = sinon.spy();
+            Mousetrap.bind('a b c', spy1);
+            Mousetrap.bind('a b c', spy2);
+
+            KeyEvent.simulate('a'.charCodeAt(0), 65);
+            KeyEvent.simulate('b'.charCodeAt(0), 66);
+            KeyEvent.simulate('c'.charCodeAt(0), 67);
+
+            expect(spy1.callCount).to.equal(0, 'first callback should not fire');
+            expect(spy2.callCount).to.equal(1, 'second callback should fire');
+        });
 
         it('broken sequences', function() {
             var spy = sinon.spy();
