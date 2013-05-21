@@ -306,6 +306,28 @@ describe('Mousetrap.bind', function() {
             expect(spy2.callCount).to.equal(1, '"ctrl+b" should fire');
         });
 
+        it('sequences that start the same work', function() {
+            var spy1 = sinon.spy();
+            var spy2 = sinon.spy();
+
+            Mousetrap.bind('g g l', spy2);
+            Mousetrap.bind('g g o', spy1);
+
+            KeyEvent.simulate('g'.charCodeAt(0), 71);
+            KeyEvent.simulate('g'.charCodeAt(0), 71);
+            KeyEvent.simulate('o'.charCodeAt(0), 79);
+            expect(spy1.callCount).to.equal(1, '"g g o" should fire');
+            expect(spy2.callCount).to.equal(0, '"g g l" should not fire');
+
+            spy1.reset();
+            spy2.reset();
+            KeyEvent.simulate('g'.charCodeAt(0), 71);
+            KeyEvent.simulate('g'.charCodeAt(0), 71);
+            KeyEvent.simulate('l'.charCodeAt(0), 76);
+            expect(spy1.callCount).to.equal(0, '"g g o" should not fire');
+            expect(spy2.callCount).to.equal(1, '"g g l" should fire');
+        });
+
         it('sequences should not fire subsequences', function() {
             var spy1 = sinon.spy();
             var spy2 = sinon.spy();
