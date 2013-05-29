@@ -302,11 +302,12 @@
      * @param {string} character
      * @param {Array} modifiers
      * @param {Event|Object} e
-     * @param {boolean=} remove - should we remove any matches
+     * @param {string=} sequenceName - name of the sequence we are looking for
      * @param {string=} combination
+     * @param {number=} level
      * @returns {Array}
      */
-    function _getMatches(character, modifiers, e, remove, combination) {
+    function _getMatches(character, modifiers, e, sequenceName, combination, level) {
         var i,
             callback,
             matches = [],
@@ -327,9 +328,9 @@
         for (i = 0; i < _callbacks[character].length; ++i) {
             callback = _callbacks[character][i];
 
-            // if this is a sequence but it is not at the right level
-            // then move onto the next match
-            if (callback.seq && _sequenceLevels[callback.seq] != callback.level) {
+            // if a sequence name is not specified, but this is a sequence at
+            // the wrong level then move onto the next match
+            if (!sequenceName && callback.seq && _sequenceLevels[callback.seq] != callback.level) {
                 continue;
             }
 
@@ -348,9 +349,14 @@
             // firefox will fire a keypress if meta or control is down
             if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
 
-                // remove is used so if you change your mind and call bind a
-                // second time with a new function the first one is overwritten
-                if (remove && callback.combo == combination) {
+                // when you bind a combination or sequence a second time it
+                // should overwrite the first one.  if a sequenceName or
+                // combination is specified in this call it does just that
+                //
+                // @todo make deleting its own method?
+                var deleteCombo = !sequenceName && callback.combo == combination;
+                var deleteSequence = sequenceName && callback.seq == sequenceName && callback.level == level;
+                if (deleteCombo || deleteSequence) {
                     _callbacks[character].splice(i, 1);
                 }
 
@@ -763,7 +769,7 @@
         _callbacks[info.key] = _callbacks[info.key] || [];
 
         // remove an existing match if there is one
-        _getMatches(info.key, info.modifiers, {type: info.action}, !sequenceName, combination);
+        _getMatches(info.key, info.modifiers, {type: info.action}, sequenceName, combination, level);
 
         // add this call back to the array
         // if it is a sequence put it at the beginning

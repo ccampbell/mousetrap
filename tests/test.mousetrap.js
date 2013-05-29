@@ -375,7 +375,7 @@ describe('Mousetrap.bind', function() {
             expect(spy2.callCount).to.equal(1, '"a option b" should fire');
         });
 
-        it.skip('rebinding same sequence should override previous', function() {
+        it('rebinding same sequence should override previous', function() {
             var spy1 = sinon.spy();
             var spy2 = sinon.spy();
             Mousetrap.bind('a b c', spy1);
