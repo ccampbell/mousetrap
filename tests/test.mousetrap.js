@@ -221,7 +221,7 @@ describe('Mousetrap.bind', function() {
             expect(spy.callCount).to.equal(1, 'callback should fire');
         });
 
-        it.skip('binding sequences with mixed types', function() {
+        it('binding sequences with mixed types', function() {
             var spy = sinon.spy();
             Mousetrap.bind('g o enter', spy);
 
@@ -231,6 +231,26 @@ describe('Mousetrap.bind', function() {
             KeyEvent.simulate('O'.charCodeAt(0), 79);
             expect(spy.callCount).to.equal(0, 'callback should not fire');
 
+            KeyEvent.simulate(0, 13);
+            expect(spy.callCount).to.equal(1, 'callback should fire');
+        });
+
+        it('binding sequences starting with modifier keys', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('option enter', spy);
+            KeyEvent.simulate(0, 18, ['alt']);
+            KeyEvent.simulate(0, 13);
+            expect(spy.callCount).to.equal(1, 'callback should fire');
+
+            spy = sinon.spy();
+            Mousetrap.bind('command enter', spy);
+            KeyEvent.simulate(0, 91, ['meta']);
+            KeyEvent.simulate(0, 13);
+            expect(spy.callCount).to.equal(1, 'callback should fire');
+
+            spy = sinon.spy();
+            Mousetrap.bind('escape enter', spy);
+            KeyEvent.simulate(0, 27);
             KeyEvent.simulate(0, 13);
             expect(spy.callCount).to.equal(1, 'callback should fire');
         });

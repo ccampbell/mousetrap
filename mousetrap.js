@@ -180,7 +180,7 @@
          *
          * @type {boolean|string}
          */
-        _sequenceType = false;
+        _nextExpectedAction = false;
 
     /**
      * loop through the f keys, f1 to f19 and add them to the map
@@ -291,7 +291,7 @@
         }
 
         if (!activeSequences) {
-            _sequenceType = false;
+            _nextExpectedAction = false;
         }
     }
 
@@ -490,7 +490,7 @@
         // modifier keys are ignored because you can have a sequence
         // that contains modifiers such as "enter ctrl+space" and in most
         // cases the modifier key will be pressed before the next key
-        if (e.type == _sequenceType && !_isModifier(character)) {
+        if (e.type == _nextExpectedAction && !_isModifier(character)) {
             _resetSequences(doNotReset);
         }
     }
@@ -611,53 +611,56 @@
         // and setting the level to 0
         _sequenceLevels[combo] = 0;
 
-        // if there is no action pick the best one for the first key
-        // in the sequence
-        if (!action) {
-            action = _pickBestAction(keys[0], []);
-        }
-
         /**
          * callback to increase the sequence level for this sequence and reset
          * all other sequences that were active
          *
+         * @param {string} nextAction
+         * @returns {Function}
+         */
+        function _increaseSequence(nextAction) {
+            return function() {
+                _nextExpectedAction = nextAction;
+                ++_sequenceLevels[combo];
+                _resetSequenceTimer();
+            };
+        }
+
+        /**
+         * wraps the specified callback inside of another function in order
+         * to reset all sequence counters as soon as this sequence is done
+         *
          * @param {Event} e
          * @returns void
          */
-        var _increaseSequence = function() {
-                _sequenceType = action;
-                ++_sequenceLevels[combo];
-                _resetSequenceTimer();
-            },
+        function _callbackAndReset(e) {
+            _fireCallback(callback, e, combo);
 
-            /**
-             * wraps the specified callback inside of another function in order
-             * to reset all sequence counters as soon as this sequence is done
-             *
-             * @param {Event} e
-             * @returns void
-             */
-            _callbackAndReset = function(e) {
-                _fireCallback(callback, e, combo);
+            // we should ignore the next key up if the action is key down
+            // or keypress.  this is so if you finish a sequence and
+            // release the key the final key will not trigger a keyup
+            if (action !== 'keyup') {
+                _ignoreNextKeyup = _characterFromEvent(e);
+            }
 
-                // we should ignore the next key up if the action is key down
-                // or keypress.  this is so if you finish a sequence and
-                // release the key the final key will not trigger a keyup
-                if (action !== 'keyup') {
-                    _ignoreNextKeyup = _characterFromEvent(e);
-                }
-
-                // weird race condition if a sequence ends with the key
-                // another sequence begins with
-                setTimeout(_resetSequences, 10);
-            },
-            i;
+            // weird race condition if a sequence ends with the key
+            // another sequence begins with
+            setTimeout(_resetSequences, 10);
+        }
 
         // loop through keys one at a time and bind the appropriate callback
         // function.  for any key leading up to the final one it should
         // increase the sequence. after the final, it should reset all sequences
-        for (i = 0; i < keys.length; ++i) {
-            _bindSingle(keys[i], i < keys.length - 1 ? _increaseSequence : _callbackAndReset, action, combo, i);
+        //
+        // if an action is specified in the original bind call then that will
+        // be used throughout.  otherwise we will pass the action that the
+        // next key in the sequence should match.  this allows a sequence
+        // to mix and match keypress and keydown events depending on which
+        // ones are better suited to the key provided
+        for (var i = 0; i < keys.length; ++i) {
+            var isFinal = i + 1 === keys.length;
+            var wrappedCallback = isFinal ? _callbackAndReset : _increaseSequence(action || _getKeyInfo(keys[i + 1]).action);
+            _bindSingle(keys[i], wrappedCallback, action, combo, i);
         }
     }
 
