@@ -522,7 +522,7 @@
             return;
         }
 
-        if (e.type == 'keyup' && _ignoreNextKeyup == character) {
+        if (e.type == 'keyup' && _ignoreNextKeyup === character) {//_ignoreNextKeyup == character doesn't work for 0, but === work just fine
             _ignoreNextKeyup = false;
             return;
         }
