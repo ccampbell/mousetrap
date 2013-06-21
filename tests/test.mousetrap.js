@@ -84,6 +84,16 @@ describe('Mousetrap.bind', function() {
             expect(spy.callCount).to.equal(2, 'keyup event for "z" should fire once for held down key');
         });
 
+        it('keyup event for 0 should fire', function() {
+            var spy = sinon.spy();
+
+            Mousetrap.bind('0', spy, 'keyup');
+
+            KeyEvent.simulate(0, 48);
+
+            expect(spy.callCount).to.equal(1, 'keyup event for "0" should fire');
+        });
+
         it('rebinding a key overwrites the callback for that key', function() {
             var spy1 = sinon.spy();
             var spy2 = sinon.spy();
