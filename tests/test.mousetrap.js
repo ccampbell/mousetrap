@@ -432,6 +432,37 @@ describe('Mousetrap.bind', function() {
             expect(spy.callCount).to.equal(1, '"ctrl+b a" should fire');
         });
 
+        it('sequences starting with spacebar should work', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('a space b c', spy);
+
+            KeyEvent.simulate('a'.charCodeAt(0), 65);
+            KeyEvent.simulate(32, 32);
+            KeyEvent.simulate('b'.charCodeAt(0), 66);
+            KeyEvent.simulate('c'.charCodeAt(0), 67);
+
+            expect(spy.callCount).to.equal(1, '"a space b c" should fire');
+        });
+
+        it.only('konami code', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('up up down down left right left right b a enter', spy);
+
+            KeyEvent.simulate(0, 38);
+            KeyEvent.simulate(0, 38);
+            KeyEvent.simulate(0, 40);
+            KeyEvent.simulate(0, 40);
+            KeyEvent.simulate(0, 37);
+            KeyEvent.simulate(0, 39);
+            KeyEvent.simulate(0, 37);
+            KeyEvent.simulate(0, 39);
+            KeyEvent.simulate('b'.charCodeAt(0), 66);
+            KeyEvent.simulate('a'.charCodeAt(0), 65);
+            KeyEvent.simulate(0, 13);
+
+            expect(spy.callCount).to.equal(1, 'konami code should fire');
+        });
+
         it('sequence timer resets', function() {
             var spy = sinon.spy();
             var clock = sinon.useFakeTimers();
