@@ -444,7 +444,7 @@ describe('Mousetrap.bind', function() {
             expect(spy.callCount).to.equal(1, '"a space b c" should fire');
         });
 
-        it.only('konami code', function() {
+        it('konami code', function() {
             var spy = sinon.spy();
             Mousetrap.bind('up up down down left right left right b a enter', spy);
 
