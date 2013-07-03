@@ -11,7 +11,9 @@
  *
  * And can optionally pass in 'keypress', 'keydown', or 'keyup'
  * as a second argument
+ *
  */
+/* global Mousetrap:true */
 Mousetrap = (function(Mousetrap) {
     var self = Mousetrap,
         _oldBind = self.bind,

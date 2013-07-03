@@ -6,16 +6,17 @@
  * usage:
  * Mousetrap.bindGlobal('ctrl+s', _saveChanges);
  */
+/* global Mousetrap:true */
 Mousetrap = (function(Mousetrap) {
-    var _global_callbacks = {},
-        _original_stop_callback = Mousetrap.stopCallback;
+    var _globalCallbacks = {},
+        _originalStopCallback = Mousetrap.stopCallback;
 
     Mousetrap.stopCallback = function(e, element, combo) {
-        if (_global_callbacks[combo]) {
+        if (_globalCallbacks[combo]) {
             return false;
         }
 
-        return _original_stop_callback(e, element, combo);
+        return _originalStopCallback(e, element, combo);
     };
 
     Mousetrap.bindGlobal = function(keys, callback, action) {
@@ -23,12 +24,12 @@ Mousetrap = (function(Mousetrap) {
 
         if (keys instanceof Array) {
             for (var i = 0; i < keys.length; i++) {
-                _global_callbacks[keys[i]] = true;
+                _globalCallbacks[keys[i]] = true;
             }
             return;
         }
 
-        _global_callbacks[keys] = true;
+        _globalCallbacks[keys] = true;
     };
 
     return Mousetrap;
