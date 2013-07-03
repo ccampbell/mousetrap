@@ -93,11 +93,13 @@
                 modifiers: modifiersToInclude
             }, 'keydown'));
 
-            keyEvents.push(new KeyEvent({
-                charCode: charCode,
-                keyCode: charCode,
-                modifiers: modifiersToInclude
-            }, 'keypress'));
+            if (charCode > 0) {
+                keyEvents.push(new KeyEvent({
+                    charCode: charCode,
+                    keyCode: charCode,
+                    modifiers: modifiersToInclude
+                }, 'keypress'));
+            }
 
             repeat--;
         }
