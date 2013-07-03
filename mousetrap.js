@@ -175,6 +175,13 @@
         _ignoreNextKeyup = false,
 
         /**
+         * temporary state where we will ignore the next keypress
+         *
+         * @type {boolean}
+         */
+        _ignoreNextKeypress = false,
+
+        /**
          * are we currently inside of a sequence?
          * type of action ("keyup" or "keydown" or "keypress") or false
          *
@@ -496,9 +503,22 @@
         // modifier keys are ignored because you can have a sequence
         // that contains modifiers such as "enter ctrl+space" and in most
         // cases the modifier key will be pressed before the next key
-        if (e.type == _nextExpectedAction && !_isModifier(character)) {
+        //
+        // also if you have a sequence such as "ctrl+b a" then pressing the
+        // "b" key will trigger a "keypress" and a "keydown"
+        //
+        // the "keydown" is expected when there is a modifier, but the
+        // "keypress" ends up matching the _nextExpectedAction since it occurs
+        // after and that causes the sequence to reset
+        //
+        // we ignore keypresses in a sequence that directly follow a keydown
+        // for the same character
+        var ignoreThisKeypress = e.type == 'keypress' && character === _ignoreNextKeypress;
+        if (e.type == _nextExpectedAction && !_isModifier(character) && !ignoreThisKeypress) {
             _resetSequences(doNotReset);
         }
+
+        _ignoreNextKeypress = processedSequenceCallback && e.type == 'keydown' ? character : false;
     }
 
     /**

@@ -412,6 +412,26 @@ describe('Mousetrap.bind', function() {
             expect(spy.callCount).to.equal(0, 'sequence for "h a t" should not fire for "h e a r t"');
         });
 
+        it('sequences containing combos should work', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('a ctrl+b', spy);
+
+            KeyEvent.simulate('a'.charCodeAt(0), 65);
+            KeyEvent.simulate('B'.charCodeAt(0), 66, ['ctrl']);
+
+            expect(spy.callCount).to.equal(1, '"a ctrl+b" should fire');
+
+            Mousetrap.unbind('a ctrl+b');
+
+            spy = sinon.spy();
+            Mousetrap.bind('ctrl+b a', spy);
+
+            KeyEvent.simulate('b'.charCodeAt(0), 66, ['ctrl']);
+            KeyEvent.simulate('a'.charCodeAt(0), 65);
+
+            expect(spy.callCount).to.equal(1, '"ctrl+b a" should fire');
+        });
+
         it('sequence timer resets', function() {
             var spy = sinon.spy();
             var clock = sinon.useFakeTimers();
