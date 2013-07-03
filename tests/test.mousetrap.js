@@ -559,6 +559,9 @@ describe('Mousetrap.unbind', function() {
         expect(spy.callCount).to.equal(3, 'callback should have fired 3 times');
 
         Mousetrap.unbind(['a', 'b', 'c']);
+        KeyEvent.simulate('a'.charCodeAt(0), 65);
+        KeyEvent.simulate('b'.charCodeAt(0), 66);
+        KeyEvent.simulate('c'.charCodeAt(0), 67);
         expect(spy.callCount).to.equal(3, 'callback should not fire after unbind');
     });
 });
