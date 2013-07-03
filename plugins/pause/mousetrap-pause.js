@@ -8,12 +8,12 @@ Mousetrap = (function(Mousetrap) {
         _original_stop_callback = self.stopCallback,
         enabled = true;
 
-    self.stopCallback = function(e, element) {
+    self.stopCallback = function(e, element, combo) {
         if (!enabled) {
             return true;
         }
 
-        return _original_stop_callback(e, element);
+        return _original_stop_callback(e, element, combo);
     };
 
     self.pause = function() {
