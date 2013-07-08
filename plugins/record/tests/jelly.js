@@ -4,7 +4,7 @@
  * @author Dan Tao <daniel.tao@gmail.com>
  */
 var Jelly = (function() {
-    var recordButton = $("button.test-record"),
+    var recordButton = $("input.test-record"),
         recordResult = $("div.test-record-result");
 
     function _formatSequenceAsHtml(sequence) {
@@ -30,18 +30,21 @@ var Jelly = (function() {
     }
 
     function _prepareRecordTest() {
-        recordButton.prop('disabled', true);
         recordButton.text('Recording');
 
         Mousetrap.record(function(sequence) {
             recordResult.html(_formatSequenceAsHtml(sequence));
             recordButton.prop('disabled', false);
             recordButton.text('Record');
+        }, function(sequence) {
+            recordButton.val(sequence.join(', '));
         });
 
         // take focus away from the button so that Mousetrap will actually
         // capture keystrokes
-        recordButton.blur();
+        recordButton.keydown(function(e) {
+            e.preventDefault();
+        });
     }
 
     return {

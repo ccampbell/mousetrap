@@ -105,10 +105,17 @@
      * @returns void
      */
     function _recordCurrentCombo() {
+        var sequence;
+        
         _recordedSequence.push(_currentRecordedKeys);
         _currentRecordedKeys = [];
         _recordedCharacterKey = false;
         _restartRecordTimer();
+
+        if (_recordingSequenceCallback) {
+            sequence = _normalizeSequence(_recordedSequence);
+            _recordingSequenceCallback(sequence);
+        }
     }
 
     /**
@@ -122,6 +129,7 @@
      */
     function _normalizeSequence(sequence) {
         var i;
+        var result = [];
 
         for (i = 0; i < sequence.length; ++i) {
             sequence[i].sort(function(x, y) {
@@ -137,8 +145,9 @@
                 return x > y ? 1 : -1;
             });
 
-            sequence[i] = sequence[i].join('+');
+            result[i] = sequence[i].join('+');
         }
+        return result;
     }
 
     /**
@@ -148,9 +157,10 @@
      * @returns void
      */
     function _finishRecording() {
+        var sequence;
         if (_recordedSequenceCallback) {
-            _normalizeSequence(_recordedSequence);
-            _recordedSequenceCallback(_recordedSequence);
+            sequence = _normalizeSequence(_recordedSequence);
+            _recordedSequenceCallback(sequence);
         }
 
         // reset all recorded state
@@ -181,9 +191,10 @@
      * @param {Function} callback
      * @returns void
      */
-    Mousetrap.record = function(callback) {
+    Mousetrap.record = function(callback, recording) {
         Mousetrap.handleKey = _handleKey;
         _recordedSequenceCallback = callback;
+        _recordingSequenceCallback = recording;
     };
 
 })(Mousetrap);
