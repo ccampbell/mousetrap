@@ -246,12 +246,6 @@
                 character = character.toLowerCase();
             }
 
-            // String.fromCharCode(32) for spacebar returns " " for the
-            // character name, make sure it matches the mousetrap name
-            if (character == ' ') {
-                return 'space';
-            }
-
             return character;
         }
 
