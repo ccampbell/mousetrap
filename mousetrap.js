@@ -928,4 +928,8 @@
     if (typeof define === 'function' && define.amd) {
         define(Mousetrap);
     }
+    
+    if(typeof module == 'object' && typeof module.exports == 'object') {
+        module.exports = Mousetrap;
+    }
 }) ();
