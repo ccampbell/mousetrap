@@ -572,6 +572,12 @@ describe('Mousetrap.getMap', function() {
     });
 });
 
+describe('Mousetrap.getReverseMap', function() {
+    it('returns mapping', function() {
+      expect(Mousetrap.getReverseMap()).not.to.equal(undefined);
+    });
+});
+
 describe('Mousetrap.getKeycodeMap', function() {
     it('returns mapping', function() {
       expect(Mousetrap.getKeycodeMap()).not.to.equal(undefined);

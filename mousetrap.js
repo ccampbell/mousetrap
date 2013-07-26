@@ -924,6 +924,10 @@
           return _MAP;
         },
         
+        getReverseMap: function() {
+            return _getReverseMap();
+        },
+        
         getKeycodeMap: function() {
           return _KEYCODE_MAP;
         },
