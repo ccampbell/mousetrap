@@ -918,7 +918,19 @@
         /**
          * exposes _handleKey publicly so it can be overwritten by extensions
          */
-        handleKey: _handleKey
+        handleKey: _handleKey,
+        
+        getMap: function() {
+          return _MAP;
+        },
+        
+        getKeycodeMap: function() {
+          return _KEYCODE_MAP;
+        },
+        
+        getShiftMap: function() {
+          return _SHIFT_MAP;
+        }
     };
 
     // expose mousetrap to the global object
