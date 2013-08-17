@@ -836,6 +836,23 @@
             }
         }
 
+        /**
+         * determines whether one element is a descendent of another
+         *
+         * @param {Element} element
+         * @param {Element} ancestor
+         * @returns {boolean}
+         */
+        function _belongsTo(element, ancestor) {
+            if (element == ancestor) {
+                return true;
+            }
+            if (element == document) {
+                return false;
+            }
+            return _belongsTo(element.parentNode, ancestor);
+        }
+
         // start!
         _addEvent(target, 'keypress', _handleKeyEvent);
         _addEvent(target, 'keydown', _handleKeyEvent);
@@ -926,7 +943,7 @@
                 }
 
                 // don't stop for the element we've explicitly targeted
-                if (element == target) {
+                if (_belongsTo(element, target)) {
                     return false;
                 }
 

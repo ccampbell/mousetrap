@@ -538,12 +538,25 @@ describe('Mousetrap.bind', function() {
     });
 
     describe('wrapping a specific element', function() {
-        var textarea = document.querySelector('textarea');
+        var form = document.querySelector('form');
+        var textarea = form.querySelector('textarea');
 
         it('z key fires when pressing z in the target element', function() {
             var spy = sinon.spy();
 
-            Mousetrap.wrap(textarea).bind('z', spy);
+            Mousetrap.wrap(form).bind('z', spy);
+
+            KeyEvent.simulate('Z'.charCodeAt(0), 90, [], form);
+
+            expect(spy.callCount).to.equal(1, 'callback should fire once');
+            expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
+            expect(spy.args[0][1]).to.equal('z', 'second argument should be key combo');
+        });
+
+        it('z key fires when pressing z in a child of the target element', function() {
+            var spy = sinon.spy();
+
+            Mousetrap.wrap(form).bind('z', spy);
 
             KeyEvent.simulate('Z'.charCodeAt(0), 90, [], textarea);
 
