@@ -20,7 +20,7 @@
  * @version 1.4.4
  * @url craig.is/killing/mice
  */
-(function() {
+(function(window, document, undefined) {
 
     /**
      * mapping of special keycodes to their corresponding keys
@@ -928,4 +928,4 @@
     if (typeof define === 'function' && define.amd) {
         define(Mousetrap);
     }
-}) ();
+}) (window, document);
