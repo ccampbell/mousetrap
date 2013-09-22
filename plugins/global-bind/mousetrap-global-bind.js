@@ -11,8 +11,8 @@ Mousetrap = (function(Mousetrap) {
     var _globalCallbacks = {},
         _originalStopCallback = Mousetrap.stopCallback;
 
-    Mousetrap.stopCallback = function(e, element, combo) {
-        if (_globalCallbacks[combo]) {
+    Mousetrap.stopCallback = function(e, element, combo, sequence) {
+        if (_globalCallbacks[combo] || _globalCallbacks[sequence]) {
             return false;
         }
 

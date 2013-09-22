@@ -412,10 +412,10 @@
      * @param {Event} e
      * @returns void
      */
-    function _fireCallback(callback, e, combo) {
+    function _fireCallback(callback, e, combo, sequence) {
 
         // if this event should not happen stop here
-        if (Mousetrap.stopCallback(e, e.target || e.srcElement, combo)) {
+        if (Mousetrap.stopCallback(e, e.target || e.srcElement, combo, sequence)) {
             return;
         }
 
@@ -481,7 +481,7 @@
 
                 // keep a list of which sequences were matches for later
                 doNotReset[callbacks[i].seq] = 1;
-                _fireCallback(callbacks[i].callback, e, callbacks[i].combo);
+                _fireCallback(callbacks[i].callback, e, callbacks[i].combo, callbacks[i].seq);
                 continue;
             }
 
