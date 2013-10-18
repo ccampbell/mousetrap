@@ -4,7 +4,7 @@
  * without having to reset Mousetrap and rebind everything
  */
 /* global Mousetrap:true */
-Mousetrap = (function(Mousetrap) {
+window.Mousetrap = (function(Mousetrap) {
     var self = Mousetrap,
         _originalStopCallback = self.stopCallback,
         enabled = true;
@@ -26,4 +26,4 @@ Mousetrap = (function(Mousetrap) {
     };
 
     return self;
-}) (Mousetrap);
+}) (window.Mousetrap);

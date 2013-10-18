@@ -186,4 +186,4 @@
         _recordedSequenceCallback = callback;
     };
 
-})(Mousetrap);
+})(window.Mousetrap);
