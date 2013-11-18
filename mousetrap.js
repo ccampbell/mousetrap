@@ -933,8 +933,8 @@
                 return false;
             }
 
-            // stop for input, select, and textarea
-            return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || element.isContentEditable;
+            // stop for input, button, select, and textarea
+            return element.tagName == 'INPUT' || element.tagName == 'BUTTON' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || element.isContentEditable;
         },
 
         /**
