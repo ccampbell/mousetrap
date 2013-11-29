@@ -720,11 +720,17 @@
      * @return {Array}
      */
     function _keysFromString(combination) {
+        // special case: capturing '+'
         if (combination === '+') {
             return ['+'];
         }
-
-        return combination.split('+');
+        // special case: capturing '+' with modifier(s)
+        else if (combination.match(/\+\+$/)) {
+            return combination.replace(/\+\+$/, '').split('+').concat('+');
+        }
+        else {
+            return combination.split('+');
+        }
     }
 
     /**
