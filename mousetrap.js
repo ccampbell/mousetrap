@@ -872,7 +872,7 @@
          * @returns void
          */
         bind: function(keys, callback, action) {
-            keys = keys instanceof Array ? keys : [keys];
+            keys = Array.isArray(keys) ? keys : [keys];
             _bindMultiple(keys, callback, action);
             return this;
         },

@@ -1410,7 +1410,7 @@ module.exports = function (chai, _) {
       , str
       , ok = true;
 
-    keys = keys instanceof Array
+    keys = Array.isArray(keys)
       ? keys
       : Array.prototype.slice.call(arguments);
 
