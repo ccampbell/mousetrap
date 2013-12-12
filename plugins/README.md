@@ -22,3 +22,7 @@ Allows you to temporarily prevent Mousetrap events from firing.
 ## Record
 
 Allows you to capture a keyboard shortcut or sequence defined by a user.
+
+## Bind handle
+
+Allows you to unbind and rebind a specific binding through a returned handle.
