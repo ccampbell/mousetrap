@@ -146,11 +146,25 @@
         _callbacks = {},
 
         /**
+         * a stack of lists of callbacks, to be used via Mousetrap.save() and Mousetrap.restore
+         *
+         * @type {Array}
+         */
+        _callbacksStack = [],
+
+        /**
          * direct map of string combinations to callbacks used for trigger()
          *
          * @type {Object}
          */
         _directMap = {},
+
+        /**
+         * a stack of lists of direct maps, to be used via Mousetrap.save() and Mousetrap.restore
+         *
+         * @type {Array}
+         */
+        _directMapStack = [],
 
         /**
          * keeps track of what level each sequence is at since multiple
@@ -916,6 +930,38 @@
         reset: function() {
             _callbacks = {};
             _directMap = {};
+            return this;
+        },
+
+        /**
+         * saves the current state of the library in a stack fashion.  this is useful
+         * if you want to clear out the current keyboard shortcuts and bind
+         * new ones but are interested in recovering the previous
+         * state after - for example if you are showing some sort of modal dialog
+         *
+         * @returns void
+         */
+        save: function() {
+            _callbacksStack.push(_callbacks);
+            _directMapStack.push(_directMap);
+            _callbacks = {};
+            _directMap = {};
+            return this;
+        },
+
+        /**
+         * restores the current state of the library in a stack fashion.  this is useful
+         * if you want to clear out the current keyboard shortcuts and bind
+         * new ones but are interested in recovering the previous
+         * state after - for example if you are showing some sort of modal dialog
+         *
+         * @returns void
+         */
+        restore: function() {
+            if ((_callbacksStack.length > 0) && (_directMapStack.length > 0)) {
+                _callbacks = _callbacksStack.pop();
+                _directMap = _directMapStack.pop();
+            }
             return this;
         },
 
