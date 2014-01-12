@@ -31,7 +31,7 @@ If you would like to donate to help support Mousetrap development use [Gittip](h
         Mousetrap.bind('esc', function() { console.log('escape'); }, 'keyup');
 
         // combinations
-        Mousetrap.bind('command+shift+K', function() { console.log('command shift k'); });
+        Mousetrap.bind('command+shift+k', function() { console.log('command shift k'); });
 
         // map multiple combinations to the same callback
         Mousetrap.bind(['command+k', 'ctrl+k'], function() {
