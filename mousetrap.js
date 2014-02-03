@@ -907,6 +907,20 @@
         },
 
         /**
+         * retrieve a callback for a keybindinng
+         *
+         * @param {string} keys
+         * @param {string=} action
+         * @returns function
+         *
+         */
+        getCallback: function(keys, action) {
+          if (_directMap[keys + ':' + action]) {
+            return _directMap[keys + ':' + action];
+          }
+        },
+
+        /**
          * resets the library back to its initial state.  this is useful
          * if you want to clear out the current keyboard shortcuts and bind
          * new ones - for example if you switch to another page
