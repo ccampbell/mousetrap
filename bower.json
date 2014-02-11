@@ -1,0 +1,6 @@
+{
+  "name": "mousetrap",
+  "version": "1.4.6",
+  "main": "./mousetrap.js",
+  "dependencies": {}
+}
