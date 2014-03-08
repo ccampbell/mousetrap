@@ -46,7 +46,15 @@
          *
          * @type {Function}
          */
-        _origHandleKey = Mousetrap.handleKey;
+        _origHandleKey = Mousetrap.handleKey,
+
+
+        /**
+         * an interrupt key to end the recording sequence
+         *
+         * @type {String | null}
+         */
+         _finishKey = null;
 
     /**
      * handles a character key event
@@ -59,14 +67,18 @@
     function _handleKey(character, modifiers, e) {
         // remember this character if we're currently recording a sequence
         if (e.type == 'keydown') {
-            if (character.length === 1 && _recordedCharacterKey) {
-                _recordCurrentCombo();
-            }
+            if (character === _finishKey) {
+                _finishRecording();
+            } else {
+                if (character.length === 1 && _recordedCharacterKey) {
+                    _recordCurrentCombo();
+                }
 
-            for (i = 0; i < modifiers.length; ++i) {
-                _recordKey(modifiers[i]);
+                for (i = 0; i < modifiers.length; ++i) {
+                    _recordKey(modifiers[i]);
+                }
+                _recordKey(character);
             }
-            _recordKey(character);
 
         // once a key is released, all keys that were held down at the time
         // count as a keypress
@@ -181,9 +193,11 @@
      * @param {Function} callback
      * @returns void
      */
-    Mousetrap.record = function(callback) {
+    Mousetrap.record = function(callback, finishKey) {
+      console.log('initiated');
         Mousetrap.handleKey = _handleKey;
         _recordedSequenceCallback = callback;
+        _finishKey = finishKey;
     };
 
 })(Mousetrap);
