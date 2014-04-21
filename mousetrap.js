@@ -38,6 +38,7 @@
             16: 'shift',
             17: 'ctrl',
             18: 'alt',
+            19: 'pause',
             20: 'capslock',
             27: 'esc',
             32: 'space',
@@ -53,6 +54,8 @@
             46: 'del',
             91: 'meta',
             93: 'meta',
+            144: 'numlock',
+            145: "scroll",
             224: 'meta'
         },
 
