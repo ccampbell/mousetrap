@@ -25,3 +25,17 @@ Essentially, echo implements blind typing:
 </script>
 ```
 
+Echo takes an additional two optional arguments:
+
+* `action` denotes the action that will trigger the callback: `keydown`, `keypress`, or `keyup`.
+
+* `nonpropogatedKeys` is an object mapping keys whose default behaviors will not occur. By default, this is:
+
+```
+{
+    'backspace': true,
+    'tab': true,
+    'space': true,
+    'enter': true
+}
+```
