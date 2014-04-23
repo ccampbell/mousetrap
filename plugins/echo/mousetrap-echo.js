@@ -181,9 +181,10 @@
      * prevents default/stops propogation if callback returns false
      *
      * @type {Function} callback
+     * @type {Event} e
      * @returns void
      */
-    var _fireCallback = function (callback) {
+    var _fireCallback = function (callback, e) {
         Mousetrap.handleKey = _superHandleKey;
         if ( callback(_recordString.join(''), _record) === false ) {
             _preventDefault(e);
@@ -260,7 +261,7 @@
     var _handleKey = function (character, modifiers, e) {
         if (_breakers[character] === e.type || 
             _breakers[_modifyCharacter(character, modifiers)] === e.type ) {
-            _fireCallback(_callback);
+            _fireCallback(_callback, e);
             return;
         }
 
