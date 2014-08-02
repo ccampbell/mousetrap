@@ -65,25 +65,25 @@
          * @type {Object}
          */
         _KEYCODE_MAP = {
-	        61: '=', // FF keyCode for '=' (same as on keypress)
-	        106: '*',
-	        107: '+',
-	        109: '-',
-	        110: '.',
-	        111 : '/',
-	        173 : '-', // FF keyCode for '-'
-	        186: ';',
-	        187: '=',
-	        188: ',',
-	        189: '-',
-	        190: '.',
-	        191: '/',
-	        192: '`',
-	        219: '[',
-	        220: '\\',
-	        221: ']',
-	        222: '\''
-        },  
+	          61: '=', // FF keyCode for '=' (same as on keypress)
+            106: '*',
+            107: '+',
+            109: '-',
+            110: '.',
+            111 : '/',
+	          173 : '-', // FF keyCode for '-'
+            186: ';',
+            187: '=',
+            188: ',',
+            189: '-',
+            190: '.',
+            191: '/',
+            192: '`',
+            219: '[',
+            220: '\\',
+            221: ']',
+            222: '\''
+        },
 
         /**
          * this is a mapping of keys that require shift on a US keypad
@@ -231,18 +231,9 @@
      */
     function _characterFromEvent(e) {
 
-	      console.error("mousetrap::_characterFromEvent() > ", e);
-	      console.error("   e.type    > ", e.type);
-	      console.error("   e.which   > ", e.which);
-	      console.error("   e.keyCode > ", e.keyCode);
-
         // for keypress events we should return the character as is
         if (e.type == 'keypress') {
-
             var character = String.fromCharCode(e.which);
-
-	          console.error("KEYPRESS");
-	          console.error("   'character' from  String.fromCharCode(e.which) > ", character);
 
             // if the shift key is not pressed then it is safe to assume
             // that we want the character to be lowercase.  this means if
@@ -262,21 +253,10 @@
 
         // for non keypress events the special maps are needed
         if (_MAP[e.which]) {
-
-	          console.error("NON-KEYPRESS, using _MAP > ");
-	          console.error("   > _MAP[e.which]: ", _MAP[e.which]);
-	          console.error("   > _MAP[e.keyCode]: ", _MAP[e.keyCode]);
-
             return _MAP[e.which];
         }
 
         if (_KEYCODE_MAP[e.which]) {
-
-
-	          console.error("NON-KEYPRESS, using _KEYCODE_MAP > ");
-	          console.error("   > _KEYCODE_MAP[e.which]: ", _KEYCODE_MAP[e.which]);
-	          console.error("   > _KEYCODE_MAP[e.keyCode]: ", _KEYCODE_MAP[e.keyCode]);
-
             return _KEYCODE_MAP[e.which];
         }
 
@@ -285,11 +265,6 @@
         // with keydown and keyup events the character seems to always
         // come in as an uppercase character whether you are pressing shift
         // or not.  we should make sure it is always lowercase for comparisons
-
-	      console.error("NON-KEYPRESS, using non-special map, just String.fromCharCode(e.which).toLowerCase() > ");
-	      console.error("   > String.fromCharCode(e.which:",e.which,").toLowerCase()");
-	      console.error("   > String.fromCharCode(e.keyCode:",e.keyCode,").toLowerCase()");
-
         return String.fromCharCode(e.which).toLowerCase();
     }
 
