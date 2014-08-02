@@ -18,7 +18,7 @@
     "shortcuts",
     "events"
   ],
-  "author": "Craig Campbell",
+  "author": "Greg Herrington",
   "license": "Apache 2.0",
   "readmeFilename": "README.md",
   "devDependencies": {
