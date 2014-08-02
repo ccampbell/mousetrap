@@ -1,6 +1,6 @@
 {
   "name": "Mousetrap",
-  "version": "1.4.7",
+  "version": "1.4.6",
   "description": "Simple library for handling keyboard shortcuts",
   "main": "mousetrap.js",
   "directories": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/herringtown/mousetrap.git"
+    "url": "git://github.com/ccampbell/mousetrap.git"
   },
   "keywords": [
     "keyboard",
@@ -20,6 +20,7 @@
   ],
   "author": "Craig Campbell",
   "license": "Apache 2.0",
+  "gitHead": "c202a0bd4967d5a3064f9cb376db51dec9345336",
   "readmeFilename": "README.md",
   "devDependencies": {
     "grunt": "~0.4.1",

@@ -83,7 +83,7 @@
 	        220: '\\',
 	        221: ']',
 	        222: '\''
-        },
+        },  
 
         /**
          * this is a mapping of keys that require shift on a US keypad
