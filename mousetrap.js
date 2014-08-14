@@ -950,4 +950,9 @@
     if (typeof define === 'function' && define.amd) {
         define(Mousetrap);
     }
+
+    // expose mousetrap as an CommonJS module
+    if (typeof exports === 'object') {
+        module.exports = Mousetrap;
+    }
 }) (window, document);
