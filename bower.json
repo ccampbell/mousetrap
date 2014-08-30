@@ -1,7 +1,7 @@
 {
   "name": "mousetrap",
   "main": "mousetrap.min.js",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "license": "Apache 2.0",
   "ignore": [
     "**/.*",
