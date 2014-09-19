@@ -12,7 +12,7 @@ describe('Mousetrap.bind', function() {
 
             Mousetrap.bind('/', spy);
 
-            KeyEvent.simulate('/'.charCodeAt(0), 90);
+            KeyEvent.simulate('/'.charCodeAt(0), 191);
 
             // really slow for some reason
             // expect(spy).to.have.been.calledOnce;
@@ -25,7 +25,7 @@ describe('Mousetrap.bind', function() {
 
             Mousetrap.bind('?', spy);
 
-            KeyEvent.simulate('?'.charCodeAt(0), 90);
+            KeyEvent.simulate('?'.charCodeAt(0), 191);
 
             // really slow for some reason
             // expect(spy).to.have.been.calledOnce;
@@ -40,7 +40,7 @@ describe('Mousetrap.bind', function() {
             Mousetrap.bind('?', spy);
             Mousetrap.bind('/', spySlash);
 
-            KeyEvent.simulate('/'.charCodeAt(0), 90);
+            KeyEvent.simulate('/'.charCodeAt(0), 191);
 
             // really slow for some reason
             // expect(spy).to.have.been.calledOnce;
@@ -54,7 +54,7 @@ describe('Mousetrap.bind', function() {
             Mousetrap.bind('?', spy);
             Mousetrap.bind('/', spySlash);
 
-            KeyEvent.simulate('?'.charCodeAt(0), 90);
+            KeyEvent.simulate('?'.charCodeAt(0), 191);
 
             // really slow for some reason
             // expect(spy).to.have.been.calledOnce;
