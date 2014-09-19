@@ -7,6 +7,60 @@ afterEach(function() {
 
 describe('Mousetrap.bind', function() {
     describe('basic', function() {
+        it('/ key fires when pressing /', function() {
+            var spy = sinon.spy();
+
+            Mousetrap.bind('/', spy);
+
+            KeyEvent.simulate('/'.charCodeAt(0), 90);
+
+            // really slow for some reason
+            // expect(spy).to.have.been.calledOnce;
+            expect(spy.callCount).to.equal(1, 'callback should fire once');
+            expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
+            expect(spy.args[0][1]).to.equal('/', 'second argument should be key combo');
+        });
+        it('? key fires when pressing ?', function() {
+            var spy = sinon.spy();
+
+            Mousetrap.bind('?', spy);
+
+            KeyEvent.simulate('?'.charCodeAt(0), 90);
+
+            // really slow for some reason
+            // expect(spy).to.have.been.calledOnce;
+            expect(spy.callCount).to.equal(1, 'callback should fire once');
+            expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
+            expect(spy.args[0][1]).to.equal('?', 'second argument should be key combo');
+        });
+        it('? key does not fire when pressing /', function() {
+            var spy = sinon.spy();
+            var spySlash = sinon.spy();
+
+            Mousetrap.bind('?', spy);
+            Mousetrap.bind('/', spySlash);
+
+            KeyEvent.simulate('/'.charCodeAt(0), 90);
+
+            // really slow for some reason
+            // expect(spy).to.have.been.calledOnce;
+            expect(spy.callCount).to.equal(0, 'callback should fire zero times');
+            expect(spySlash.callCount).to.equal(1, 'callback should fire once');
+        });
+        it('/ key does not fire when pressing ?', function() {
+            var spy = sinon.spy();
+            var spySlash = sinon.spy();
+
+            Mousetrap.bind('?', spy);
+            Mousetrap.bind('/', spySlash);
+
+            KeyEvent.simulate('?'.charCodeAt(0), 90);
+
+            // really slow for some reason
+            // expect(spy).to.have.been.calledOnce;
+            expect(spy.callCount).to.equal(1, 'callback should fire once');
+            expect(spySlash.callCount).to.equal(0, 'callback should fire zero times');
+        });
         it('z key fires when pressing z', function() {
             var spy = sinon.spy();
 
