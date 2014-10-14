@@ -943,11 +943,15 @@
         handleKey: _handleKey
     };
 
-    // expose mousetrap to the global object
-    window.Mousetrap = Mousetrap;
-
+    // commonjs
+    if (typeof module === 'object') {
+        module.exports = Mousetrap;
     // expose mousetrap as an AMD module
-    if (typeof define === 'function' && define.amd) {
+    } else if (typeof define === 'function' && define.amd) {
         define(Mousetrap);
+    // expose mousetrap to the global object
+    } else {
+        window.Mousetrap = Mousetrap;
     }
+
 }) (window, document);

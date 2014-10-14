@@ -1,5 +1,5 @@
 {
-  "name": "Mousetrap",
+  "name": "mousetrap",
   "version": "1.4.6",
   "description": "Simple library for handling keyboard shortcuts",
   "main": "mousetrap.js",
@@ -26,5 +26,11 @@
     "grunt": "~0.4.1",
     "grunt-complexity": "~0.1.2",
     "grunt-mocha": "~0.3.1"
+  },
+  "spm": {
+    "main": "mousetrap.js",
+    "ignore": [
+      "tests"
+    ]
   }
 }
