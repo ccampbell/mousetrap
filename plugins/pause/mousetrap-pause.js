@@ -7,11 +7,30 @@
 Mousetrap = (function(Mousetrap) {
     var self = Mousetrap,
         _originalStopCallback = self.stopCallback,
-        enabled = true;
+        enabled = true,
+        enabledExceptFor = true,
+        pausedExceptForCombinations;
 
     self.stopCallback = function(e, element, combo) {
+
         if (!enabled) {
             return true;
+        }
+
+        if (!enabledExceptFor) {
+            var i           = 0,
+                comboLength = pausedExceptForCombinations.length,
+                isMatch     = false;
+
+            for ( ; i < comboLength; i++ ) {
+                if ( pausedExceptForCombinations[i] === combo ) {
+                    isMatch = true;
+                }
+            }
+
+            if ( !isMatch ) {
+                return true;
+            }
         }
 
         return _originalStopCallback(e, element, combo);
@@ -23,6 +42,13 @@ Mousetrap = (function(Mousetrap) {
 
     self.unpause = function() {
         enabled = true;
+        enabledExceptFor = true;
+    };
+
+    self.pauseExceptFor = function( combinations ) {
+        enabledExceptFor = false;
+        combinations = combinations instanceof Array ? combinations : [combinations];
+        pausedExceptForCombinations = combinations;
     };
 
     return self;
