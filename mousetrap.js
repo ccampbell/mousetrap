@@ -720,8 +720,29 @@
      * @return {Array}
      */
     function _keysFromString(combination) {
+        var keys = [],
+            split, key, i;
+
         if (combination === '+') {
             return ['+'];
+        }
+
+        if (combination.indexOf('++') !== -1) {
+            split = combination.split('+');
+
+            for (i = split.length - 1 ; i >= 0; i--) {
+                key = split[i];
+
+                if (!key && !split[i-1] ) {
+                    key = '+';
+                }
+
+                if (key) {
+                    keys.push(key);
+                }
+            }
+
+            return keys.reverse();
         }
 
         return combination.split('+');
