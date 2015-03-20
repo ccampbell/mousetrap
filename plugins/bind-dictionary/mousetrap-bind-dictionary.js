@@ -23,7 +23,7 @@ Mousetrap = (function(Mousetrap) {
         args = arguments;
 
         // normal call
-        if (typeof args[0] == 'string' || args[0] instanceof Array) {
+        if (typeof args[0] == 'string' || Array.isArray(args[0])) {
             return _oldBind(args[0], args[1], args[2]);
         }
 

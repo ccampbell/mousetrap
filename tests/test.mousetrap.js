@@ -176,6 +176,16 @@ describe('Mousetrap.bind', function() {
             expect(spy.args[0][1]).to.equal('*', 'callback should match *');
         });
 
+        it('binding plus character', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('ctrl++', spy);
+
+            KeyEvent.simulate('+'.charCodeAt(0), 107, ['ctrl']);
+
+            expect(spy.callCount).to.equal(1, 'callback should fire');
+            expect(spy.args[0][1]).to.equal('ctrl++', 'callback should match ctrl++');
+        });
+
         it('binding special characters keyup', function() {
             var spy = sinon.spy();
             Mousetrap.bind('*', spy, 'keyup');
