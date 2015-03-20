@@ -70,7 +70,7 @@ There are a number of other similar libraries out there so what makes this one d
 
 ## Tests
 
-Unit tests run via <a href="http://visionmedia.github.io/mocha" target="_blank">mocha</a>.
+Unit tests run via <a href="http://mochajs.org/" target="_blank">mocha</a>.
 
 ### Running in browser
 
