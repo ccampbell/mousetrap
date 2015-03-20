@@ -724,6 +724,25 @@
             return ['+'];
         }
 
+        var keys = [];
+
+        if (combination.indexOf('++') !== -1) {
+            var split = combination.split('+');
+
+            for (var i = split.length -1 ; i >= 0; i--) {
+                var key = split[i];
+                if (!key && !split[i-1] ) {
+                    key = '+';
+                }
+
+                if (key) {
+                    keys.push(key);
+                }
+            }
+
+            return keys.reverse();
+        }
+
         return combination.split('+');
     }
 
