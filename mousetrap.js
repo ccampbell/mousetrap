@@ -948,6 +948,11 @@
     // expose mousetrap to the global object
     window.Mousetrap = Mousetrap;
 
+    // expose as a common js module
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = Mousetrap;
+    }
+
     // expose mousetrap as an AMD module
     if (typeof define === 'function' && define.amd) {
         define(Mousetrap);
