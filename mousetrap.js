@@ -957,4 +957,7 @@
     if (typeof define === 'function' && define.amd) {
         define(Mousetrap);
     }
+    if (typeof module != 'undefined') {
+        module.exports = Mousetrap;
+    }
 }) (window, document);
