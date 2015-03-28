@@ -126,6 +126,7 @@
             'command': 'meta',
             'return': 'enter',
             'escape': 'esc',
+            'plus': '+',
             'mod': /Mac|iPod|iPhone|iPad/.test(navigator.platform) ? 'meta' : 'ctrl'
         },
 
@@ -724,6 +725,7 @@
             return ['+'];
         }
 
+        combination = combination.replace(/\+{2}/g, '+plus');
         return combination.split('+');
     }
 

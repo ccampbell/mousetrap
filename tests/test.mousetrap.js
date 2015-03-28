@@ -200,6 +200,53 @@ describe('Mousetrap.bind', function() {
             expect(spy.callCount).to.equal(1, 'callback should fire');
             expect(spy.args[0][1]).to.equal('left', 'callback should match "left"');
         });
+
+        it('binding plus key alone should work', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('+', spy);
+
+            // fires for regular + character
+            KeyEvent.simulate('+'.charCodeAt(0), 43);
+
+            // and for shift+=
+            KeyEvent.simulate(43, 187, ['shift']);
+
+            expect(spy.callCount).to.equal(2, 'callback should fire');
+            expect(spy.args[0][1]).to.equal('+', 'callback should match "+"');
+        });
+
+        it('binding plus key as "plus" should work', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('plus', spy);
+
+            // fires for regular + character
+            KeyEvent.simulate('+'.charCodeAt(0), 43);
+
+            // and for shift+=
+            KeyEvent.simulate(43, 187, ['shift']);
+
+            expect(spy.callCount).to.equal(2, 'callback should fire');
+            expect(spy.args[0][1]).to.equal('plus', 'callback should match "plus"');
+        });
+
+        it('binding to alt++ should work', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('alt++', spy);
+
+            KeyEvent.simulate('+'.charCodeAt(0), 43, ['alt']);
+            expect(spy.callCount).to.equal(1, 'callback should fire');
+            expect(spy.args[0][1]).to.equal('alt++', 'callback should match "alt++"');
+        });
+
+        it('binding to alt+shift++ should work as well', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('alt+shift++', spy);
+
+            KeyEvent.simulate('+'.charCodeAt(0), 43, ['shift', 'alt']);
+            expect(spy.callCount).to.equal(1, 'callback should fire');
+            expect(spy.args[0][1]).to.equal('alt+shift++', 'callback should match "alt++"');
+
+        })
     });
 
     describe('combos with modifiers', function() {
