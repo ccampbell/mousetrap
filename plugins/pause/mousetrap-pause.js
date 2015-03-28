@@ -4,26 +4,28 @@
  * without having to reset Mousetrap and rebind everything
  */
 /* global Mousetrap:true */
-Mousetrap = (function(Mousetrap) {
-    var self = Mousetrap,
-        _originalStopCallback = self.stopCallback,
-        enabled = true;
+(function(Mousetrap) {
+    var _originalStopCallback = Mousetrap.prototype.stopCallback;
 
-    self.stopCallback = function(e, element, combo) {
-        if (!enabled) {
+    Mousetrap.prototype.stopCallback = function(e, element, combo) {
+        var self = this;
+
+        if (self.paused) {
             return true;
         }
 
-        return _originalStopCallback(e, element, combo);
+        return _originalStopCallback.call(self, e, element, combo);
     };
 
-    self.pause = function() {
-        enabled = false;
+    Mousetrap.prototype.pause = function() {
+        var self = this;
+        self.paused = true;
     };
 
-    self.unpause = function() {
-        enabled = true;
+    Mousetrap.prototype.unpause = function() {
+        var self = this;
+        self.paused = false;
     };
 
-    return self;
+    Mousetrap.init();
 }) (Mousetrap);
