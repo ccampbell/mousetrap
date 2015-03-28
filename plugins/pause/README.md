@@ -8,6 +8,10 @@ Usage looks like:
 // stop Mousetrap events from firing
 Mousetrap.pause();
 
+// stop Mousetrap events from firing except for the specified ones
+Mousetrap.pauseExceptFor( '?' );
+Mousetrap.pauseExceptFor( ['?', 'h'] );
+
 // allow Mousetrap events to fire again
 Mousetrap.unpause();
 ```
