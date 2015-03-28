@@ -80,6 +80,25 @@ describe('Mousetrap.bind', function() {
             expect(spy.callCount).to.equal(0, 'callback should not have fired');
         });
 
+        it('z key does not fire when inside an input element in a shadow dom', function() {
+            var shadow = document.createElement('div');
+            shadow.style.display = 'none';
+            shadow.createShadowRoot();
+            document.body.appendChild(shadow);
+
+            var input = document.createElement('input');
+            shadow.shadowRoot.appendChild(input);
+
+            var spy = sinon.spy();
+
+            Mousetrap.bind('z', spy);
+            KeyEvent.simulate('Z'.charCodeAt(0), 90, [], input);
+
+            document.body.removeChild(shadow);
+
+            expect(spy.callCount).to.equal(0, 'callback should not have fired');
+        });
+
         it('keyup events should fire', function() {
             var spy = sinon.spy();
 
