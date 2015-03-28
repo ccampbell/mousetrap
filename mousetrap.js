@@ -410,7 +410,7 @@
     }
 
     function _belongsTo(element, ancestor) {
-        if (element === document) {
+        if (element === document || element === null) {
             return false;
         }
 
@@ -598,7 +598,8 @@
         function _fireCallback(callback, e, combo, sequence) {
 
             // if this event should not happen stop here
-            if (self.stopCallback(e, e.target || e.srcElement, combo, sequence)) {
+            var element = typeof e.path == 'object' && e.path.constructor == Array ? e.path[0]  : e.target || e.srcElement;
+            if (self.stopCallback(e, element, combo, sequence)) {
                 return;
             }
 
