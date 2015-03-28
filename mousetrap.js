@@ -942,7 +942,12 @@
         /**
          * exposes _handleKey publicly so it can be overwritten by extensions
          */
-        handleKey: _handleKey
+        handleKey: _handleKey,
+
+        /**
+         * exposes _characterFromEvent publicly so it can be used in non evented systems (like games).
+         */
+        characterFromEvent: _characterFromEvent
     };
 
     // expose mousetrap to the global object
