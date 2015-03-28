@@ -655,4 +655,17 @@ describe('wrapping a specific element', function() {
 
         expect(spy.callCount).to.equal(0, 'callback should not have fired');
     });
+
+    it('should work when constructing a new mousetrap object', function() {
+        var spy = sinon.spy();
+
+        var mousetrap = new Mousetrap(form);
+        mousetrap.bind('a', spy);
+
+        KeyEvent.simulate('a'.charCodeAt(0), 65, [], textarea);
+
+        expect(spy.callCount).to.equal(1, 'callback should fire once');
+        expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
+        expect(spy.args[0][1]).to.equal('a', 'second argument should be key combo');
+    });
 });
