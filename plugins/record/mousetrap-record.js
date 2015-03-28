@@ -9,7 +9,7 @@
      *
      * @type {Array}
      */
-    var _recordedSequence = [],
+    var _recordedSequence = [[]],
 
         /**
          * a callback to invoke after recording a sequence
@@ -70,7 +70,7 @@
 
         // once a key is released, all keys that were held down at the time
         // count as a keypress
-        } else if (e.type == 'keyup' && _currentRecordedKeys.length > 0) {
+        } else if (e.type == 'keyup' && getCurrentRecordedKeys().length > 0) {
             _recordCurrentCombo();
         }
     }
@@ -82,20 +82,35 @@
      * @returns void
      */
     function _recordKey(key) {
-        var i;
+        var i, 
+            currentRecordedKeys = getCurrentRecordedKeys();
 
         // one-off implementation of Array.indexOf, since IE6-9 don't support it
-        for (i = 0; i < _currentRecordedKeys.length; ++i) {
-            if (_currentRecordedKeys[i] === key) {
+        for (i = 0; i < currentRecordedKeys.length; ++i) {
+            if (currentRecordedKeys[i] === key) {
                 return;
             }
         }
 
-        _currentRecordedKeys.push(key);
+        currentRecordedKeys.push(key);
 
         if (key.length === 1) {
             _recordedCharacterKey = true;
         }
+
+        if (_recordingSequenceCallback) {
+            sequence = _normalizeSequence(_recordedSequence);
+            _recordingSequenceCallback(sequence);
+        }
+    }
+
+    /**
+     * returns the current recorded keys
+     *
+     * @returns array
+     */
+    function getCurrentRecordedKeys() {
+        return _recordedSequence[_recordedSequence.length -1];
     }
 
     /**
@@ -105,8 +120,9 @@
      * @returns void
      */
     function _recordCurrentCombo() {
-        _recordedSequence.push(_currentRecordedKeys);
-        _currentRecordedKeys = [];
+        var sequence;
+        
+        _recordedSequence.push([]);
         _recordedCharacterKey = false;
         _restartRecordTimer();
     }
@@ -122,6 +138,7 @@
      */
     function _normalizeSequence(sequence) {
         var i;
+        var result = [];
 
         for (i = 0; i < sequence.length; ++i) {
             sequence[i].sort(function(x, y) {
@@ -137,8 +154,11 @@
                 return x > y ? 1 : -1;
             });
 
-            sequence[i] = sequence[i].join('+');
+            if (sequence[i].length > 0) {
+                result[i] = sequence[i].join('+');   
+            }
         }
+        return result;
     }
 
     /**
@@ -148,15 +168,15 @@
      * @returns void
      */
     function _finishRecording() {
+        var sequence;
         if (_recordedSequenceCallback) {
-            _normalizeSequence(_recordedSequence);
-            _recordedSequenceCallback(_recordedSequence);
+            sequence = _normalizeSequence(_recordedSequence);
+            _recordedSequenceCallback(sequence);
         }
 
         // reset all recorded state
-        _recordedSequence = [];
+        _recordedSequence = [[]];
         _recordedSequenceCallback = null;
-        _currentRecordedKeys = [];
 
         Mousetrap.handleKey = _origHandleKey;
     }
@@ -181,9 +201,10 @@
      * @param {Function} callback
      * @returns void
      */
-    Mousetrap.record = function(callback) {
+    Mousetrap.record = function(callback, recording) {
         Mousetrap.handleKey = _handleKey;
         _recordedSequenceCallback = callback;
+        _recordingSequenceCallback = recording;
     };
 
 })(Mousetrap);
