@@ -7,7 +7,7 @@
  * Mousetrap.bindGlobal('ctrl+s', _saveChanges);
  */
 /* global Mousetrap:true */
-Mousetrap = (function(Mousetrap) {
+window.Mousetrap = (function(Mousetrap) {
     var _globalCallbacks = {},
         _originalStopCallback = Mousetrap.stopCallback;
 
@@ -33,4 +33,4 @@ Mousetrap = (function(Mousetrap) {
     };
 
     return Mousetrap;
-}) (Mousetrap);
+}) (window.Mousetrap);

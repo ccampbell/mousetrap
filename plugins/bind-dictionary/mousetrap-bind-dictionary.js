@@ -14,7 +14,7 @@
  *
  */
 /* global Mousetrap:true */
-Mousetrap = (function(Mousetrap) {
+window.Mousetrap = (function(Mousetrap) {
     var self = Mousetrap,
         _oldBind = self.bind,
         args;
@@ -36,4 +36,4 @@ Mousetrap = (function(Mousetrap) {
     };
 
     return self;
-}) (Mousetrap);
+}) (window.Mousetrap);
