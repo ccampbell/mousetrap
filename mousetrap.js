@@ -410,12 +410,12 @@
     }
 
     function _belongsTo(element, ancestor) {
-        if (element === ancestor) {
-            return true;
-        }
-
         if (element === document) {
             return false;
+        }
+
+        if (element === ancestor) {
+            return true;
         }
 
         return _belongsTo(element.parentNode, ancestor);
