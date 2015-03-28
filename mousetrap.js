@@ -424,6 +424,8 @@
     function Mousetrap(targetElement) {
         var self = this;
 
+        targetElement = targetElement || document;
+
         if (!(self instanceof Mousetrap)) {
             return new Mousetrap(targetElement);
         }

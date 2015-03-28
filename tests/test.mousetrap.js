@@ -668,4 +668,17 @@ describe('wrapping a specific element', function() {
         expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
         expect(spy.args[0][1]).to.equal('a', 'second argument should be key combo');
     });
+
+    it('should allow you to create an empty mousetrap constructor', function() {
+        var spy = sinon.spy();
+
+        var mousetrap = new Mousetrap();
+        mousetrap.bind('a', spy);
+
+        KeyEvent.simulate('a'.charCodeAt(0), 65);
+
+        expect(spy.callCount).to.equal(1, 'callback should fire once');
+        expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
+        expect(spy.args[0][1]).to.equal('a', 'second argument should be key combo');
+    });
 });
