@@ -134,8 +134,13 @@ describe('Mousetrap.bind', function() {
 
             expect(spy.callCount).to.equal(1, 'callback should fire');
             expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
-            expect(spy.args[0][0].cancelBubble).to.be.True;
-            expect(spy.args[0][0].defaultPrevented).to.be.True;
+
+            expect(spy.args[0][0].defaultPrevented).to.be.true;
+
+            // cancelBubble is not correctly set to true in webkit/blink
+            //
+            // @see https://code.google.com/p/chromium/issues/detail?id=162270
+            // expect(spy.args[0][0].cancelBubble).to.be.true;
 
             // try without return false
             spy = sinon.spy();
@@ -144,8 +149,8 @@ describe('Mousetrap.bind', function() {
 
             expect(spy.callCount).to.equal(1, 'callback should fire');
             expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
-            expect(spy.args[0][0].cancelBubble).to.be.False;
-            expect(spy.args[0][0].defaultPrevented).to.be.False;
+            expect(spy.args[0][0].cancelBubble).to.be.falsey;
+            expect(spy.args[0][0].defaultPrevented).to.be.falsey;
         });
 
         it('capslock key is ignored', function() {
