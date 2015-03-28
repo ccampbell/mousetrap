@@ -429,18 +429,25 @@
         }
 
         /**
+         * element to attach key events to
+         *
+         * @type {Element}
+         */
+        self.target = targetElement;
+
+        /**
          * a list of all the callbacks setup via Mousetrap.bind()
          *
          * @type {Object}
          */
-        var _callbacks = {};
+        self._callbacks = {};
 
         /**
          * direct map of string combinations to callbacks used for trigger()
          *
          * @type {Object}
          */
-        var _directMap = {};
+        self._directMap = {};
 
         /**
          * keeps track of what level each sequence is at since multiple
@@ -523,7 +530,7 @@
             var action = e.type;
 
             // if there are no events related to this keycode
-            if (!_callbacks[character]) {
+            if (!self._callbacks[character]) {
                 return [];
             }
 
@@ -534,8 +541,8 @@
 
             // loop through all callbacks for the key that was pressed
             // and see if any of them match
-            for (i = 0; i < _callbacks[character].length; ++i) {
-                callback = _callbacks[character][i];
+            for (i = 0; i < self._callbacks[character].length; ++i) {
+                callback = self._callbacks[character][i];
 
                 // if a sequence name is not specified, but this is a sequence at
                 // the wrong level then move onto the next match
@@ -566,7 +573,7 @@
                     var deleteCombo = !sequenceName && callback.combo == combination;
                     var deleteSequence = sequenceName && callback.seq == sequenceName && callback.level == level;
                     if (deleteCombo || deleteSequence) {
-                        _callbacks[character].splice(i, 1);
+                        self._callbacks[character].splice(i, 1);
                     }
 
                     matches.push(callback);
@@ -607,7 +614,7 @@
          * @param {Event} e
          * @returns void
          */
-        function _handleKey(character, modifiers, e) {
+        self._handleKey = function(character, modifiers, e) {
             var callbacks = _getMatches(character, modifiers, e);
             var i;
             var doNotReset = {};
@@ -685,7 +692,7 @@
             }
 
             _ignoreNextKeypress = processedSequenceCallback && e.type == 'keydown';
-        }
+        };
 
         /**
          * handles a keydown event
@@ -811,7 +818,7 @@
         function _bindSingle(combination, callback, action, sequenceName, level) {
 
             // store a direct mapped reference for use with Mousetrap.trigger
-            _directMap[combination + ':' + action] = callback;
+            self._directMap[combination + ':' + action] = callback;
 
             // make sure multiple spaces in a row become a single space
             combination = combination.replace(/\s+/g, ' ');
@@ -830,7 +837,7 @@
 
             // make sure to initialize array if this is the first time
             // a callback is added for this key
-            _callbacks[info.key] = _callbacks[info.key] || [];
+            self._callbacks[info.key] = self._callbacks[info.key] || [];
 
             // remove an existing match if there is one
             _getMatches(info.key, info.modifiers, {type: info.action}, sequenceName, combination, level);
@@ -841,7 +848,7 @@
             //
             // this is important because the way these are processed expects
             // the sequence ones to come first
-            _callbacks[info.key][sequenceName ? 'unshift' : 'push']({
+            self._callbacks[info.key][sequenceName ? 'unshift' : 'push']({
                 callback: callback,
                 modifiers: info.modifiers,
                 action: info.action,
@@ -859,117 +866,141 @@
          * @param {string|undefined} action
          * @returns void
          */
-        function _bindMultiple(combinations, callback, action) {
+        self._bindMultiple = function(combinations, callback, action) {
             for (var i = 0; i < combinations.length; ++i) {
                 _bindSingle(combinations[i], callback, action);
             }
-        }
+        };
 
         // start!
         _addEvent(targetElement, 'keypress', _handleKeyEvent);
         _addEvent(targetElement, 'keydown', _handleKeyEvent);
         _addEvent(targetElement, 'keyup', _handleKeyEvent);
-
-        /**
-         * binds an event to mousetrap
-         *
-         * can be a single key, a combination of keys separated with +,
-         * an array of keys, or a sequence of keys separated by spaces
-         *
-         * be sure to list the modifier keys first to make sure that the
-         * correct key ends up getting bound (the last key in the pattern)
-         *
-         * @param {string|Array} keys
-         * @param {Function} callback
-         * @param {string=} action - 'keypress', 'keydown', or 'keyup'
-         * @returns void
-         */
-        self.bind = function(keys, callback, action) {
-            keys = keys instanceof Array ? keys : [keys];
-            _bindMultiple(keys, callback, action);
-            return self;
-        };
-
-        /**
-         * unbinds an event to mousetrap
-         *
-         * the unbinding sets the callback function of the specified key combo
-         * to an empty function and deletes the corresponding key in the
-         * _directMap dict.
-         *
-         * TODO: actually remove this from the _callbacks dictionary instead
-         * of binding an empty function
-         *
-         * the keycombo+action has to be exactly the same as
-         * it was defined in the bind method
-         *
-         * @param {string|Array} keys
-         * @param {string} action
-         * @returns void
-         */
-        self.unbind = function(keys, action) {
-            return self.bind(keys, function() {}, action);
-        };
-
-        /**
-         * triggers an event that has already been bound
-         *
-         * @param {string} keys
-         * @param {string=} action
-         * @returns void
-         */
-        self.trigger = function(keys, action) {
-            if (_directMap[keys + ':' + action]) {
-                _directMap[keys + ':' + action]({}, keys);
-            }
-            return self;
-        };
-
-        /**
-         * resets the library back to its initial state.  this is useful
-         * if you want to clear out the current keyboard shortcuts and bind
-         * new ones - for example if you switch to another page
-         *
-         * @returns void
-         */
-        self.reset = function() {
-            _callbacks = {};
-            _directMap = {};
-            return self;
-        };
-
-       /**
-        * should we stop this event before firing off callbacks
-        *
-        * @param {Event} e
-        * @param {Element} element
-        * @return {boolean}
-        */
-        self.stopCallback = function(e, element) {
-
-            // if the element has the class "mousetrap" then no need to stop
-            if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
-                return false;
-            }
-
-            if (_belongsTo(element, targetElement)) {
-                return false;
-            }
-
-            // stop for input, select, and textarea
-            return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || element.isContentEditable;
-        };
-
-        /**
-         * exposes _handleKey publicly so it can be overwritten by extensions
-         */
-        self.handleKey = _handleKey;
     }
 
-    var documentMousetrap = Mousetrap(document);
-    for (var method in documentMousetrap) {
-        Mousetrap[method] = documentMousetrap[method];
-    }
+    /**
+     * binds an event to mousetrap
+     *
+     * can be a single key, a combination of keys separated with +,
+     * an array of keys, or a sequence of keys separated by spaces
+     *
+     * be sure to list the modifier keys first to make sure that the
+     * correct key ends up getting bound (the last key in the pattern)
+     *
+     * @param {string|Array} keys
+     * @param {Function} callback
+     * @param {string=} action - 'keypress', 'keydown', or 'keyup'
+     * @returns void
+     */
+    Mousetrap.prototype.bind = function(keys, callback, action) {
+        var self = this;
+        keys = keys instanceof Array ? keys : [keys];
+        self._bindMultiple.call(self, keys, callback, action);
+        return self;
+    };
+
+    /**
+     * unbinds an event to mousetrap
+     *
+     * the unbinding sets the callback function of the specified key combo
+     * to an empty function and deletes the corresponding key in the
+     * _directMap dict.
+     *
+     * TODO: actually remove this from the _callbacks dictionary instead
+     * of binding an empty function
+     *
+     * the keycombo+action has to be exactly the same as
+     * it was defined in the bind method
+     *
+     * @param {string|Array} keys
+     * @param {string} action
+     * @returns void
+     */
+    Mousetrap.prototype.unbind = function(keys, action) {
+        var self = this;
+        return self.bind.call(self, keys, function() {}, action);
+    };
+
+    /**
+     * triggers an event that has already been bound
+     *
+     * @param {string} keys
+     * @param {string=} action
+     * @returns void
+     */
+    Mousetrap.prototype.trigger = function(keys, action) {
+        var self = this;
+        if (self._directMap[keys + ':' + action]) {
+            self._directMap[keys + ':' + action]({}, keys);
+        }
+        return self;
+    };
+
+    /**
+     * resets the library back to its initial state.  this is useful
+     * if you want to clear out the current keyboard shortcuts and bind
+     * new ones - for example if you switch to another page
+     *
+     * @returns void
+     */
+    Mousetrap.prototype.reset = function() {
+        var self = this;
+        self._callbacks = {};
+        self._directMap = {};
+        return self;
+    };
+
+    /**
+     * should we stop this event before firing off callbacks
+     *
+     * @param {Event} e
+     * @param {Element} element
+     * @return {boolean}
+     */
+    Mousetrap.prototype.stopCallback = function(e, element) {
+        var self = this;
+
+        // if the element has the class "mousetrap" then no need to stop
+        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+            return false;
+        }
+
+        if (_belongsTo(element, self.target)) {
+            return false;
+        }
+
+        // stop for input, select, and textarea
+        return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || element.isContentEditable;
+    };
+
+    /**
+     * exposes _handleKey publicly so it can be overwritten by extensions
+     */
+    Mousetrap.prototype.handleKey = function() {
+        var self = this;
+        return self._handleKey.apply(self, arguments);
+    };
+
+    /**
+     * Init the global mousetrap functions
+     *
+     * This method is needed to allow the global mousetrap functions to work
+     * now that mousetrap is a constructor function.
+     */
+    Mousetrap.init = function() {
+        var documentMousetrap = Mousetrap(document);
+        for (var method in documentMousetrap) {
+            if (method.charAt(0) !== '_') {
+                Mousetrap[method] = (function(method) {
+                    return function() {
+                        return documentMousetrap[method].apply(documentMousetrap, arguments);
+                    };
+                } (method));
+            }
+        }
+    };
+
+    Mousetrap.init();
 
     // expose mousetrap to the global object
     window.Mousetrap = Mousetrap;
