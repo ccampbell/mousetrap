@@ -598,7 +598,7 @@
         function _fireCallback(callback, e, combo, sequence) {
 
             // if this event should not happen stop here
-            var element = typeof e.path == 'object' && e.path.constructor == Array ? e.path[0]  : e.target || e.srcElement;
+            var element = typeof e.path === 'object' && e.path.constructor === Array ? e.path[0]  : e.target || e.srcElement;
             if (self.stopCallback(e, element, combo, sequence)) {
                 return;
             }
