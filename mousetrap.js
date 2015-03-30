@@ -17,7 +17,7 @@
  * Mousetrap is a simple keyboard shortcut library for Javascript with
  * no external dependencies
  *
- * @version 1.5.1
+ * @version 1.5.2
  * @url craig.is/killing/mice
  */
 (function(window, document, undefined) {
