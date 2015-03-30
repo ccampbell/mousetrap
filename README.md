@@ -99,4 +99,4 @@ Download the repo and go to `tests/mousetrap.html` in your browser.
 
 ## Documentation
 
-Full documentation can be found at http://craig.is/killing/mice
+Full documentation can be found at https://craig.is/killing/mice
