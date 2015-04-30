@@ -681,4 +681,21 @@ describe('wrapping a specific element', function() {
         expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
         expect(spy.args[0][1]).to.equal('a', 'second argument should be key combo');
     });
+
+    it('should allow you to destroy the instance', function() {
+      var spy1 = sinon.spy();
+      var mousetrap1 = new Mousetrap();
+      mousetrap1.bind('a', spy1);
+      mousetrap1.destroy();
+
+      var spy2 = sinon.spy();
+      var mousetrap2 = new Mousetrap();
+      mousetrap2.bind('a', spy2);
+
+      KeyEvent.simulate('a'.charCodeAt(0), 65);
+
+      expect(spy1.callCount).to.equal(0, 'mousetrap1 callback should never be fired');
+      expect(spy2.callCount).to.equal(1, 'mousetrap2 callback should fire once');
+      expect(Mousetrap.destroy).to.equal(undefined, 'Mousetrap should not have destroy method');
+    })
 });
