@@ -10,21 +10,18 @@
      * @type {Array}
      */
     var _recordedSequence = [],
-
         /**
          * a callback to invoke after recording a sequence
          *
          * @type {Function|null}
          */
         _recordedSequenceCallback = null,
-
         /**
          * a list of all of the keys currently held down
          *
          * @type {Array}
          */
         _currentRecordedKeys = [],
-
         /**
          * temporary state where we remember if we've already captured a
          * character key in the current combo
@@ -32,14 +29,12 @@
          * @type {boolean}
          */
         _recordedCharacterKey = false,
-
         /**
          * a handle for the timer of the current recording
          *
          * @type {null|number}
          */
         _recordTimer = null,
-
         /**
          * the original handleKey method to override when Mousetrap.record() is
          * called
@@ -47,7 +42,6 @@
          * @type {Function}
          */
         _origHandleKey = Mousetrap.prototype.handleKey;
-
     /**
      * handles a character key event
      *
@@ -58,30 +52,25 @@
      */
     function _handleKey(character, modifiers, e) {
         var self = this;
-
         if (!self.recording) {
             _origHandleKey.apply(self, arguments);
             return;
         }
-
         // remember this character if we're currently recording a sequence
         if (e.type == 'keydown') {
             if (character.length === 1 && _recordedCharacterKey) {
                 _recordCurrentCombo();
             }
-
             for (i = 0; i < modifiers.length; ++i) {
                 _recordKey(modifiers[i]);
             }
             _recordKey(character);
-
         // once a key is released, all keys that were held down at the time
         // count as a keypress
         } else if (e.type == 'keyup' && _currentRecordedKeys.length > 0) {
             _recordCurrentCombo();
         }
     }
-
     /**
      * marks a character key as held down while recording a sequence
      *
@@ -90,21 +79,17 @@
      */
     function _recordKey(key) {
         var i;
-
         // one-off implementation of Array.indexOf, since IE6-9 don't support it
         for (i = 0; i < _currentRecordedKeys.length; ++i) {
             if (_currentRecordedKeys[i] === key) {
                 return;
             }
         }
-
         _currentRecordedKeys.push(key);
-
         if (key.length === 1) {
             _recordedCharacterKey = true;
         }
     }
-
     /**
      * marks whatever key combination that's been recorded so far as finished
      * and gets ready for the next combo
@@ -117,7 +102,6 @@
         _recordedCharacterKey = false;
         _restartRecordTimer();
     }
-
     /**
      * ensures each combo in a sequence is in a predictable order and formats
      * key combos to be '+'-delimited
@@ -129,7 +113,6 @@
      */
     function _normalizeSequence(sequence) {
         var i;
-
         for (i = 0; i < sequence.length; ++i) {
             sequence[i].sort(function(x, y) {
                 // modifier keys always come first, in alphabetical order
@@ -138,16 +121,13 @@
                 } else if (x.length === 1 && y.length > 1) {
                     return 1;
                 }
-
                 // character keys come next (list should contain no duplicates,
                 // so no need for equality check)
                 return x > y ? 1 : -1;
             });
-
             sequence[i] = sequence[i].join('+');
         }
     }
-
     /**
      * finishes the current recording, passes the recorded sequence to the stored
      * callback, and sets Mousetrap.handleKey back to its original function
@@ -159,13 +139,11 @@
             _normalizeSequence(_recordedSequence);
             _recordedSequenceCallback(_recordedSequence);
         }
-
         // reset all recorded state
         _recordedSequence = [];
         _recordedSequenceCallback = null;
         _currentRecordedKeys = [];
     }
-
     /**
      * called to set a 1 second timeout on the current recording
      *
@@ -178,7 +156,6 @@
         clearTimeout(_recordTimer);
         _recordTimer = setTimeout(_finishRecording, 1000);
     }
-
     /**
      * records the next sequence and passes it to a callback once it's
      * completed
@@ -194,12 +171,9 @@
             callback.apply(self, arguments);
         };
     };
-
     Mousetrap.prototype.handleKey = function() {
         var self = this;
         _handleKey.apply(self, arguments);
     };
-
     Mousetrap.init();
-
 })(Mousetrap);
