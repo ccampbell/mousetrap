@@ -22,6 +22,10 @@
  */
 (function(window, document, undefined) {
 
+    if (!window) {
+        return;
+    }
+
     /**
      * mapping of special keycodes to their corresponding keys
      *
@@ -1018,4 +1022,4 @@
             return Mousetrap;
         });
     }
-}) (window, document);
+}) (typeof window !== 'undefined' ? window : null, typeof document !== 'undefined' ? document : null);
