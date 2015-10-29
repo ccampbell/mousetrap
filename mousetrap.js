@@ -22,6 +22,10 @@
  */
 (function(window, document, undefined) {
 
+    if (!window) {
+        return;
+    }
+
     /**
      * mapping of special keycodes to their corresponding keys
      *
@@ -53,6 +57,13 @@
         46: 'del',
         91: 'meta',
         93: 'meta',
+        173: 'mute',
+        174: 'volumedown',
+        175: 'volumeup',
+        176: 'nexttrack',
+        177: 'previoustrack',
+        178: 'stop',
+        179: 'playpause',
         224: 'meta'
     };
 
@@ -1018,4 +1029,4 @@
             return Mousetrap;
         });
     }
-}) (window, document);
+}) (typeof window !== 'undefined' ? window : null, typeof document !== 'undefined' ? document : null);
