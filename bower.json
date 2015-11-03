@@ -1,0 +1,17 @@
+{
+  "name": "mousetrap",
+  "version": "1.4.6",
+  "main": [
+    "mousetrap.js"
+  ],
+  "dependencies": {
+  },
+  "ignore": [
+    "tests",
+    ".*",
+    "*.json",
+    "*.md",
+    "*.txt",
+    "Gruntfile.js"
+  ]
+}
