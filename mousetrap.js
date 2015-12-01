@@ -53,7 +53,8 @@
         46: 'del',
         91: 'meta',
         93: 'meta',
-        224: 'meta'
+        224: 'meta',
+        19: 'pausebreak'
     };
 
     /**
