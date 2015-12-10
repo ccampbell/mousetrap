@@ -450,6 +450,19 @@
          * @type {Object}
          */
         self._directMap = {};
+		
+        /**
+         * When keys are released in a keyup action- they get stored until another key is pressed. These are used when combination ends with a modifier key
+         *
+         * @type {Object}
+         */
+        self._releasedKeys = [];
+        /**
+         * Held keys.. these get used when combination ends with a modifier key- and needs to check if an action with different character should trigger
+         *
+         * @type {Object}
+         */
+        self._heldKeys = [];
 
         /**
          * keeps track of what level each sequence is at since multiple
@@ -532,55 +545,75 @@
             var action = e.type;
 
             // if there are no events related to this keycode
-            if (!self._callbacks[character]) {
+            if (!self._callbacks[character] && !_isModifier(character) ) {
                 return [];
             }
 
+			var allCharacters = [character];
+			
             // if a modifier key is coming up on its own we should allow it
-            if (action == 'keyup' && _isModifier(character)) {
-                modifiers = [character];
+            if (action == 'keyup' && _isModifier(character) ) {
+				modifiers = [character];
+				for (property in self._callbacks) {
+					if(_isModifier(property) && allCharacters.indexOf(property) === -1)allCharacters.push(property);
+				}
             }
-
+			
             // loop through all callbacks for the key that was pressed
             // and see if any of them match
-            for (i = 0; i < self._callbacks[character].length; ++i) {
-                callback = self._callbacks[character][i];
+			for (k = 0; k < allCharacters.length; ++k) {
+				if(typeof self._callbacks[allCharacters[k]] !== 'undefined'){
+					character = allCharacters[k];
+					for (i = 0; i < self._callbacks[character].length; ++i) {
+						callback = self._callbacks[character][i];
+						
+						//if key is modifier and is last in combo, meaning combination is only modifiers, add all modifiers to modifier array so it can match properly
+						//also check that the modifiers were originally held down, otherwise exclude them.
+						if (action == 'keyup' && _isModifier(character) && callback.modifiers[callback.modifiers.length-1]===character ) {
+							modifiers = [];
+							for (j = 0; j < callback.modifiers.length; ++j) {
+								if(self._releasedKeys.indexOf(callback.modifiers[j]) !== -1 && modifiers.indexOf(callback.modifiers[j])==-1 )modifiers.push(callback.modifiers[j]);
+								if(self._heldKeys.indexOf(callback.modifiers[j]) !== -1 && modifiers.indexOf(callback.modifiers[j])==-1 )modifiers.push(callback.modifiers[j]);
+							}
+						}
+						
+						// if a sequence name is not specified, but this is a sequence at
+						// the wrong level then move onto the next match
+						if (!sequenceName && callback.seq && _sequenceLevels[callback.seq] != callback.level) {
+							continue;
+						}
 
-                // if a sequence name is not specified, but this is a sequence at
-                // the wrong level then move onto the next match
-                if (!sequenceName && callback.seq && _sequenceLevels[callback.seq] != callback.level) {
-                    continue;
-                }
+						// if the action we are looking for doesn't match the action we got
+						// then we should keep going
+						if (action != callback.action) {
+							continue;
+						}
 
-                // if the action we are looking for doesn't match the action we got
-                // then we should keep going
-                if (action != callback.action) {
-                    continue;
-                }
+						// if this is a keypress event and the meta key and control key
+						// are not pressed that means that we need to only look at the
+						// character, otherwise check the modifiers as well
+						//
+						// chrome will not fire a keypress if meta or control is down
+						// safari will fire a keypress if meta or meta+shift is down
+						// firefox will fire a keypress if meta or control is down
+						if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
 
-                // if this is a keypress event and the meta key and control key
-                // are not pressed that means that we need to only look at the
-                // character, otherwise check the modifiers as well
-                //
-                // chrome will not fire a keypress if meta or control is down
-                // safari will fire a keypress if meta or meta+shift is down
-                // firefox will fire a keypress if meta or control is down
-                if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
+							// when you bind a combination or sequence a second time it
+							// should overwrite the first one.  if a sequenceName or
+							// combination is specified in this call it does just that
+							//
+							// @todo make deleting its own method?
+							var deleteCombo = !sequenceName && callback.combo == combination;
+							var deleteSequence = sequenceName && callback.seq == sequenceName && callback.level == level;
+							if (deleteCombo || deleteSequence) {
+								self._callbacks[character].splice(i, 1);
+							}
 
-                    // when you bind a combination or sequence a second time it
-                    // should overwrite the first one.  if a sequenceName or
-                    // combination is specified in this call it does just that
-                    //
-                    // @todo make deleting its own method?
-                    var deleteCombo = !sequenceName && callback.combo == combination;
-                    var deleteSequence = sequenceName && callback.seq == sequenceName && callback.level == level;
-                    if (deleteCombo || deleteSequence) {
-                        self._callbacks[character].splice(i, 1);
-                    }
-
-                    matches.push(callback);
-                }
-            }
+							matches.push(callback);
+						}
+					}
+				}
+			}
 
             return matches;
         }
@@ -704,6 +737,7 @@
          */
         function _handleKeyEvent(e) {
 
+			
             // normalize e.which for key events
             // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
             if (typeof e.which !== 'number') {
@@ -711,12 +745,25 @@
             }
 
             var character = _characterFromEvent(e);
-
+			
             // no character found then stop
             if (!character) {
                 return;
             }
 
+			//make sure the keys that are released are remembered until another keypress/keydown
+			//make sure keys that are being held, are remembered
+			if(!e.repeat && e.type!='keyup'){
+				self._releasedKeys = [];
+				self._heldKeys.push(character);
+			}else if(e.type=='keyup'){
+				self._releasedKeys.push(character);
+				do{
+					var heldIndex = self._heldKeys.indexOf(character);
+					if(heldIndex>-1)self._heldKeys.splice(heldIndex,1);
+				}while(heldIndex>-1);
+			}
+			
             // need to use === for the character check because the character can be 0
             if (e.type == 'keyup' && _ignoreNextKeyup === character) {
                 _ignoreNextKeyup = false;
