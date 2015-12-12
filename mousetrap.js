@@ -371,7 +371,14 @@
         var key;
         var i;
         var modifiers = [];
-
+		var namespace = combination.split('.');
+		
+		//get the namespace if it has one (eg: ctrl+a.name combination would give namespace of name after the period)
+		if(namespace.length>1){
+			combination = namespace[0];
+			namespace = namespace[1];
+		}
+		
         // take the keys from this pattern and figure out what the actual
         // pattern is all about
         keys = _keysFromString(combination);
@@ -405,7 +412,8 @@
         return {
             key: key,
             modifiers: modifiers,
-            action: action
+            action: action,
+			namespace: namespace
         };
     }
 
@@ -536,9 +544,10 @@
          * @param {string=} sequenceName - name of the sequence we are looking for
          * @param {string=} combination
          * @param {number=} level
+         * @param {string=} namespace (eg: if original combination is ctrl+a.name, namespace would be after the period)
          * @returns {Array}
          */
-        function _getMatches(character, modifiers, e, sequenceName, combination, level) {
+        function _getMatches(character, modifiers, e, sequenceName, combination, level, namespace) {
             var i;
             var callback;
             var matches = [];
@@ -889,7 +898,7 @@
             self._callbacks[info.key] = self._callbacks[info.key] || [];
 
             // remove an existing match if there is one
-            _getMatches(info.key, info.modifiers, {type: info.action}, sequenceName, combination, level);
+            _getMatches(info.key, info.modifiers, {type: info.action}, sequenceName, combination, level, info.namespace);
 
             // add this call back to the array
             // if it is a sequence put it at the beginning
@@ -901,6 +910,7 @@
                 callback: callback,
                 modifiers: info.modifiers,
                 action: info.action,
+				namespace: info.namespace,
                 seq: sequenceName,
                 level: level,
                 combo: combination
