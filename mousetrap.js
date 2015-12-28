@@ -112,7 +112,9 @@
         '<': ',',
         '>': '.',
         '?': '/',
-        '|': '\\'
+        '|': '\\',
+		'}':']',
+		'{':'['
     };
 
     /**
@@ -195,7 +197,8 @@
             if (!e.shiftKey) {
                 character = character.toLowerCase();
             }
-
+			
+			if(character==" ")return "space";
             return character;
         }
 
@@ -643,7 +646,18 @@
             if (self.stopCallback(e, e.target || e.srcElement, combo, sequence)) {
                 return;
             }
-
+			//check if there are keys before this one that are part of the combo (ex: ctrl+space+c), make sure they are still held down
+			if(combo.indexOf("+")>-1){
+				var charArray = combo.split("+");
+				for(var i=0; i<charArray.length-1; i++){
+					var heldIndex = self._heldKeys.indexOf(charArray[i]);
+					if(heldIndex==-1)return;
+				}
+			}else if(combo.indexOf(" ")==-1){
+				//if it is just a single key, don't fire if others are being held.
+				if(self._heldKeys.length>1)return;
+			}
+			
             if (callback(e, combo) === false) {
                 _preventDefault(e);
                 _stopPropagation(e);
@@ -739,6 +753,18 @@
         };
 
         /**
+         * handles a onblur event
+         *
+         * @param {Event} e
+         * @returns void
+         */
+        function _handleBlurEvent(e) {
+			//make sure the held keys and released keys get cleared if window loses focus.
+		   self._heldKeys = [];
+		   self._releasedKeys = [];
+		}
+		
+        /**
          * handles a keydown event
          *
          * @param {Event} e
@@ -762,15 +788,21 @@
 
 			//make sure the keys that are released are remembered until another keypress/keydown
 			//make sure keys that are being held, are remembered
-			if(!e.repeat && e.type!='keyup'){
-				self._releasedKeys = [];
-				self._heldKeys.push(character);
-			}else if(e.type=='keyup'){
-				self._releasedKeys.push(character);
-				do{
-					var heldIndex = self._heldKeys.indexOf(character);
-					if(heldIndex>-1)self._heldKeys.splice(heldIndex,1);
-				}while(heldIndex>-1);
+			held = character;
+			if(_SHIFT_MAP[character]){
+				held = -1;
+			}
+			if(held!==-1){
+				if(!e.repeat && e.type!='keyup'){
+					self._releasedKeys = [];
+					if(self._heldKeys.indexOf(held)==-1)self._heldKeys.push(held);
+				}else if(e.type=='keyup'){
+					if(self._releasedKeys.indexOf(held)==-1)self._releasedKeys.push(held);
+					do{
+						var heldIndex = self._heldKeys.indexOf(held);
+						if(heldIndex>-1)self._heldKeys.splice(heldIndex,1);
+					}while(heldIndex>-1);
+				}
 			}
 			
             // need to use === for the character check because the character can be 0
@@ -935,6 +967,8 @@
         _addEvent(targetElement, 'keypress', _handleKeyEvent);
         _addEvent(targetElement, 'keydown', _handleKeyEvent);
         _addEvent(targetElement, 'keyup', _handleKeyEvent);
+		
+        _addEvent(window, 'blur', _handleBlurEvent);
     }
 
     /**
@@ -1063,7 +1097,7 @@
 
     // expose mousetrap to the global object
     window.Mousetrap = Mousetrap;
-
+	
     // expose as a common js module
     if (typeof module !== 'undefined' && module.exports) {
         module.exports = Mousetrap;
