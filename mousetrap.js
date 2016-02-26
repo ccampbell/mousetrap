@@ -1023,4 +1023,4 @@
             return Mousetrap;
         });
     }
-}) (typeof window !== 'undefined' ? window : null, typeof document !== 'undefined' ? document : null);
+}) (typeof window !== 'undefined' ? window : null, typeof  window !== 'undefined' ? document : null);
