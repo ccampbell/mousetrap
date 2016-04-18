@@ -18,7 +18,14 @@
     };
 
     KeyEvent.prototype.toNative = function() {
-        var event = document.createEventObject ? document.createEventObject() : document.createEvent('Events');
+        var event;
+
+        // Events created with createEventObject() in IE 10 don't work with setting properties like `which`, etc.
+        if (/*@cc_on!@*/false && document.documentMode === 10) {
+            event = document.createEvent('HTMLEvents');
+        } else {
+            event = document.createEventObject ? document.createEventObject() : document.createEvent('Events');
+        }
 
         if (event.initEvent) {
             event.initEvent(this.type, true, true);
