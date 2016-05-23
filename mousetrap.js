@@ -984,6 +984,19 @@
     };
 
     /**
+     * allow custom key mappings
+     */
+    Mousetrap.extendMap = function(object) {
+      var key;
+      for (key in object) {
+          if (object.hasOwnProperty(key)) {
+              _MAP[key] = object[key];
+          }
+      }
+      _REVERSE_MAP = null;
+    }
+
+    /**
      * Init the global mousetrap functions
      *
      * This method is needed to allow the global mousetrap functions to work
