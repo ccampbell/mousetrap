@@ -21,6 +21,11 @@
  * @url craig.is/killing/mice
  */
 (function(window, document, undefined) {
+    
+    // Check if mousetrap is used inside browser, if not, retrun
+    if (!window) {
+        return;
+    }
 
     /**
      * mapping of special keycodes to their corresponding keys
@@ -1018,4 +1023,4 @@
             return Mousetrap;
         });
     }
-}) (window, document);
+}) (typeof window !== 'undefined' ? window : null, typeof  window !== 'undefined' ? document : null);
