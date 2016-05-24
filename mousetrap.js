@@ -21,8 +21,8 @@
  * @url craig.is/killing/mice
  */
 (function(window, document, undefined) {
-    
-    // Check if mousetrap is used inside browser, if not, retrun
+
+    // Check if mousetrap is used inside browser, if not, return
     if (!window) {
         return;
     }
