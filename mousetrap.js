@@ -901,7 +901,7 @@
      */
     Mousetrap.prototype.bind = function(keys, callback, action) {
         var self = this;
-        keys = keys instanceof Array ? keys : [keys];
+        keys = Mousetrap._isArray(keys) ? keys : [keys];
         self._bindMultiple.call(self, keys, callback, action);
         return self;
     };
@@ -986,6 +986,16 @@
     Mousetrap.prototype.handleKey = function() {
         var self = this;
         return self._handleKey.apply(self, arguments);
+    };
+
+    /**
+     * checks if the value is an array
+     *
+     * @param {*} value
+     * @returns {boolean}
+     */
+    Mousetrap._isArray = function(value) {
+        return Object.prototype.toString.call(value) == '[object Array]';
     };
 
     /**

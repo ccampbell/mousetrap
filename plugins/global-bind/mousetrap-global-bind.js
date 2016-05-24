@@ -29,7 +29,7 @@
         var self = this;
         self.bind(keys, callback, action);
 
-        if (keys instanceof Array) {
+        if (Mousetrap._isArray(keys)) {
             for (var i = 0; i < keys.length; i++) {
                 _globalCallbacks[keys[i]] = true;
             }

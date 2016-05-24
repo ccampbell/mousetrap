@@ -23,7 +23,7 @@
         args = arguments;
 
         // normal call
-        if (typeof args[0] == 'string' || args[0] instanceof Array) {
+        if (typeof args[0] == 'string' || Mousetrap._isArray(args[0])) {
             return _oldBind.call(self, args[0], args[1], args[2]);
         }
 
