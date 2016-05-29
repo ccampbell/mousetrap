@@ -991,7 +991,7 @@
     /**
      * allow custom key mappings
      */
-    Mousetrap.extendMap = function(object) {
+    Mousetrap.addKeycodes = function(object) {
         for (var key in object) {
             if (object.hasOwnProperty(key)) {
                 _MAP[key] = object[key];

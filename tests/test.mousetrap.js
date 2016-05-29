@@ -683,11 +683,11 @@ describe('wrapping a specific element', function() {
     });
 });
 
-describe('Mouestra.extendMap', function() {
+describe('Mouestra.addKeycodes', function() {
     it('should properly recognize non-default mapping', function() {
         var spy = sinon.spy();
 
-        Mousetrap.extendMap({
+        Mousetrap.addKeycodes({
             144: 'num',
         });
 
