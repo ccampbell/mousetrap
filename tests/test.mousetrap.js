@@ -247,6 +247,15 @@ describe('Mousetrap.bind', function() {
             expect(spy.args[0][1]).to.equal('alt+shift++', 'callback should match "alt++"');
 
         })
+
+        it('binding to pausebreak key should work', function() {
+            var spy = sinon.spy();
+            Mousetrap.bind('pausebreak', spy);
+
+            KeyEvent.simulate( 0, 19 );
+            expect(spy.callCount).to.equal(1, 'callback should fire');
+            expect(spy.args[0][1]).to.equal( 'pausebreak', 'callback should match "alt++"');
+        })
     });
 
     describe('combos with modifiers', function() {
