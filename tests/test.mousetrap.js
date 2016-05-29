@@ -269,6 +269,19 @@ describe('Mousetrap.bind', function() {
             KeyEvent.simulate('O'.charCodeAt(0), 79, ['meta', 'shift']);
             expect(spy.callCount).to.equal(1, 'command+o callback should fire');
         });
+
+        it('should fire callback when ctrl+numpad 0 is pressed', function() {
+            var spy = sinon.spy();
+
+            Mousetrap.bind('ctrl+0', spy);
+
+            // numpad 0 keycode
+            KeyEvent.simulate(96, 96, ['ctrl']);
+
+            expect(spy.callCount).to.equal(1, 'callback should fire once');
+            expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
+            expect(spy.args[0][1]).to.equal('ctrl+0', 'second argument should be key combo');
+        });
     });
 
     describe('sequences', function() {
