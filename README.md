@@ -13,8 +13,6 @@ It is around **2kb** minified and gzipped and **4.5kb** minified, has no externa
 
 It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific keys, keyboard combinations, or key sequences.
 
-If you would like to donate to help support Mousetrap development use [Gittip](https://www.gittip.com/ccampbell).
-
 ## Getting started
 
 1.  Include mousetrap on your page before the closing ``</body>`` tag
