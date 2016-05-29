@@ -684,14 +684,18 @@ describe('wrapping a specific element', function() {
 });
 
 describe('Mouestra.extendMap', function() {
-  it('should properly recognize non-default mapping', function() {
-    var spy = sinon.spy();
-    Mousetrap.extendMap({
-      144: 'num',
+    it('should properly recognize non-default mapping', function() {
+        var spy = sinon.spy();
+
+        Mousetrap.extendMap({
+            144: 'num',
+        });
+
+        Mousetrap.bind('num', spy);
+
+        KeyEvent.simulate(144, 144);
+        expect(spy.callCount).to.equal(1, 'callback should fire for num');
+
+        spy.reset();
     });
-    Mousetrap.bind('num', spy);
-    KeyEvent.simulate(144, 144);
-    expect(spy.callCount).to.equal(1, 'callback should fire for num');
-    spy.reset();
-  });
 });
