@@ -683,7 +683,7 @@ describe('wrapping a specific element', function() {
     });
 });
 
-describe('Mouestra.addKeycodes', function() {
+describe('Mouestrap.addKeycodes', function() {
     it('should properly recognize non-default mapping', function() {
         var spy = sinon.spy();
 
