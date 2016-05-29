@@ -72,7 +72,7 @@ Unit tests run via <a href="http://mochajs.org/" target="_blank">mocha</a>.
 
 ### Running in browser
 
-Download the repo and go to `tests/mousetrap.html` in your browser.
+[View it online](http://rawgit.com/ccampbell/mousetrap/master/tests/mousetrap.html) to check your browser compatibility. You may also download the repo and open `tests/mousetrap.html` in your browser. 
 
 ### Running with Grunt and PhantomJS
 
