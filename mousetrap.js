@@ -230,12 +230,25 @@
     /**
      * checks if two arrays are equal
      *
-     * @param {Array} modifiers1
-     * @param {Array} modifiers2
+     * @param {Array} arr1
+     * @param {Array} arr2
      * @returns {boolean}
      */
-    function _modifiersMatch(modifiers1, modifiers2) {
-        return modifiers1.sort().join(',') === modifiers2.sort().join(',');
+    function _modifiersMatch(arr1, arr2) {
+        var i,
+            len = arr1.length;
+
+        if (len !== arr2.length) {
+            return false;
+        }
+        arr1 = arr1.sort();
+        arr2 = arr2.sort();
+        for (i = 0; i < len; i++) {
+            if (arr1[i] !== arr2[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
