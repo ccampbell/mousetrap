@@ -432,6 +432,14 @@
         return _belongsTo(element.parentNode, ancestor);
     }
 
+    function _isArray(arg) {
+        if (Array.isArray) {
+            return Array.isArray(arg);
+        }
+
+        return (arg instanceof Array) || ((typeof arg === 'object') && (Object.prototype.toString.call(arg) === '[object Array]'));
+    }
+
     function Mousetrap(targetElement) {
         var self = this;
 
@@ -907,7 +915,7 @@
      */
     Mousetrap.prototype.bind = function(keys, callback, action) {
         var self = this;
-        keys = keys instanceof Array ? keys : [keys];
+        keys = _isArray(keys) ? keys : [keys];
         self._bindMultiple.call(self, keys, callback, action);
         return self;
     };
