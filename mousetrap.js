@@ -183,51 +183,6 @@
     }
 
     /**
-     * takes the event and returns the key character
-     *
-     * @param {Event} e
-     * @return {string}
-     */
-    function _characterFromEvent(e) {
-
-        // for keypress events we should return the character as is
-        if (e.type == 'keypress') {
-            var character = String.fromCharCode(e.which);
-
-            // if the shift key is not pressed then it is safe to assume
-            // that we want the character to be lowercase.  this means if
-            // you accidentally have caps lock on then your key bindings
-            // will continue to work
-            //
-            // the only side effect that might not be desired is if you
-            // bind something like 'A' cause you want to trigger an
-            // event when capital A is pressed caps lock will no longer
-            // trigger the event.  shift+a will though.
-            if (!e.shiftKey) {
-                character = character.toLowerCase();
-            }
-
-            return character;
-        }
-
-        // for non keypress events the special maps are needed
-        if (_MAP[e.which]) {
-            return _MAP[e.which];
-        }
-
-        if (_KEYCODE_MAP[e.which]) {
-            return _KEYCODE_MAP[e.which];
-        }
-
-        // if it is not in the special map
-
-        // with keydown and keyup events the character seems to always
-        // come in as an uppercase character whether you are pressing shift
-        // or not.  we should make sure it is always lowercase for comparisons
-        return String.fromCharCode(e.which).toLowerCase();
-    }
-
-    /**
      * checks if two arrays are equal
      *
      * @param {Array} modifiers1
@@ -432,13 +387,14 @@
         return _belongsTo(element.parentNode, ancestor);
     }
 
-    function Mousetrap(targetElement) {
+    function Mousetrap(targetElement, options) {
         var self = this;
 
         targetElement = targetElement || document;
+        options = options || {};
 
         if (!(self instanceof Mousetrap)) {
-            return new Mousetrap(targetElement);
+            return new Mousetrap(targetElement, options);
         }
 
         /**
@@ -447,6 +403,26 @@
          * @type {Element}
          */
         self.target = targetElement;
+
+        /**
+         * A container for user-defined options that configure how Mousetrap works
+         * 
+         * @type {Object}
+         */
+        self._options = {}; 
+        // Object.keys isn't supported until IE9, and Object.getOwnPropertyNames has its own set of issues, so prefer
+        // this array-object instead for better iteration on old browsers.
+        var defaultOptions = [
+            ['lowercaseCapsLock', true],
+        ];
+
+        // This really should do a deep copy, but that is not trivial without bringing in
+        // Object.assign() or jQuery.extend, or some other library.
+        defaultOptions.forEach(function(item) {
+            var name = item[0];
+            var defaultValue = item[1];
+            self._options[name] = typeof options[name] === 'undefined' ? defaultValue : options[name];
+        });
 
         /**
          * a list of all the callbacks setup via Mousetrap.bind()
@@ -706,6 +682,51 @@
 
             _ignoreNextKeypress = processedSequenceCallback && e.type == 'keydown';
         };
+
+        /**
+         * takes the event and returns the key character
+         *
+         * @param {Event} e
+         * @return {string}
+         */
+        function _characterFromEvent(e) {
+
+            // for keypress events we should return the character as is
+            if (e.type == 'keypress') {
+                var character = String.fromCharCode(e.which);
+
+                // if the shift key is not pressed then it is safe to assume
+                // that we want the character to be lowercase.  this means if
+                // you accidentally have caps lock on then your key bindings
+                // will continue to work
+                //
+                // the only side effect that might not be desired is if you
+                // bind something like 'A' cause you want to trigger an
+                // event when capital A is pressed caps lock will no longer
+                // trigger the event.  shift+a will though.
+                if (self._options.lowercaseCapsLock && !e.shiftKey) {
+                    character = character.toLowerCase();
+                }
+
+                return character;
+            }
+
+            // for non keypress events the special maps are needed
+            if (_MAP[e.which]) {
+                return _MAP[e.which];
+            }
+
+            if (_KEYCODE_MAP[e.which]) {
+                return _KEYCODE_MAP[e.which];
+            }
+
+            // if it is not in the special map
+
+            // with keydown and keyup events the character seems to always
+            // come in as an uppercase character whether you are pressing shift
+            // or not.  we should make sure it is always lowercase for comparisons
+            return String.fromCharCode(e.which).toLowerCase();
+        }
 
         /**
          * handles a keydown event

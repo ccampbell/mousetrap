@@ -153,20 +153,52 @@ describe('Mousetrap.bind', function() {
             expect(spy.args[0][0].defaultPrevented).to.be.falsey;
         });
 
-        it('capslock key is ignored', function() {
-            var spy = sinon.spy();
-            Mousetrap.bind('a', spy);
+        it('capslock key is ignored depending on the options passed in', function() {
+            var allOptions = [
+                undefined,
+                {},
+                { lowercaseCapsLock: false },
+                { lowercaseCapsLock: true },
+            ];
 
-            KeyEvent.simulate('a'.charCodeAt(0), 65);
-            expect(spy.callCount).to.equal(1, 'callback should fire for lowercase a');
+            var tests = [
+                {
+                    character: 'a',
+                    shiftPressed: false,
+                },
+                {
+                    character: 'A',
+                    shiftPressed: false,
+                },
+                {
+                    character: 'A',
+                    shiftPressed: true,
+                },
+            ];
 
-            spy.reset();
-            KeyEvent.simulate('A'.charCodeAt(0), 65);
-            expect(spy.callCount).to.equal(1, 'callback should fire for capslock A');
+            allOptions.forEach(function(options) {
+                var mousetrap = new Mousetrap(undefined, options);
+                var lowerSpy = sinon.spy();
+                var upperSpy = sinon.spy();
+                mousetrap.bind('a', lowerSpy);
+                mousetrap.bind('A', upperSpy);
 
-            spy.reset();
-            KeyEvent.simulate('A'.charCodeAt(0), 65, ['shift']);
-            expect(spy.callCount).to.equal(0, 'callback should not fire fort shift+a');
+                tests.forEach(function(test) {
+                    KeyEvent.simulate(test.character.charCodeAt(0), 65, test.shiftPressed ? ['shift'] : undefined);
+                    var lowercaseCapsLock = !(options && options.lowercaseCapsLock === false);
+                    var expectUpper = test.character === 'A' && 
+                        (test.shiftPressed || !lowercaseCapsLock);
+                    console.log(test);
+                    var message = 'callback for A should ' +
+                        (expectUpper ? '' : 'not ') + 'fire for ' + 
+                        (test.shiftPressed ? 'shift+ ' : '') + test.character;
+                    expect(upperSpy.callCount).to.equal(expectUpper ? 1 : 0, message);
+                    expect(lowerSpy.callCount).to.equal(expectUpper ? 0 : 1, message);
+                    lowerSpy.reset();
+                    upperSpy.reset();
+                });
+                mousetrap.reset();
+            });
         });
     });
 
