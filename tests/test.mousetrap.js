@@ -694,6 +694,34 @@ describe('wrapping a specific element', function() {
         expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
         expect(spy.args[0][1]).to.equal('a', 'second argument should be key combo');
     });
+
+    it('should fire for all Mousetrap instances on the target', function() {
+        var spy = sinon.spy();
+
+        var mousetrap = new Mousetrap();
+        mousetrap.bind('a', spy);
+        var mousetrap = new Mousetrap();
+        mousetrap.bind('a', spy);
+
+        KeyEvent.simulate('a'.charCodeAt(0), 65);
+
+        expect(spy.callCount).to.equal(2, 'callback should for all instances');
+        expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
+        expect(spy.args[0][1]).to.equal('a', 'second argument should be key combo');
+    });
+
+    it('should fire for all Mousetrap instances in hierarchy', function() {
+        var spy = sinon.spy();
+
+        var mousetrap = new Mousetrap(document.body);
+        mousetrap.bind('a', spy);
+        var mousetrap = new Mousetrap(form);
+        mousetrap.bind('a', spy);
+
+        KeyEvent.simulate('a'.charCodeAt(0), 65, [], textarea);
+
+        expect(spy.callCount).to.equal(2, 'callback should for all instances');
+    });
 });
 
 describe('Mouestrap.addKeycodes', function() {
