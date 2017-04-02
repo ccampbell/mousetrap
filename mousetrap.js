@@ -1,6 +1,6 @@
 /*global define:false */
 /**
- * Copyright 2016 Craig Campbell
+ * Copyright 2012-2017 Craig Campbell
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
  * Mousetrap is a simple keyboard shortcut library for Javascript with
  * no external dependencies
  *
- * @version 1.6.0
+ * @version 1.6.1
  * @url craig.is/killing/mice
  */
 (function(window, document, undefined) {
