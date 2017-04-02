@@ -21,6 +21,12 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
     ```html
     <script src="/path/to/mousetrap.min.js"></script>
     ```
+    
+    or install `mousetrap` from `npm` and require it
+    
+    ```js
+    var Mousetrap = require('mousetrap');
+    ```
 
 2.  Add some keyboard events to listen for
 
