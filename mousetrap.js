@@ -211,11 +211,11 @@
         }
 
         // for non keypress events the special maps are needed
-        if (_MAP[e.which]) {
+        if (_MAP[e.which] !== undefined) {
             return _MAP[e.which];
         }
 
-        if (_KEYCODE_MAP[e.which]) {
+        if (_KEYCODE_MAP[e.which] !== undefined) {
             return _KEYCODE_MAP[e.which];
         }
 
@@ -724,7 +724,7 @@
             var character = _characterFromEvent(e);
 
             // no character found then stop
-            if (!character) {
+            if (character === undefined) {
                 return;
             }
 
