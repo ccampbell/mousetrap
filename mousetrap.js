@@ -974,7 +974,10 @@
         var self = this;
         
         // don't block modifier key combos such as ctrl+k
-        if (combo.indexOf('mod') !== -1 || combo.indexOf('alt') !== -1) {
+        if (combo.indexOf('alt') !== -1 ||
+            !(combo.indexOf('mod+left') !== -1 || combo.indexOf('mod+right') !== -1 ||
+              combo.indexOf('mod+a') !== -1 || combo.indexOf('mod+z') !== -1 ||
+              combo.indexOf('mod+c') !== -1 || combo.indexOf('mod+x') !== -1 || combo.indexOf('mod+v') !== -1)) {
             return false;
         }
 
