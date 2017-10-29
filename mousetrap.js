@@ -173,9 +173,9 @@
      * @param {Function} callback
      * @returns void
      */
-    function _addEvent(object, type, callback) {
+    function _addEvent(object, type, callback, useCapture) {
         if (object.addEventListener) {
-            object.addEventListener(type, callback, false);
+            object.addEventListener(type, callback, useCapture);
             return;
         }
 
@@ -432,10 +432,11 @@
         return _belongsTo(element.parentNode, ancestor);
     }
 
-    function Mousetrap(targetElement) {
+    function Mousetrap(targetElement, useCapture) {
         var self = this;
 
         targetElement = targetElement || document;
+        useCapture = !!useCapture;
 
         if (!(self instanceof Mousetrap)) {
             return new Mousetrap(targetElement);
@@ -886,9 +887,9 @@
         };
 
         // start!
-        _addEvent(targetElement, 'keypress', _handleKeyEvent);
-        _addEvent(targetElement, 'keydown', _handleKeyEvent);
-        _addEvent(targetElement, 'keyup', _handleKeyEvent);
+        _addEvent(targetElement, 'keypress', _handleKeyEvent, useCapture);
+        _addEvent(targetElement, 'keydown', _handleKeyEvent, useCapture);
+        _addEvent(targetElement, 'keyup', _handleKeyEvent, useCapture);
     }
 
     /**
