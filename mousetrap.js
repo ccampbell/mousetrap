@@ -576,7 +576,7 @@
                 // chrome will not fire a keypress if meta or control is down
                 // safari will fire a keypress if meta or meta+shift is down
                 // firefox will fire a keypress if meta or control is down
-                if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
+                if ((action == 'keypress' && !e.metaKey && !e.ctrlKey && !e.altKey) || _modifiersMatch(modifiers, callback.modifiers)) {
 
                     // when you bind a combination or sequence a second time it
                     // should overwrite the first one.  if a sequenceName or
