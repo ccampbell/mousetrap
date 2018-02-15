@@ -18,7 +18,7 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
     install `mousetrap-ts` from `npm` and import it
 
     ```ts
-    import Mousetrap from 'mousetrap';
+    import Mousetrap from 'mousetrap-ts';
     ```
 
 2.  Add some keyboard events to listen for
@@ -31,25 +31,40 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
         Mousetrap.bind('esc', () => { console.log('escape'); }, 'keyup');
 
         // combinations
-        Mousetrap.bind('command+shift+k', function() { console.log('command shift k'); });
+        Mousetrap.bind('command+shift+k', () => { console.log('command shift k'); });
 
         // map multiple combinations to the same callback
-        Mousetrap.bind(['command+k', 'ctrl+k'], function() {
+        Mousetrap.bind(['command+k', 'ctrl+k'], () => {
             console.log('command k or control k');
 
-            // return false to prevent default browser behavior
-            // and stop event from bubbling
+            // return false to prevent default browser behavior and stop event from bubbling
+
             return false;
         });
 
         // gmail style sequences
-        Mousetrap.bind('g i', function() { console.log('go to inbox'); });
-        Mousetrap.bind('* a', function() { console.log('select all'); });
+        Mousetrap.bind('g i', () => { console.log('go to inbox'); });
+        Mousetrap.bind('* a', () => { console.log('select all'); });
 
         // konami code!
-        Mousetrap.bind('up up down down left right left right b a enter', function() {
+        Mousetrap.bind('up up down down left right left right b a enter', () => {
             console.log('konami code');
         });
+
+        // Use the KeyBindings Enum - Replace import statement with the following line
+        import Mousetrap, { KeyBindings } from 'mousetrap-ts';
+        Mousetrap.bind(KeyBindings.moveDown, () => { console.log('Triggered on arrow down') });
+
+        // Type your callback - Replace import statement with the following line
+        import Mousetrap, { CallbackFunction } from 'mousetrap-ts';
+        const callback: CallbackFunction = (e, combo) => {
+            console.log('Corrects attributes and return value');
+            return false;
+        };
+        Mousetrap.bind(KeyBindings.moveDown, callback);
+
+        // Remove all listeners and reset callbacks
+        Mousetrap.destroy();
     </script>
     ```
 
