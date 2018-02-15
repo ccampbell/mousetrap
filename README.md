@@ -56,7 +56,7 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
         Mousetrap.bind(KeyBindings.moveDown, () => { console.log('Triggered on arrow down') });
 
         // Type your callback - Replace import statement with the following line
-        import Mousetrap, { CallbackFunction } from 'mousetrap-ts';
+        import Mousetrap, { CallbackFunction, KeyBindings } from 'mousetrap-ts';
         const callback: CallbackFunction = (e, combo) => {
             console.log('Corrects attributes and return value');
             return false;

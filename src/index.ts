@@ -19,7 +19,7 @@
  * @version 1.6.1
  * @url craig.is/killing/mice
  *
- * Changed by: jway52@scania.com - Converted to ES2015 and TypeScript.
+ * Changed by: JonWallsten - Converted to ES2015 and TypeScript.
  * @version 1.0.0
  */
 

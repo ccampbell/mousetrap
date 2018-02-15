@@ -1,6 +1,6 @@
 {
   "name": "mousetrap-ts",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "Simple library for handling keyboard shortcuts",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
