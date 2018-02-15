@@ -18,7 +18,7 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
     install `mousetrap-ts` from `npm` and import it
 
     ```ts
-    import mousetrap from 'mousetrap';
+    import Mousetrap from 'mousetrap';
     ```
 
 2.  Add some keyboard events to listen for
