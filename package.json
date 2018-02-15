@@ -1,6 +1,6 @@
 {
   "name": "mousetrap-ts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Simple library for handling keyboard shortcuts",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -29,7 +29,8 @@
     "clean:cache": "rimraf -- .tmp",
     "webpack": "ts-node --max_old_space_size=8192 node_modules/webpack/bin/webpack.js",
     "webpack:debug": "ts-node --inspect --debug-brk --max_old_space_size=8192 node_modules/webpack/bin/webpack.js",
-    "precommit": "npm run lint"
+    "precommit": "npm run lint",
+    "prepush": "npm run build"
   },
   "devDependencies": {
     "@types/node": "8.x.x",
