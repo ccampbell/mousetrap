@@ -16,16 +16,12 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
 
 ## Getting started
 
-1.  Include mousetrap on your page before the closing ``</body>`` tag
+1.  Install mousetrap-ts
 
-    ```html
-    <script src="/path/to/mousetrap.min.js"></script>
-    ```
-    
-    or install `mousetrap` from `npm` and require it
-    
-    ```js
-    var Mousetrap = require('mousetrap');
+    install `mousetrap-ts` from `npm` and import it
+
+    ```ts
+    import mousetrap from 'mousetrap';
     ```
 
 2.  Add some keyboard events to listen for
@@ -33,9 +29,9 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
     ```html
     <script>
         // single keys
-        Mousetrap.bind('4', function() { console.log('4'); });
-        Mousetrap.bind("?", function() { console.log('show shortcuts!'); });
-        Mousetrap.bind('esc', function() { console.log('escape'); }, 'keyup');
+        Mousetrap.bind('4', () => { console.log('4'); });
+        Mousetrap.bind("?", () => { console.log('show shortcuts!'); });
+        Mousetrap.bind('esc', () => { console.log('escape'); }, 'keyup');
 
         // combinations
         Mousetrap.bind('command+shift+k', function() { console.log('command shift k'); });
@@ -79,7 +75,7 @@ Unit tests run via <a href="http://mochajs.org/" target="_blank">mocha</a>.
 
 ### Running in browser
 
-[View it online](http://rawgit.com/ccampbell/mousetrap/master/tests/mousetrap.html) to check your browser compatibility. You may also download the repo and open `tests/mousetrap.html` in your browser. 
+[View it online](http://rawgit.com/ccampbell/mousetrap/master/tests/mousetrap.html) to check your browser compatibility. You may also download the repo and open `tests/mousetrap.html` in your browser.
 
 ### Running with Grunt and PhantomJS
 
