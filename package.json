@@ -1,30 +1,57 @@
 {
-  "name": "mousetrap",
-  "version": "1.6.1",
+  "name": "mousetrap-ts",
+  "version": "1.0.6",
   "description": "Simple library for handling keyboard shortcuts",
-  "main": "mousetrap.js",
-  "directories": {
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "grunt mocha"
-  },
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ccampbell/mousetrap.git"
+    "url": "git://github.com/jonwallsten/mousetrap.git"
   },
-  "keywords": [
-    "keyboard",
-    "shortcuts",
-    "events"
-  ],
-  "author": "Craig Campbell",
+  "author": "Jon Wallsten",
   "license": "Apache-2.0",
-  "gitHead": "c202a0bd4967d5a3064f9cb376db51dec9345336",
   "readmeFilename": "README.md",
+  "scripts": {
+    "ci": "npm run clean && npm run lint && npm run build:prod",
+    "build:dev": "npm run clean && npm run webpack -- --config config/webpack.dev.ts --progress --colors --hide-modules --display-error-details --profile --display-entrypoints",
+    "build:dev:dirty": "npm run webpack -- --config config/webpack.dev.ts --progress --profile --display-entrypoints",
+    "build:dev:watch": "npm run build:dev -- --watch",
+    "build:prod": "npm run webpack -- --config config/webpack.prod.ts  --progress --profile --bail --display-entrypoints",
+    "build:sourcemaps": "cross-env USE_SOURCEMAPS=true npm run build",
+    "build": "npm run clean && npm run build:prod",
+    "dev": "npm run build:dev:watch",
+    "lint:ts": "tslint -t codeFrame 'src/**/*.ts'",
+    "lint:ts:fix": "tslint --fix -t codeFrame 'src/**/*.ts'",
+    "lint": "npm run lint:ts",
+    "compile": "npm run clean:cache && tsc",
+    "clean": "npm run clean:dist && npm run clean:cache",
+    "clean:dist": "rimraf -- dist",
+    "clean:cache": "rimraf -- .tmp",
+    "webpack": "ts-node --max_old_space_size=8192 node_modules/webpack/bin/webpack.js",
+    "webpack:debug": "ts-node --inspect --debug-brk --max_old_space_size=8192 node_modules/webpack/bin/webpack.js",
+    "precommit": "npm run lint",
+    "prepush": "npm run build"
+  },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-complexity": "~0.1.2",
-    "grunt-mocha": "~0.3.1"
-  }
+    "@types/node": "8.x.x",
+    "@types/uglify-js": "2.6.30",
+    "@types/webpack": "3.8.7",
+    "awesome-typescript-loader": "3.4.1",
+    "cross-env": "5.1.3",
+    "dts-bundle": "0.7.3",
+    "hard-source-webpack-plugin": "^0.5.18",
+    "husky": "0.14.3",
+    "recursive-copy": "2.0.9",
+    "rimraf": "2.6.2",
+    "ts-node": "4.1.0",
+    "tslint": "5.9.1",
+    "tslint-config-standard": "7.0.0",
+    "tslint-eslint-rules": "5.0.0",
+    "tslint-loader": "3.5.3",
+    "typescript": "2.7.1",
+    "uglifyjs-webpack-plugin": "^1.1.8",
+    "webpack": "3.11.0",
+    "webpack-merge": "4.1.1"
+  },
+  "dependencies": {}
 }

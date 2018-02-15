@@ -1,6 +1,3 @@
-# Mousetrap
-[![CDNJS](https://img.shields.io/cdnjs/v/mousetrap.svg)](https://cdnjs.com/libraries/mousetrap)
-
 Mousetrap is a simple library for handling keyboard shortcuts in Javascript.
 
 It is licensed under the Apache 2.0 license.
@@ -16,16 +13,12 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
 
 ## Getting started
 
-1.  Include mousetrap on your page before the closing ``</body>`` tag
+1.  Install mousetrap-ts
 
-    ```html
-    <script src="/path/to/mousetrap.min.js"></script>
-    ```
-    
-    or install `mousetrap` from `npm` and require it
-    
-    ```js
-    var Mousetrap = require('mousetrap');
+    install `mousetrap-ts` from `npm` and import it
+
+    ```ts
+    import Mousetrap from 'mousetrap-ts';
     ```
 
 2.  Add some keyboard events to listen for
@@ -33,30 +26,45 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
     ```html
     <script>
         // single keys
-        Mousetrap.bind('4', function() { console.log('4'); });
-        Mousetrap.bind("?", function() { console.log('show shortcuts!'); });
-        Mousetrap.bind('esc', function() { console.log('escape'); }, 'keyup');
+        Mousetrap.bind('4', () => { console.log('4'); });
+        Mousetrap.bind("?", () => { console.log('show shortcuts!'); });
+        Mousetrap.bind('esc', () => { console.log('escape'); }, 'keyup');
 
         // combinations
-        Mousetrap.bind('command+shift+k', function() { console.log('command shift k'); });
+        Mousetrap.bind('command+shift+k', () => { console.log('command shift k'); });
 
         // map multiple combinations to the same callback
-        Mousetrap.bind(['command+k', 'ctrl+k'], function() {
+        Mousetrap.bind(['command+k', 'ctrl+k'], () => {
             console.log('command k or control k');
 
-            // return false to prevent default browser behavior
-            // and stop event from bubbling
+            // return false to prevent default browser behavior and stop event from bubbling
+
             return false;
         });
 
         // gmail style sequences
-        Mousetrap.bind('g i', function() { console.log('go to inbox'); });
-        Mousetrap.bind('* a', function() { console.log('select all'); });
+        Mousetrap.bind('g i', () => { console.log('go to inbox'); });
+        Mousetrap.bind('* a', () => { console.log('select all'); });
 
         // konami code!
-        Mousetrap.bind('up up down down left right left right b a enter', function() {
+        Mousetrap.bind('up up down down left right left right b a enter', () => {
             console.log('konami code');
         });
+
+        // Use the KeyBindings Enum - Replace import statement with the following line
+        import Mousetrap, { KeyBindings } from 'mousetrap-ts';
+        Mousetrap.bind(KeyBindings.moveDown, () => { console.log('Triggered on arrow down') });
+
+        // Type your callback - Replace import statement with the following line
+        import Mousetrap, { CallbackFunction, KeyBindings } from 'mousetrap-ts';
+        const callback: CallbackFunction = (e, combo) => {
+            console.log('Corrects attributes and return value');
+            return false;
+        };
+        Mousetrap.bind(KeyBindings.moveDown, callback);
+
+        // Remove all listeners and reset callbacks
+        Mousetrap.destroy();
     </script>
     ```
 
@@ -73,34 +81,6 @@ There are a number of other similar libraries out there so what makes this one d
 - It works with the numeric keypad on your keyboard
 - The code is well documented/commented
 
-## Tests
-
-Unit tests run via <a href="http://mochajs.org/" target="_blank">mocha</a>.
-
-### Running in browser
-
-[View it online](http://rawgit.com/ccampbell/mousetrap/master/tests/mousetrap.html) to check your browser compatibility. You may also download the repo and open `tests/mousetrap.html` in your browser. 
-
-### Running with Grunt and PhantomJS
-
-1.  Install grunt-cli
-
-    ```bash
-    npm install -g grunt-cli
-    ```
-
-2.  Install npm packages
-
-    ```bash
-    cd /path/to/repo
-    npm install
-    ```
-
-3.  Run tests
-
-    ```bash
-    grunt mocha
-    ```
 
 ## Documentation
 

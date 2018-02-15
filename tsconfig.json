@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": false,
+    "removeComments": false,
+    "noUnusedLocals": true,
+    "noEmitHelpers": true,
+    "noEmitOnError": true,
+    "importHelpers": true,
+    "strictNullChecks": false,
+    "pretty": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationDir": "dist/declaration",
+    "outDir": ".tmp/code",
+    "lib": [
+      "dom",
+      "es6"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "config/**/*.ts",
+    "typings/global.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".tmp"
+  ],
+  "compileOnSave": false,
+  "buildOnSave": false,
+  "awesomeTypescriptLoaderOptions": {
+    "useCache": true,
+    "cacheDirectory": ".tmp/awcache",
+    "forceIsolatedModules": true,
+    "files": [
+        "src/**/index.ts"
+    ],
+    "reportFiles": [
+        "src/**/*.ts"
+    ]
+  }
+}
