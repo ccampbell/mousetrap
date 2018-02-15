@@ -1,6 +1,3 @@
-# Mousetrap
-[![CDNJS](https://img.shields.io/cdnjs/v/mousetrap.svg)](https://cdnjs.com/libraries/mousetrap)
-
 Mousetrap is a simple library for handling keyboard shortcuts in Javascript.
 
 It is licensed under the Apache 2.0 license.
@@ -69,34 +66,6 @@ There are a number of other similar libraries out there so what makes this one d
 - It works with the numeric keypad on your keyboard
 - The code is well documented/commented
 
-## Tests
-
-Unit tests run via <a href="http://mochajs.org/" target="_blank">mocha</a>.
-
-### Running in browser
-
-[View it online](http://rawgit.com/ccampbell/mousetrap/master/tests/mousetrap.html) to check your browser compatibility. You may also download the repo and open `tests/mousetrap.html` in your browser.
-
-### Running with Grunt and PhantomJS
-
-1.  Install grunt-cli
-
-    ```bash
-    npm install -g grunt-cli
-    ```
-
-2.  Install npm packages
-
-    ```bash
-    cd /path/to/repo
-    npm install
-    ```
-
-3.  Run tests
-
-    ```bash
-    grunt mocha
-    ```
 
 ## Documentation
 
