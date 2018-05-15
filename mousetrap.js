@@ -72,9 +72,11 @@
     var _KEYCODE_MAP = {
         106: '*',
         107: '+',
+        61: '=', // FF keyCode for '=' (same as on keypress)
         109: '-',
         110: '.',
         111 : '/',
+        173: '-', // FF keyCode for '-'
         186: ';',
         187: '=',
         188: ',',
