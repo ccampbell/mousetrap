@@ -182,6 +182,45 @@
         object.attachEvent('on' + type, callback);
     }
 
+    // Mousetrap instances map->list for event delegation
+    var mousetraps = {};
+
+    /**
+     * handles a keydown event
+     *
+     * @param {Event} e
+     * @returns void
+     */
+    function _handleKeyEvent(e) {
+
+        // normalize e.which for key events
+        // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
+        if (typeof e.which !== 'number') {
+            e.which = e.keyCode;
+        }
+
+        var character = _characterFromEvent(e);
+
+        // no character found then stop
+        if (!character) {
+            return;
+        }
+
+        var mods = _eventModifiers(e);
+        var element = e.target;
+        while (element) {
+            var traps = mousetraps[_mousetrapElementId(element)];
+            if (traps) traps.forEach(function(trap) {
+                trap.handleKey(character, mods, e);
+            });
+
+            if (element === document) {
+                return;
+            }
+            element = element.parentNode
+        }
+    }
+
     /**
      * takes the event and returns the key character
      *
@@ -432,6 +471,21 @@
         return _belongsTo(element.parentNode, ancestor);
     }
 
+    var uniqueId = 1;
+
+    function _mousetrapElementId(element) {
+        if (element === document) {
+            return '#doc';
+        }
+
+        var id = element.getAttribute('data-mousetrap-id');
+        if (!id) {
+            id = uniqueId++;
+            element.setAttribute('data-mousetrap-id', id);
+        }
+        return id;
+    }
+
     function Mousetrap(targetElement) {
         var self = this;
 
@@ -628,6 +682,12 @@
          * @returns void
          */
         self._handleKey = function(character, modifiers, e) {
+            // need to use === for the character check because the character can be 0
+            if (e.type == 'keyup' && _ignoreNextKeyup === character) {
+                _ignoreNextKeyup = false;
+                return;
+            }
+
             var callbacks = _getMatches(character, modifiers, e);
             var i;
             var doNotReset = {};
@@ -706,36 +766,6 @@
 
             _ignoreNextKeypress = processedSequenceCallback && e.type == 'keydown';
         };
-
-        /**
-         * handles a keydown event
-         *
-         * @param {Event} e
-         * @returns void
-         */
-        function _handleKeyEvent(e) {
-
-            // normalize e.which for key events
-            // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
-            if (typeof e.which !== 'number') {
-                e.which = e.keyCode;
-            }
-
-            var character = _characterFromEvent(e);
-
-            // no character found then stop
-            if (!character) {
-                return;
-            }
-
-            // need to use === for the character check because the character can be 0
-            if (e.type == 'keyup' && _ignoreNextKeyup === character) {
-                _ignoreNextKeyup = false;
-                return;
-            }
-
-            self.handleKey(character, _eventModifiers(e), e);
-        }
 
         /**
          * called to set a 1 second timeout on the specified sequence
@@ -883,12 +913,18 @@
             for (var i = 0; i < combinations.length; ++i) {
                 _bindSingle(combinations[i], callback, action);
             }
-        };
 
-        // start!
-        _addEvent(targetElement, 'keypress', _handleKeyEvent);
-        _addEvent(targetElement, 'keydown', _handleKeyEvent);
-        _addEvent(targetElement, 'keyup', _handleKeyEvent);
+            // activate
+            var id = _mousetrapElementId(self.target);
+            var traps = mousetraps[id];
+            if (!traps) {
+                mousetraps[id] = traps = [];
+            }
+            var idx = traps.indexOf(self);
+            if (idx === -1) {
+                traps.push(self);
+            }
+        };
     }
 
     /**
@@ -960,6 +996,15 @@
         var self = this;
         self._callbacks = {};
         self._directMap = {};
+
+        // remove from the active instance list
+        var traps = mousetraps[_mousetrapElementId(self.target)];
+        if (traps) {
+            var idx = traps.indexOf(self);
+            if (idx !== -1) {
+                traps.splice(idx, 1);
+            }
+        }
         return self;
     };
 
@@ -989,7 +1034,7 @@
     /**
      * exposes _handleKey publicly so it can be overwritten by extensions
      */
-    Mousetrap.prototype.handleKey = function() {
+    Mousetrap.prototype.handleKey = function(character) {
         var self = this;
         return self._handleKey.apply(self, arguments);
     };
@@ -1023,6 +1068,11 @@
                 } (method));
             }
         }
+
+        // start!
+        _addEvent(document, 'keypress', _handleKeyEvent);
+        _addEvent(document, 'keydown', _handleKeyEvent);
+        _addEvent(document, 'keyup', _handleKeyEvent);
     };
 
     Mousetrap.init();

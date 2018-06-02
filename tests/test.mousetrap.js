@@ -669,6 +669,18 @@ describe('wrapping a specific element', function() {
         expect(spy.callCount).to.equal(0, 'callback should not have fired');
     });
 
+    it('z key does not fire after #reset() call', function() {
+        var spy = sinon.spy();
+
+        var mousetrap = new Mousetrap(form);
+        mousetrap.bind('z', spy);
+        KeyEvent.simulate('Z'.charCodeAt(0), 90, [], textarea); // through
+        mousetrap.reset();
+        KeyEvent.simulate('Z'.charCodeAt(0), 90, [], textarea); // neglected
+
+        expect(spy.callCount).to.equal(1, 'callback should only have fired before #reset');
+    });
+
     it('should work when constructing a new mousetrap object', function() {
         var spy = sinon.spy();
 
@@ -694,6 +706,51 @@ describe('wrapping a specific element', function() {
         expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
         expect(spy.args[0][1]).to.equal('a', 'second argument should be key combo');
     });
+
+    it('should fire for all Mousetrap instances on the target', function() {
+        var spy = sinon.spy();
+
+        var mousetrap = new Mousetrap();
+        mousetrap.bind('a', spy);
+        mousetrap = new Mousetrap();
+        mousetrap.bind('a', spy);
+
+        KeyEvent.simulate('a'.charCodeAt(0), 65);
+
+        expect(spy.callCount).to.equal(2, 'callback should for all instances');
+        expect(spy.args[0][0]).to.be.an.instanceOf(Event, 'first argument should be Event');
+        expect(spy.args[0][1]).to.equal('a', 'second argument should be key combo');
+    });
+
+    it('should fire for all Mousetrap instances in hierarchy', function() {
+        var spy = sinon.spy();
+
+        var mousetrap = new Mousetrap(document.body);
+        mousetrap.bind('a', spy);
+        mousetrap = new Mousetrap(form);
+        mousetrap.bind('a', spy);
+
+        KeyEvent.simulate('a'.charCodeAt(0), 65, [], textarea);
+
+        expect(spy.callCount).to.equal(2, 'callback should for all instances');
+    });
+
+    it('a key does not fire after #reset() call in hierarchy', function() {
+        var spy = sinon.spy();
+
+        var mousetrap = new Mousetrap(document.body);
+        mousetrap.bind('a', spy);
+
+        // bound & reset Mousetrap instance
+        mousetrap = new Mousetrap(form);
+        mousetrap.bind('a', spy);
+        mousetrap.reset();
+
+        KeyEvent.simulate('a'.charCodeAt(0), 65, [], textarea);
+
+        expect(spy.callCount).to.equal(1, 'callback should only have fired before #reset');
+    });
+
 });
 
 describe('Mouestrap.addKeycodes', function() {
