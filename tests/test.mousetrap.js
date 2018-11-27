@@ -87,7 +87,41 @@ describe('Mousetrap.bind', function () {
       }
     });
 
-    it('keyup events should fire', function () {
+    it('z key does not fire when inside an input element in an open shadow dom', function() {
+      var spy = sinon.spy();
+
+      var shadowHost = document.createElement('div');
+      var shadowRoot = shadowHost.attachShadow({ mode: 'open' });
+      document.body.appendChild(shadowHost);
+
+      var inputElement = document.createElement('input');
+      shadowRoot.appendChild(inputElement);
+      expect(shadowHost.shadowRoot).to.equal(shadowRoot, 'shadow root accessible');
+
+      Mousetrap.bind('z', spy);
+      KeyEvent.simulate('Z'.charCodeAt(0), 90, [], inputElement, 1, { shadowHost: shadowHost });
+      document.body.removeChild(shadowHost);
+      expect(spy.callCount).to.equal(0, 'callback should not have fired');
+    });
+
+    it('z key does fire when inside an input element in a closed shadow dom', function() {
+      var spy = sinon.spy();
+
+      var shadowHost = document.createElement('div');
+      var shadowRoot = shadowHost.attachShadow({ mode: 'closed' });
+      document.body.appendChild(shadowHost);
+
+      var inputElement = document.createElement('input');
+      shadowRoot.appendChild(inputElement);
+      expect(shadowHost.shadowRoot).to.equal(null, 'shadow root unaccessible');
+
+      Mousetrap.bind('z', spy);
+      KeyEvent.simulate('Z'.charCodeAt(0), 90, [], inputElement, 1, { shadowHost: shadowHost });
+      document.body.removeChild(shadowHost);
+      expect(spy.callCount).to.equal(1, 'callback should have fired once');
+    });
+
+    it('keyup events should fire', function() {
       var spy = sinon.spy();
 
       Mousetrap.bind('z', spy, 'keyup');
