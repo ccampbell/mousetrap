@@ -1,4 +1,4 @@
-(function() {
+(function(window, document) {
     var KeyEvent = function(data, type) {
         this.keyCode = 'keyCode' in data ? data.keyCode : 0;
         this.charCode = 'charCode' in data ? data.charCode : 0;
@@ -126,4 +126,16 @@
     };
 
     window.KeyEvent = KeyEvent;
-}) ();
+
+    // expose as a common js module
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = KeyEvent;
+    }
+
+    // expose KeyEvent as an AMD module
+    if (typeof define === 'function' && define.amd) {
+        define(function() {
+            return KeyEvent;
+        });
+    }
+}) (typeof window !== 'undefined' ? window : null, typeof  window !== 'undefined' ? document : null);
