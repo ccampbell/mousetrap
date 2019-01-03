@@ -12,11 +12,11 @@ It is around **2kb** minified and gzipped and **4.5kb** minified, has no externa
 - Firefox
 - Chrome
 
-It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific keys, keyboard combinations, or key sequences.
+It has support for `keypress`, `keydown`, and `keyup` events on specific keys, keyboard combinations, or key sequences.
 
 ## Getting started
 
-1.  Include mousetrap on your page before the closing ``</body>`` tag
+1. Include mousetrap on your page before the closing `</body>` tag
 
     ```html
     <script src="/path/to/mousetrap.min.js"></script>
@@ -28,7 +28,7 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
     var Mousetrap = require('mousetrap');
     ```
 
-2.  Add some keyboard events to listen for
+2. Add some keyboard events to listen for
 
     ```html
     <script>
@@ -65,40 +65,34 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
 There are a number of other similar libraries out there so what makes this one different?
 
 - There are no external dependencies, no framework is required
-- You are not limited to ``keydown`` events (You can specify ``keypress``, ``keydown``, or ``keyup`` or let Mousetrap choose for you).
-- You can bind key events directly to special keys such as ``?`` or ``*`` without having to specify ``shift+/`` or ``shift+8`` which are not consistent across all keyboards
+- You are not limited to `keydown` events (You can specify `keypress`, `keydown`, or `keyup` or let Mousetrap choose for you).
+- You can bind key events directly to special keys such as `?` or `*` without having to specify `shift+/` or `shift+8` which are not consistent across all keyboards
 - It works with international keyboard layouts
 - You can bind Gmail like key sequences in addition to regular keys and key combinations
-- You can programatically trigger key events with the ``trigger()`` method
+- You can programatically trigger key events with the `trigger()` method
 - It works with the numeric keypad on your keyboard
 - The code is well documented/commented
 
 ## Tests
 
-Unit tests run via <a href="http://mochajs.org/" target="_blank">mocha</a>.
+Unit tests are run with <a href="https://mochajs.org/">mocha</a>.
 
 ### Running in browser
 
 [View it online](http://rawgit.com/ccampbell/mousetrap/master/tests/mousetrap.html) to check your browser compatibility. You may also download the repo and open `tests/mousetrap.html` in your browser.
 
-### Running with Grunt and PhantomJS
+### Running with Node.js
 
-1.  Install grunt-cli
+1. Install development dependencies
 
-    ```bash
-    npm install -g grunt-cli
-    ```
-
-2.  Install npm packages
-
-    ```bash
+    ```sh
     cd /path/to/repo
     npm install
     ```
 
-3.  Run tests
+3. Run tests
 
-    ```bash
+    ```sh
     npm test
     ```
 

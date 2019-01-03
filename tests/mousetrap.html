@@ -2,33 +2,23 @@
 <head>
     <meta charset="utf-8">
     <title>Mousetrap Tests</title>
-    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css">
 </head>
 <body>
-    <!-- used to test targeted keyboard shortcuts w/ Mousetrap.wrap -->
-    <form style="display: none;">
-        <textarea></textarea>
-    </form>
-
     <div id="mocha"></div>
+
+    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/sinon/pkg/sinon.js"></script>
+    <script src="../node_modules/mocha/mocha.js"></script>
     <script src="../mousetrap.js"></script>
     <script src="libs/key-event.js"></script>
-    <script src="libs/chai-1.6.0.js"></script>
-    <!-- <script src="libs/chai-spies-0.5.0.js"></script> -->
-    <script src="libs/sinon-chai-2.4.0.js"></script>
-    <script src="libs/sinon-1.7.1.js"></script>
-    <script src="libs/sinon-ie-1.7.1.js"></script>
-    <script src="../node_modules/mocha/mocha.js"></script>
+
     <script>mocha.setup('bdd')</script>
     <script src="test.mousetrap.js"></script>
-    <script>
-        mocha.globals(['Mousetrap']);
 
-        if (window.mochaPhantomJS) {
-            window.mochaPhantomJS.run();
-        }
-        else if (!window.PHANTOMJS) {
-            mocha.run();
-        }
+    <script>
+        mocha.checkLeaks();
+        mocha.globals(['Mousetrap']);
+        mocha.run();
     </script>
 </body>
