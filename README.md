@@ -21,9 +21,9 @@ It has support for ``keypress``, ``keydown``, and ``keyup`` events on specific k
     ```html
     <script src="/path/to/mousetrap.min.js"></script>
     ```
-    
+
     or install `mousetrap` from `npm` and require it
-    
+
     ```js
     var Mousetrap = require('mousetrap');
     ```
@@ -79,7 +79,7 @@ Unit tests run via <a href="http://mochajs.org/" target="_blank">mocha</a>.
 
 ### Running in browser
 
-[View it online](http://rawgit.com/ccampbell/mousetrap/master/tests/mousetrap.html) to check your browser compatibility. You may also download the repo and open `tests/mousetrap.html` in your browser. 
+[View it online](http://rawgit.com/ccampbell/mousetrap/master/tests/mousetrap.html) to check your browser compatibility. You may also download the repo and open `tests/mousetrap.html` in your browser.
 
 ### Running with Grunt and PhantomJS
 
@@ -99,7 +99,7 @@ Unit tests run via <a href="http://mochajs.org/" target="_blank">mocha</a>.
 3.  Run tests
 
     ```bash
-    grunt mocha
+    npm test
     ```
 
 ## Documentation

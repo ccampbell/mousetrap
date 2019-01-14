@@ -8,7 +8,8 @@ module.exports = function(grunt) {
         mocha: {
             options: {
                 reporter: 'Nyan',
-                run: true
+                run: true,
+                growlOnSuccess: false
             },
             mousetrap: {
                 src: ['tests/mousetrap.html']
