@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha tests/test.mousetrap.js"
+    "test": "mocha --reporter=nyan tests/test.mousetrap.js"
   },
   "repository": {
     "type": "git",
