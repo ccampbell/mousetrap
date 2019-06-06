@@ -69,7 +69,7 @@ There are a number of other similar libraries out there so what makes this one d
 - You can bind key events directly to special keys such as `?` or `*` without having to specify `shift+/` or `shift+8` which are not consistent across all keyboards
 - It works with international keyboard layouts
 - You can bind Gmail like key sequences in addition to regular keys and key combinations
-- You can programatically trigger key events with the `trigger()` method
+- You can programmatically trigger key events with the `trigger()` method
 - It works with the numeric keypad on your keyboard
 - The code is well documented/commented
 
