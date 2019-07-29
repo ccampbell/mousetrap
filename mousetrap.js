@@ -420,16 +420,16 @@
         };
     }
 
-    function _belongsTo(element, ancestor) {
+    function _belongsTo(element, ancestors) {
         if (element === null || element === document) {
             return false;
         }
 
-        if (element === ancestor) {
+        if (ancestors.indexOf(element) !== -1) {
             return true;
         }
 
-        return _belongsTo(element.parentNode, ancestor);
+        return _belongsTo(element.parentNode, ancestors);
     }
 
     function Mousetrap(targetElement) {
@@ -446,7 +446,7 @@
          *
          * @type {Element}
          */
-        self.target = targetElement;
+        self.targets = [];
 
         /**
          * a list of all the callbacks setup via Mousetrap.bind()
@@ -885,10 +885,22 @@
             }
         };
 
+        /**
+         * add a target to listen for events
+         *
+         * @param {Object} targetElement - DOM node
+         * @returns void
+         */
+        self.addTarget = function(targetElement) {
+            self.targets.push(targetElement);
+            _addEvent(targetElement, 'keypress', _handleKeyEvent);
+            _addEvent(targetElement, 'keydown', _handleKeyEvent);
+            _addEvent(targetElement, 'keyup', _handleKeyEvent);
+            return self;
+        };
+
         // start!
-        _addEvent(targetElement, 'keypress', _handleKeyEvent);
-        _addEvent(targetElement, 'keydown', _handleKeyEvent);
-        _addEvent(targetElement, 'keyup', _handleKeyEvent);
+        self.addTarget(targetElement);
     }
 
     /**
@@ -978,7 +990,7 @@
             return false;
         }
 
-        if (_belongsTo(element, self.target)) {
+        if (_belongsTo(element, self.targets)) {
             return false;
         }
 
