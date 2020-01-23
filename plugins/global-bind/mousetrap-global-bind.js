@@ -43,4 +43,4 @@
     };
 
     Mousetrap.init();
-}) (Mousetrap);
+}) (typeof Mousetrap !== "undefined" ? Mousetrap : undefined);
