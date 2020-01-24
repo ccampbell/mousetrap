@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Banana</title>
+        <meta charset=utf-8>
+        <link href="banana.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <h1>Banana</h1>
+
+        <h2>For testing the <strong>bind handle</strong> extension</h2>
+        
+        <p>Pressing "b" does something.</p>
+
+        <p>Click "Unbind" to stop it working and "Bind" to make it work again.</p>
+        <button class="test-toggle-bind">Unbind</button>
+        
+        <div class="test-bind-handle-result"></div>
+
+        <script type="text/javascript" src="../../../tests/libs/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="../../../mousetrap.js"></script>
+        <script type="text/javascript" src="../mousetrap-bind-handle.min.js"></script>
+        <script type="text/javascript" src="banana.js"></script>
+
+        <script type="text/javascript">
+            Banana.mash();
+        </script>
+    </body>
+
+</html>
