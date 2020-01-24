@@ -1,0 +1,4 @@
+language: nodejs
+
+nodejs:
+  - node
