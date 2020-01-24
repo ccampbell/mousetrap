@@ -89,6 +89,15 @@
     };
 
     /**
+     * Firefox's API "InstallTrigger" to install add-ons is unique to the browser.
+     * This is to resolve issues in https://github.com/ccampbell/mousetrap/pull/215/
+     */
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    if (isFirefox) {
+        _KEYCODE_MAP[173] = '-'; // FF keyCode for '-'
+    }
+
+    /**
      * this is a mapping of keys that require shift on a US keypad
      * back to the non shift equivelents
      *
