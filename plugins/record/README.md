@@ -4,6 +4,7 @@ This extension lets you use Mousetrap to record keyboard sequences and play them
 
 ```html
 <button onclick="recordSequence()">Record</button>
+<button onclick="stopRecord()">Stop</button>
 
 <script>
     function recordSequence() {
@@ -11,6 +12,9 @@ This extension lets you use Mousetrap to record keyboard sequences and play them
             // sequence is an array like ['ctrl+k', 'c']
             alert('You pressed: ' + sequence.join(' '));
         });
+    }
+    function stopRecord() {
+        Mousetrap.stopRecord();
     }
 </script>
 ```

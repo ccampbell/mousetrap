@@ -46,7 +46,25 @@
          *
          * @type {Function}
          */
-        _origHandleKey = Mousetrap.prototype.handleKey;
+        _origHandleKey = Mousetrap.prototype.handleKey,
+
+        /**
+         * The options currently used.
+         *
+         * @type {Object}
+         * @property {boolean} recordSequence - Whether or not to record key sequence.
+         */
+        _options = {},
+
+        /**
+         * The default options.
+         *
+         * @type {Object}
+         * @property {boolean} recordSequence - Whether or not to record key sequence.
+         */
+        _defaultOptions = {
+            recordSequence: true
+        };
 
     /**
      * handles a character key event
@@ -66,6 +84,10 @@
 
         // remember this character if we're currently recording a sequence
         if (e.type == 'keydown') {
+
+            // To record shortcuts handled by the browser (mod+s ...)
+            e.preventDefault();
+
             if (character.length === 1 && _recordedCharacterKey) {
                 _recordCurrentCombo();
             }
@@ -155,12 +177,25 @@
      * @returns void
      */
     function _finishRecording() {
-        if (_recordedSequenceCallback) {
-            _normalizeSequence(_recordedSequence);
-            _recordedSequenceCallback(_recordedSequence);
-        }
+        var sequence = _recordedSequence;
+        var callback = _recordedSequenceCallback;
 
-        // reset all recorded state
+        // Reset the state before before calling the callback
+        // in case the callback restarts the record
+        _resetState();
+
+        if (callback) {
+            _normalizeSequence(sequence);
+            callback(sequence);
+        }
+    }
+
+    /**
+     * Reset all recorded state
+     *
+     * @returns void
+     */
+    function _resetState() {
         _recordedSequence = [];
         _recordedSequenceCallback = null;
         _currentRecordedKeys = [];
@@ -176,23 +211,62 @@
      */
     function _restartRecordTimer() {
         clearTimeout(_recordTimer);
-        _recordTimer = setTimeout(_finishRecording, 1000);
+        if (_options.recordSequence) {
+            _recordTimer = setTimeout(_finishRecording, 1000);
+        } else {
+            _finishRecording();
+        }
+    }
+
+    /**
+     * copies object properties from source object to dest object
+     *
+     * @param {Object} dest
+     * @param {Object} source
+     * @returns {Object} the dest object
+     */
+    function _extend(dest, source) {
+        for (var prop in source) {
+            if (source.hasOwnProperty(prop)) {
+                dest[prop] = source[prop];
+            }
+        }
+        return dest;
     }
 
     /**
      * records the next sequence and passes it to a callback once it's
      * completed
      *
+     * @param {Object} [options]
+     * @param {boolean} [options.recordSequence=true] - Whether or not to record key sequences.
      * @param {Function} callback
      * @returns void
      */
-    Mousetrap.prototype.record = function(callback) {
+    Mousetrap.prototype.record = function(options, callback) {
+        _options = _extend({}, _defaultOptions);
+        if(typeof options === 'function') {
+            callback = options;
+        } else {
+            _extend(_options, options);
+        }
+
         var self = this;
         self.recording = true;
         _recordedSequenceCallback = function() {
             self.recording = false;
             callback.apply(self, arguments);
         };
+    };
+
+    /**
+     * Manually stops the record
+     *
+     * @returns void
+     */
+    Mousetrap.prototype.stopRecord = function() {
+        this.recording = false;
+        _resetState();
     };
 
     Mousetrap.prototype.handleKey = function() {
