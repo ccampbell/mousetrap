@@ -431,6 +431,16 @@
 
         return _belongsTo(element.parentNode, ancestor);
     }
+    
+    function _parentHas(element, cls) {
+        if(element === null) {
+            return false
+        }
+        if ((' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1) {
+            return true
+        }
+        return _parentHas(element.parentNode, cls)
+    }
 
     function Mousetrap(targetElement) {
         var self = this;
@@ -974,7 +984,7 @@
         var self = this;
 
         // if the element has the class "mousetrap" then no need to stop
-        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+        if (_parentHas(element, 'mousetrap')) {
             return false;
         }
 
