@@ -58,6 +58,13 @@
         46: 'del',
         91: 'meta',
         93: 'meta',
+        173: 'mute',
+        174: 'volume_down',
+        175: 'volume_up',
+        176: 'media_next',
+        177: 'media_previous',
+        178: 'media_stop',
+        179: 'media_play_pause',
         224: 'meta'
     };
 
