@@ -117,7 +117,9 @@
         '<': ',',
         '>': '.',
         '?': '/',
-        '|': '\\'
+        '|': '\\',
+		'}':']',
+		'{':'['
     };
 
     /**
@@ -206,7 +208,8 @@
             if (!e.shiftKey) {
                 character = character.toLowerCase();
             }
-
+			
+			if(character==" ")return "space";
             return character;
         }
 
@@ -382,7 +385,14 @@
         var key;
         var i;
         var modifiers = [];
-
+		var namespace = combination.split('.');
+		
+		//get the namespace if it has one (eg: ctrl+a.name combination would give namespace of name after the period)
+		if(namespace.length>1){
+			combination = namespace[0];
+			namespace = namespace[1];
+		}
+		
         // take the keys from this pattern and figure out what the actual
         // pattern is all about
         keys = _keysFromString(combination);
@@ -416,7 +426,8 @@
         return {
             key: key,
             modifiers: modifiers,
-            action: action
+            action: action,
+			namespace: namespace
         };
     }
 
@@ -461,6 +472,19 @@
          * @type {Object}
          */
         self._directMap = {};
+		
+        /**
+         * When keys are released in a keyup action- they get stored until another key is pressed. These are used when combination ends with a modifier key
+         *
+         * @type {Object}
+         */
+        self._releasedKeys = [];
+        /**
+         * Held keys.. these get used when combination ends with a modifier key- and needs to check if an action with different character should trigger
+         *
+         * @type {Object}
+         */
+        self._heldKeys = [];
 
         /**
          * keeps track of what level each sequence is at since multiple
@@ -534,64 +558,85 @@
          * @param {string=} sequenceName - name of the sequence we are looking for
          * @param {string=} combination
          * @param {number=} level
+         * @param {string=} namespace (eg: if original combination is ctrl+a.name, namespace would be after the period)
          * @returns {Array}
          */
-        function _getMatches(character, modifiers, e, sequenceName, combination, level) {
+        function _getMatches(character, modifiers, e, sequenceName, combination, level, namespace) {
             var i;
             var callback;
             var matches = [];
             var action = e.type;
 
             // if there are no events related to this keycode
-            if (!self._callbacks[character]) {
+            if (!self._callbacks[character] && !_isModifier(character) ) {
                 return [];
             }
 
+			var allCharacters = [character];
+			
             // if a modifier key is coming up on its own we should allow it
-            if (action == 'keyup' && _isModifier(character)) {
-                modifiers = [character];
+            if (action == 'keyup' && _isModifier(character) ) {
+				modifiers = [character];
+				for (property in self._callbacks) {
+					if(_isModifier(property) && allCharacters.indexOf(property) === -1)allCharacters.push(property);
+				}
             }
-
+			
             // loop through all callbacks for the key that was pressed
             // and see if any of them match
-            for (i = 0; i < self._callbacks[character].length; ++i) {
-                callback = self._callbacks[character][i];
+			for (k = 0; k < allCharacters.length; ++k) {
+				if(typeof self._callbacks[allCharacters[k]] !== 'undefined'){
+					character = allCharacters[k];
+					for (i = 0; i < self._callbacks[character].length; ++i) {
+						callback = self._callbacks[character][i];
+						
+						//if key is modifier and is last in combo, meaning combination is only modifiers, add all modifiers to modifier array so it can match properly
+						//also check that the modifiers were originally held down, otherwise exclude them.
+						if (action == 'keyup' && _isModifier(character) && callback.modifiers[callback.modifiers.length-1]===character ) {
+							modifiers = [];
+							for (j = 0; j < callback.modifiers.length; ++j) {
+								if(self._releasedKeys.indexOf(callback.modifiers[j]) !== -1 && modifiers.indexOf(callback.modifiers[j])==-1 )modifiers.push(callback.modifiers[j]);
+								if(self._heldKeys.indexOf(callback.modifiers[j]) !== -1 && modifiers.indexOf(callback.modifiers[j])==-1 )modifiers.push(callback.modifiers[j]);
+							}
+						}
+						
+						// if a sequence name is not specified, but this is a sequence at
+						// the wrong level then move onto the next match
+						if (!sequenceName && callback.seq && _sequenceLevels[callback.seq] != callback.level) {
+							continue;
+						}
 
-                // if a sequence name is not specified, but this is a sequence at
-                // the wrong level then move onto the next match
-                if (!sequenceName && callback.seq && _sequenceLevels[callback.seq] != callback.level) {
-                    continue;
-                }
+						// if the action we are looking for doesn't match the action we got
+						// then we should keep going
+						if (action != callback.action) {
+							continue;
+						}
 
-                // if the action we are looking for doesn't match the action we got
-                // then we should keep going
-                if (action != callback.action) {
-                    continue;
-                }
+						// if this is a keypress event and the meta key and control key
+						// are not pressed that means that we need to only look at the
+						// character, otherwise check the modifiers as well
+						//
+						// chrome will not fire a keypress if meta or control is down
+						// safari will fire a keypress if meta or meta+shift is down
+						// firefox will fire a keypress if meta or control is down
+						if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
 
-                // if this is a keypress event and the meta key and control key
-                // are not pressed that means that we need to only look at the
-                // character, otherwise check the modifiers as well
-                //
-                // chrome will not fire a keypress if meta or control is down
-                // safari will fire a keypress if meta or meta+shift is down
-                // firefox will fire a keypress if meta or control is down
-                if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
+							// when you bind a combination or sequence a second time it
+							// should overwrite the first one.  if a sequenceName or
+							// combination is specified in this call it does just that
+							//
+							// @todo make deleting its own method?
+							var deleteCombo = !sequenceName && callback.combo == combination;
+							var deleteSequence = sequenceName && callback.seq == sequenceName && callback.level == level;
+							if (deleteCombo || deleteSequence) {
+								self._callbacks[character].splice(i, 1);
+							}
 
-                    // when you bind a combination or sequence a second time it
-                    // should overwrite the first one.  if a sequenceName or
-                    // combination is specified in this call it does just that
-                    //
-                    // @todo make deleting its own method?
-                    var deleteCombo = !sequenceName && callback.combo == combination;
-                    var deleteSequence = sequenceName && callback.seq == sequenceName && callback.level == level;
-                    if (deleteCombo || deleteSequence) {
-                        self._callbacks[character].splice(i, 1);
-                    }
-
-                    matches.push(callback);
-                }
-            }
+							matches.push(callback);
+						}
+					}
+				}
+			}
 
             return matches;
         }
@@ -612,7 +657,18 @@
             if (self.stopCallback(e, e.target || e.srcElement, combo, sequence)) {
                 return;
             }
-
+			//check if there are keys before this one that are part of the combo (ex: ctrl+space+c), make sure they are still held down
+			if(combo.indexOf("+")>-1){
+				var charArray = combo.split("+");
+				for(var i=0; i<charArray.length-1; i++){
+					var heldIndex = self._heldKeys.indexOf(charArray[i]);
+					if(heldIndex==-1)return;
+				}
+			}else if(combo.indexOf(" ")==-1){
+				//if it is just a single key, don't fire if others are being held.
+				if(self._heldKeys.length>1)return;
+			}
+			
             if (callback(e, combo) === false) {
                 _preventDefault(e);
                 _stopPropagation(e);
@@ -708,6 +764,18 @@
         };
 
         /**
+         * handles a onblur event
+         *
+         * @param {Event} e
+         * @returns void
+         */
+        function _handleBlurEvent(e) {
+			//make sure the held keys and released keys get cleared if window loses focus.
+		   self._heldKeys = [];
+		   self._releasedKeys = [];
+		}
+		
+        /**
          * handles a keydown event
          *
          * @param {Event} e
@@ -715,6 +783,7 @@
          */
         function _handleKeyEvent(e) {
 
+			
             // normalize e.which for key events
             // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
             if (typeof e.which !== 'number') {
@@ -722,12 +791,31 @@
             }
 
             var character = _characterFromEvent(e);
-
+			
             // no character found then stop
             if (!character) {
                 return;
             }
 
+			//make sure the keys that are released are remembered until another keypress/keydown
+			//make sure keys that are being held, are remembered
+			held = character;
+			if(_SHIFT_MAP[character]){
+				held = -1;
+			}
+			if(held!==-1){
+				if(!e.repeat && e.type!='keyup'){
+					self._releasedKeys = [];
+					if(self._heldKeys.indexOf(held)==-1)self._heldKeys.push(held);
+				}else if(e.type=='keyup'){
+					if(self._releasedKeys.indexOf(held)==-1)self._releasedKeys.push(held);
+					do{
+						var heldIndex = self._heldKeys.indexOf(held);
+						if(heldIndex>-1)self._heldKeys.splice(heldIndex,1);
+					}while(heldIndex>-1);
+				}
+			}
+			
             // need to use === for the character check because the character can be 0
             if (e.type == 'keyup' && _ignoreNextKeyup === character) {
                 _ignoreNextKeyup = false;
@@ -853,7 +941,7 @@
             self._callbacks[info.key] = self._callbacks[info.key] || [];
 
             // remove an existing match if there is one
-            _getMatches(info.key, info.modifiers, {type: info.action}, sequenceName, combination, level);
+            _getMatches(info.key, info.modifiers, {type: info.action}, sequenceName, combination, level, info.namespace);
 
             // add this call back to the array
             // if it is a sequence put it at the beginning
@@ -865,6 +953,7 @@
                 callback: callback,
                 modifiers: info.modifiers,
                 action: info.action,
+				namespace: info.namespace,
                 seq: sequenceName,
                 level: level,
                 combo: combination
@@ -889,6 +978,8 @@
         _addEvent(targetElement, 'keypress', _handleKeyEvent);
         _addEvent(targetElement, 'keydown', _handleKeyEvent);
         _addEvent(targetElement, 'keyup', _handleKeyEvent);
+		
+        _addEvent(window, 'blur', _handleBlurEvent);
     }
 
     /**
@@ -1043,7 +1134,7 @@
 
     // expose mousetrap to the global object
     window.Mousetrap = Mousetrap;
-
+	
     // expose as a common js module
     if (typeof module !== 'undefined' && module.exports) {
         module.exports = Mousetrap;
