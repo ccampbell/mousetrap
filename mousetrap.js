@@ -583,7 +583,7 @@
                     // combination is specified in this call it does just that
                     //
                     // @todo make deleting its own method?
-                    var deleteCombo = !sequenceName && callback.combo == combination;
+                    var deleteCombo = !sequenceName && !callback.seq && callback.combo == combination;
                     var deleteSequence = sequenceName && callback.seq == sequenceName && callback.level == level;
                     if (deleteCombo || deleteSequence) {
                         self._callbacks[character].splice(i, 1);
