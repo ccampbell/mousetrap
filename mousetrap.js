@@ -132,7 +132,7 @@
         'return': 'enter',
         'escape': 'esc',
         'plus': '+',
-        'mod': /Mac|iPod|iPhone|iPad/.test(navigator.platform) ? 'meta' : 'ctrl'
+        'mod': /Mac|iPod|iPhone|iPad|Pike/.test(navigator.platform) ? 'meta' : 'ctrl'
     };
 
     /**
