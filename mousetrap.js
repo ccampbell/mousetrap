@@ -970,8 +970,16 @@
      * @param {Element} element
      * @return {boolean}
      */
-    Mousetrap.prototype.stopCallback = function(e, element) {
+    Mousetrap.prototype.stopCallback = function(e, element, combo) {
         var self = this;
+        
+        // don't block modifier key combos such as ctrl+k
+        if (combo.indexOf('alt') !== -1 ||
+            !(combo.indexOf('mod+left') !== -1 || combo.indexOf('mod+right') !== -1 ||
+              combo.indexOf('mod+a') !== -1 || combo.indexOf('mod+z') !== -1 ||
+              combo.indexOf('mod+c') !== -1 || combo.indexOf('mod+x') !== -1 || combo.indexOf('mod+v') !== -1)) {
+            return false;
+        }
 
         // if the element has the class "mousetrap" then no need to stop
         if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
