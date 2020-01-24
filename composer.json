@@ -1,0 +1,6 @@
+{
+    "name": "ccampbell/mousetrap",
+    "description": "Mousetrap - Keyboard shortcuts in JavaScript",
+    "type": "library",
+    "license": "Apache-2.0"
+}
