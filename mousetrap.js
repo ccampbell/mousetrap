@@ -60,6 +60,12 @@
         93: 'meta',
         224: 'meta'
     };
+    
+    var _MOUSE_MAP = {
+      1: 'leftclick',
+      2: 'middleclick',
+      3: 'rightclick'
+    };
 
     /**
      * mapping for special characters so they can support
@@ -145,6 +151,14 @@
     var _REVERSE_MAP;
 
     /**
+     * variable to store the flipped version of _MOUSE_MAP from above
+     * needed to check if we should use mouseup or not when no action
+     * is specified
+     *
+     * @type {Object|undefined}
+     */
+    var _REVERSE_MOUSE_MAP;
+    /**
      * loop through the f keys, f1 to f19 and add them to the map
      * programatically
      */
@@ -213,6 +227,10 @@
         // for non keypress events the special maps are needed
         if (_MAP[e.which]) {
             return _MAP[e.which];
+        }
+        
+        if (_MOUSE_MAP[e.which]) {
+            return _MOUSE_MAP[e.which];
         }
 
         if (_KEYCODE_MAP[e.which]) {
@@ -330,7 +348,23 @@
         }
         return _REVERSE_MAP;
     }
-
+    
+        /**
+         * reverses the mouse map lookup so that we can look for specific mouse keys
+         *
+         * @return {Object}
+         */
+        function _getReverseMouseMap() {
+            if (!_REVERSE_MOUSE_MAP) {
+                _REVERSE_MOUSE_MAP = {};
+                for (var key in _MOUSE_MAP) {
+                    if (_MOUSE_MAP.hasOwnProperty(key)) {
+                        _REVERSE_MOUSE_MAP[_MOUSE_MAP[key]] = key;
+                    }
+                }
+            }
+            return _REVERSE_MOUSE_MAP;
+        }
     /**
      * picks the best action based on the key combination
      *
@@ -343,7 +377,7 @@
         // if no action was picked in we should try to pick the one
         // that we think would work best for this key
         if (!action) {
-            action = _getReverseMap()[key] ? 'keydown' : 'keypress';
+            action = _getReverseMap()[key] ? 'keydown' : _getReverseMouseMap()[key] ? 'mouseup' : 'keypress';
         }
 
         // modifier keys don't work as expected with keypress,
@@ -548,7 +582,7 @@
             }
 
             // if a modifier key is coming up on its own we should allow it
-            if (action == 'keyup' && _isModifier(character)) {
+            if ((action == 'keyup' || action == 'mouseup') && _isModifier(character)) {
                 modifiers = [character];
             }
 
@@ -889,6 +923,7 @@
         _addEvent(targetElement, 'keypress', _handleKeyEvent);
         _addEvent(targetElement, 'keydown', _handleKeyEvent);
         _addEvent(targetElement, 'keyup', _handleKeyEvent);
+        _addEvent(targetElement, 'mouseup', _handleKeyEvent);
     }
 
     /**
