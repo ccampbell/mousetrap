@@ -344,12 +344,12 @@
         // that we think would work best for this key
         if (!action) {
             action = _getReverseMap()[key] ? 'keydown' : 'keypress';
-        }
 
-        // modifier keys don't work as expected with keypress,
-        // switch to keydown
-        if (action == 'keypress' && modifiers.length) {
-            action = 'keydown';
+            // modifier keys don't work as expected with keypress,
+            // switch to keydown
+            if (action == 'keypress' && modifiers.length) {
+                action = 'keydown';
+            }
         }
 
         return action;
@@ -569,14 +569,10 @@
                     continue;
                 }
 
-                // if this is a keypress event and the meta key and control key
-                // are not pressed that means that we need to only look at the
-                // character, otherwise check the modifiers as well
-                //
                 // chrome will not fire a keypress if meta or control is down
                 // safari will fire a keypress if meta or meta+shift is down
                 // firefox will fire a keypress if meta or control is down
-                if ((action == 'keypress' && !e.metaKey && !e.ctrlKey) || _modifiersMatch(modifiers, callback.modifiers)) {
+                if (_modifiersMatch(modifiers, callback.modifiers)) {
 
                     // when you bind a combination or sequence a second time it
                     // should overwrite the first one.  if a sequenceName or
