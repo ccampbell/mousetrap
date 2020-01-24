@@ -1,7 +1,7 @@
 # Mousetrap
 [![CDNJS](https://img.shields.io/cdnjs/v/mousetrap.svg)](https://cdnjs.com/libraries/mousetrap)
 
-Mousetrap is a simple library for handling keyboard shortcuts in Javascript.
+Mousetrap is a simple library for handling keyboard shortcuts in JavaScript.
 
 It is licensed under the Apache 2.0 license.
 
