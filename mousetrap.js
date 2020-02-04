@@ -478,6 +478,13 @@
         var _resetTimer;
 
         /**
+         * amount of time (ms) to wait before resetting the sequence
+         * 
+         * @type {number}
+         */
+        self.resetSequenceTimeout = 1000;
+
+        /**
          * temporary state where we will ignore the next keyup
          *
          * @type {boolean|string}
@@ -738,16 +745,17 @@
         }
 
         /**
-         * called to set a 1 second timeout on the specified sequence
+         * called to set a timeout on the specified sequence
          *
-         * this is so after each key press in the sequence you have 1 second
+         * this is so after each key press in the sequence you have 
+         * some amount of time (1 second by default)
          * to press the next key before you have to start over
          *
          * @returns void
          */
         function _resetSequenceTimer() {
             clearTimeout(_resetTimer);
-            _resetTimer = setTimeout(_resetSequences, 1000);
+            _resetTimer = setTimeout(_resetSequences, self.resetSequenceTimeout);
         }
 
         /**
