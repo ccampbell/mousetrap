@@ -1,0 +1,21 @@
+{
+  "name": "mousetrap",
+  "version": "1.3.2",
+  "description": "Simple library for handling keyboard shortcuts in Javascript",
+  "main": "mousetrap.js",
+  "scripts": {
+    "test": "open tests/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ccampbell/mousetrap.git"
+  },
+  "keywords": [
+    "keyboard",
+    "shortcuts",
+    "keybinding",
+    "accessibility"
+  ],
+  "author": "Craig Campbell",
+  "license": "APLv2"
+}
