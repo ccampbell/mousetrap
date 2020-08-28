@@ -104,6 +104,28 @@ describe('Mousetrap.bind', function () {
       expect(spy.callCount).to.equal(0, 'callback should not have fired');
     });
 
+    it("z key does fire when inside an input element with mousetrap class in an open shadow dom", function () {
+      var spy = sinon.spy();
+      var shadowHost = document.createElement("div");
+      var shadowRoot = shadowHost.attachShadow({ mode: "open" });
+      document.body.appendChild(shadowHost);
+
+      var inputElement = document.createElement("input");
+      inputElement.className = 'mousetrap';
+      shadowRoot.appendChild(inputElement);
+      expect(shadowHost.shadowRoot).to.equal(
+        shadowRoot,
+        "shadow root accessible"
+      );
+
+      Mousetrap.bind("z", spy);
+      KeyEvent.simulate("Z".charCodeAt(0), 90, [], inputElement, 1, {
+        shadowHost: shadowHost,
+      });
+      document.body.removeChild(shadowHost);
+      expect(spy.callCount).to.equal(1, "callback should have fired once");
+    });
+
     it('z key does fire when inside an input element in a closed shadow dom', function() {
       var spy = sinon.spy();
 

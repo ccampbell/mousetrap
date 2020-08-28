@@ -973,15 +973,6 @@
     Mousetrap.prototype.stopCallback = function(e, element) {
         var self = this;
 
-        // if the element has the class "mousetrap" then no need to stop
-        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
-            return false;
-        }
-
-        if (_belongsTo(element, self.target)) {
-            return false;
-        }
-
         // Events originating from a shadow DOM are re-targetted and `e.target` is the shadow host,
         // not the initial event target in the shadow tree. Note that not all events cross the
         // shadow boundary.
@@ -995,7 +986,15 @@
                 element = initialEventTarget;
             }
         }
+        
+        // if the element has the class "mousetrap" then no need to stop
+        if ((' ' + element.className + ' ').indexOf(' mousetrap ') > -1) {
+            return false;
+        }
 
+        if (_belongsTo(element, self.target)) {
+            return false;
+        }
         // stop for input, select, and textarea
         return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || element.isContentEditable;
     };
