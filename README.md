@@ -64,14 +64,14 @@ It has support for `keypress`, `keydown`, and `keyup` events on specific keys, k
 
 There are a number of other similar libraries out there so what makes this one different?
 
-- There are no external dependencies, no framework is required
+- There are no external dependencies, no framework is required.
 - You are not limited to `keydown` events (You can specify `keypress`, `keydown`, or `keyup` or let Mousetrap choose for you).
-- You can bind key events directly to special keys such as `?` or `*` without having to specify `shift+/` or `shift+8` which are not consistent across all keyboards
-- It works with international keyboard layouts
-- You can bind Gmail like key sequences in addition to regular keys and key combinations
-- You can programatically trigger key events with the `trigger()` method
-- It works with the numeric keypad on your keyboard
-- The code is well documented/commented
+- You can bind key events directly to special keys such as `?` or `*` without having to specify `shift+/` or `shift+8` which are not consistent across all keyboards.
+- It works with international keyboard layouts.
+- You can bind Gmail like key sequences in addition to regular keys and key combinations.
+- You can programatically trigger key events with the `trigger()` method.
+- It works with the numeric keypad on your keyboard.
+- The code is well documented/commented.
 
 ## Tests
 
