@@ -90,7 +90,7 @@
 
     /**
      * this is a mapping of keys that require shift on a US keypad
-     * back to the non shift equivelents
+     * back to the non shift equivalents
      *
      * this is so you can use keyup events with these keys
      *
