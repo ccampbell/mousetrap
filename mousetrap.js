@@ -153,7 +153,7 @@
      * loop through to map numbers on the numeric keypad
      */
     for (i = 0; i <= 9; ++i) {
-        _MAP[i + 96] = i;
+        _MAP[i + 96] = (i+96).toString();
     }
 
     /**
@@ -181,6 +181,13 @@
      */
     function _characterFromEvent(e) {
 
+		//if keypress and numpad number, convert to correct value	
+        if (e.type == 'keypress' && e.location == 3 && Number(e.key) >=0 && Number(e.key) <= 9) {
+			//console.log("test",Number(e.key)+96);
+			//console.log(_MAP[Number(e.key)+96]);
+			return _MAP[Number(e.key)+96];
+		}
+		
         // for keypress events we should return the character as is
         if (e.type == 'keypress') {
             var character = String.fromCharCode(e.which);
@@ -374,7 +381,11 @@
         var key;
         var i;
         var modifiers = [];
-		var namespace = combination.split('.');
+		var namespace = [];//combination.split('.');
+		
+		var lastIndex = combination.lastIndexOf('.');
+		namespace.push( combination.substr(0, lastIndex) );
+		namespace.push( combination.substr(lastIndex) );
 		
 		//get the namespace if it has one (eg: ctrl+a.name combination would give namespace of name after the period)
 		if(namespace.length>1){
@@ -555,7 +566,10 @@
             var callback;
             var matches = [];
             var action = e.type;
-
+			
+			var originalChar = character;
+			var originalMods = modifiers;
+			
             // if there are no events related to this keycode
             if (!self._callbacks[character] && !_isModifier(character) ) {
                 return [];
@@ -563,13 +577,39 @@
 
 			var allCharacters = [character];
 			
+			if(_isModifier(character)){
+				for (i = 0; i < modifiers.length; ++i) {
+					if(allCharacters.indexOf(modifiers[i])===-1 )allCharacters.push(modifiers[i]);
+				}
+			}
+			
             // if a modifier key is coming up on its own we should allow it
             if (action == 'keyup' && _isModifier(character) ) {
 				modifiers = [character];
 				for (property in self._callbacks) {
+				//console.log(self._callbacks);
 					if(_isModifier(property) && allCharacters.indexOf(property) === -1)allCharacters.push(property);
 				}
             }
+			/*else if(_isModifier(character)){
+				//else if key pressed is modifier add callbacks that may be using a different modifier as the character (like shift+alt and alt+shift)
+				modifiers = [character];
+				for (property in self._callbacks) {
+				console.log(self._callbacks);
+					if(_isModifier(property) && allCharacters.indexOf(property) === -1)allCharacters.push(property);
+				}
+			}
+			if (_isModifier(character) ) {
+				modifiers = [character];
+				for (i = 0; i < self._heldKeys.length; ++i) {
+					if(_isModifier(self._heldKeys[i]) && modifiers.indexOf(self._heldKeys[i])===-1 )modifiers.push(self._heldKeys[i]);
+				}
+				for (property in self._callbacks) {
+					if(_isModifier(property) && allCharacters.indexOf(property) === -1)allCharacters.push(property);
+				}
+            }*/
+				//console.log(modifiers+",test");
+				//console.log(allCharacters+",test2");
 			
             // loop through all callbacks for the key that was pressed
             // and see if any of them match
@@ -578,16 +618,27 @@
 					character = allCharacters[k];
 					for (i = 0; i < self._callbacks[character].length; ++i) {
 						callback = self._callbacks[character][i];
+						modifiers = originalMods;
 						
+						if (action == 'keyup' && _isModifier(originalChar) && callback.modifiers.indexOf(originalChar)==-1){
+							continue;
+						}
 						//if key is modifier and is last in combo, meaning combination is only modifiers, add all modifiers to modifier array so it can match properly
 						//also check that the modifiers were originally held down, otherwise exclude them.
-						if (action == 'keyup' && _isModifier(character) && callback.modifiers[callback.modifiers.length-1]===character ) {
+						if (_isModifier(character) && callback.modifiers.indexOf(character)!==-1 ) {
 							modifiers = [];
 							for (j = 0; j < callback.modifiers.length; ++j) {
-								if(self._releasedKeys.indexOf(callback.modifiers[j]) !== -1 && modifiers.indexOf(callback.modifiers[j])==-1 )modifiers.push(callback.modifiers[j]);
+								if(action == 'keyup' && self._releasedKeys.indexOf(callback.modifiers[j]) !== -1 && modifiers.indexOf(callback.modifiers[j])==-1 )modifiers.push(callback.modifiers[j]);
 								if(self._heldKeys.indexOf(callback.modifiers[j]) !== -1 && modifiers.indexOf(callback.modifiers[j])==-1 )modifiers.push(callback.modifiers[j]);
 							}
 						}
+						//if keyup and a combo that has all keys lifted but other keys held that are unrelatedto combo, should still fire. This ensures modifiers match.
+						if (action == 'keyup' && callback.modifiers.length<modifiers.length){
+							for (j = modifiers.length-1; j>=0; j--) {
+								if(callback.modifiers.indexOf(modifiers[j])==-1)modifiers.splice(j,1);
+							}
+						}
+						//if (!e.repeat || action == 'keyup')console.log(originalChar+"|"+character+"|"+modifiers+"|"+callback.modifiers);
 						
 						// if a sequence name is not specified, but this is a sequence at
 						// the wrong level then move onto the next match
@@ -627,6 +678,13 @@
 				}
 			}
 
+			//try ordering them based on combo length (number of +s) to see if can use it to let shorter ones check if longer ones have fired already
+			var order = matches.sort( function(a,b){
+				var nA = a.combo.split("+").length;
+				var nB = b.combo.split("+").length;
+				return nA > nB ? -1 : nA < nB ? 1 : 0;  
+			});
+			
             return matches;
         }
 
@@ -641,23 +699,29 @@
          * @returns void
          */
         function _fireCallback(callback, e, combo, sequence) {
-
             // if this event should not happen stop here
             if (self.stopCallback(e, e.target || e.srcElement, combo, sequence)) {
                 return;
             }
+			//if (!e.repeat || e.type=='keyup')console.log(combo+","+combo.indexOf(" "));
 			//check if there are keys before this one that are part of the combo (ex: ctrl+space+c), make sure they are still held down
 			if(combo.indexOf("+")>-1){
-				var charArray = combo.split("+");
-				for(var i=0; i<charArray.length-1; i++){
-					var heldIndex = self._heldKeys.indexOf(charArray[i]);
-					if(heldIndex==-1)return;
+				if(e.type!=='keyup'){
+					var charArray = combo.split("+");
+					for(var i=0; i<charArray.length-1; i++){
+						var heldIndex = self._heldKeys.indexOf(charArray[i]);
+						if(heldIndex==-1)return;
+					}
 				}
 			}else if(combo.indexOf(" ")==-1){
+				//if (!e.repeat || e.type=='keyup')console.log(combo+","+combo.indexOf(" "));
 				//if it is just a single key, don't fire if others are being held.
-				if(self._heldKeys.length>1)return;
+				var character = combo.split(".")[0];
+				if(e.type!=='keyup' && self._heldKeys.length>1 && !_isModifier(character))return;
 			}
 			
+			//if (!e.repeat || e.type=='keyup')console.log(combo+","+combo.indexOf(" "));
+				
             if (callback(e, combo) === false) {
                 _preventDefault(e);
                 _stopPropagation(e);
@@ -678,7 +742,7 @@
             var doNotReset = {};
             var maxLevel = 0;
             var processedSequenceCallback = false;
-
+			
             // Calculate the maxLevel for sequences so we can only execute the longest callback sequence
             for (i = 0; i < callbacks.length; ++i) {
                 if (callbacks[i].seq) {
@@ -762,8 +826,38 @@
 			//make sure the held keys and released keys get cleared if window loses focus.
 		   self._heldKeys = [];
 		   self._releasedKeys = [];
+		   /*
+		   //self._sequenceLevels = {};
+		   _resetSequences({});
+		   
+			_sequenceLevels = {};
+
+			//_resetTimer;
+			_ignoreNextKeyup = false;
+			_ignoreNextKeypress = false;
+			_nextExpectedAction = false;*/
+
+			//the only way that seems to work with clearing whatever needs to be cleared is to force the keyup events to run
+			var event = document.createEvent("HTMLEvents");
+			event.initEvent('keyup', false, true);
+			event.keyCode = 18;	//alt
+			document.dispatchEvent(event);
+			event = document.createEvent("HTMLEvents");
+			event.initEvent('keyup', false, true);
+			event.keyCode = 17;	//ctrl
+			document.dispatchEvent(event);
+			event = document.createEvent("HTMLEvents");
+			event.initEvent('keyup', false, true);
+			event.keyCode = 16;	//shift
+			document.dispatchEvent(event);
 		}
 		
+		self._doKeyEvent = function(e) {
+			_handleKeyEvent(e);
+        };
+		self._doBlurEvent = function(e) {
+			_handleBlurEvent(e);
+        };
         /**
          * handles a keydown event
          *
@@ -772,27 +866,44 @@
          */
         function _handleKeyEvent(e) {
 
-			
-            // normalize e.which for key events
+			//if dialog open, return
+			//if($('#MyDialog').is(':visible'))return;
+			//console.log($('#MyDialog'));
+            
+			// normalize e.which for key events
             // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
             if (typeof e.which !== 'number') {
                 e.which = e.keyCode;
             }
-
             var character = _characterFromEvent(e);
 			
+			try{
+				//this is to fix the plus sign on the numpad not working (change it to =)
+				if(character.charCodeAt(0)==43){
+					character = '=';
+					//console.log(character+","+character.charCodeAt(0));
+				}
+			}catch{}
+			//for some odd reason holding ctrl and pressing a key that isn't bound with keydown will get some strange unprintable character from keypress?
+			if(character.length == 1 && (typeof character === 'string' && character.charCodeAt(0)<32)){
+                return;
+			}
             // no character found then stop
             if (!character) {
                 return;
             }
-
+			
 			//make sure the keys that are released are remembered until another keypress/keydown
 			//make sure keys that are being held, are remembered
-			held = character;
-			if(_SHIFT_MAP[character]){
+			var held = -1;
+			if(typeof character === 'string') held = character.toLowerCase();
+			//console.log(held);
+			if(_SHIFT_MAP[character] || held === -1 || (held.length == 1 && held.charCodeAt(0)<32 && typeof _MAP[held.charCodeAt(0)] === 'undefined' ) ){
 				held = -1;
+			}else{
+				held = held.trim();	//get weird whitespace when pressing tab then enter. This will remove it.
 			}
-			if(held!==-1){
+			if(held!==-1 && held!=="" && held!==" "){
 				if(!e.repeat && e.type!='keyup'){
 					self._releasedKeys = [];
 					if(self._heldKeys.indexOf(held)==-1)self._heldKeys.push(held);
@@ -969,6 +1080,8 @@
         _addEvent(targetElement, 'keyup', _handleKeyEvent);
 		
         _addEvent(window, 'blur', _handleBlurEvent);
+		//we now call this from outside
+        //_addEvent(targetElement, 'contextmenu', _handleBlurEvent);
     }
 
     /**
@@ -1072,6 +1185,22 @@
     Mousetrap.prototype.handleKey = function() {
         var self = this;
         return self._handleKey.apply(self, arguments);
+    };
+	
+    /**
+     * exposes _handleKeyEvent publicly so it can call events manually
+     */
+    Mousetrap.prototype.handleKeyEvent = function(e) {
+        var self = this;
+        return self._doKeyEvent(e);
+    };
+
+    /**
+     * exposes _handleblurEvent publicly so it can call events manually
+     */
+    Mousetrap.prototype.handleBlurEvent = function(e) {
+        var self = this;
+        return self._doBlurEvent(e);
     };
 
     /**
