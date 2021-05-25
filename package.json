@@ -6,6 +6,11 @@
   "directories": {
     "test": "tests"
   },
+  "files": [
+    "plugins/**/*.js",
+    "!plugins/**/tests",
+    "mousetrap*.js"
+  ],
   "scripts": {
     "test": "mocha --reporter=nyan tests/test.mousetrap.js"
   },
