@@ -58,6 +58,7 @@
      */
     function _handleKey(character, modifiers, e) {
         var self = this;
+        var i;
 
         if (!self.recording) {
             _origHandleKey.apply(self, arguments);
