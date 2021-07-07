@@ -17,11 +17,16 @@
  * Mousetrap is a simple keyboard shortcut library for Javascript with
  * no external dependencies
  *
- * @version 1.5.3
+ * @version 1.6.5
  * @url craig.is/killing/mice
  */
 (function(window, document, undefined) {
 
+	// Check if mousetrap is used inside browser, if not, return
+    if (!window) {
+        return;
+    }
+	
     /**
      * mapping of special keycodes to their corresponding keys
      *
@@ -209,6 +214,15 @@
             return character;
         }
 
+        //if (e.type == 'keyup') {
+			if( Object.values(_MAP).indexOf(e.key) > -1 || 
+				Object.values(_KEYCODE_MAP).indexOf(e.key) > -1 || 
+				Object.values(_SHIFT_MAP).indexOf(e.key) > -1 ){
+					//console.log(e.key);
+					return e.key;
+				}
+		//}
+		
         // for non keypress events the special maps are needed
         if (_MAP[e.which]) {
             return _MAP[e.which];
@@ -814,6 +828,7 @@
             }
 
             _ignoreNextKeypress = processedSequenceCallback && e.type == 'keydown';
+			
         };
 
         /**
@@ -893,6 +908,11 @@
                 return;
             }
 			
+			//if character falls outside the range, ignore it (if using international languages, pressing multiple keys will cause charcodes outside the range)
+			if( e.type !== 'keyup' && character.charCodeAt(0) > 222 ){
+				return;
+			}
+			
 			//make sure the keys that are released are remembered until another keypress/keydown
 			//make sure keys that are being held, are remembered
 			var held = -1;
@@ -903,6 +923,7 @@
 			}else{
 				held = held.trim();	//get weird whitespace when pressing tab then enter. This will remove it.
 			}
+			
 			if(held!==-1 && held!=="" && held!==" "){
 				if(!e.repeat && e.type!='keyup'){
 					self._releasedKeys = [];
@@ -921,7 +942,7 @@
                 _ignoreNextKeyup = false;
                 return;
             }
-
+			
             self.handleKey(character, _eventModifiers(e), e);
         }
 
@@ -1174,6 +1195,20 @@
         if (_belongsTo(element, self.target)) {
             return false;
         }
+		
+        // Events originating from a shadow DOM are re-targetted and `e.target` is the shadow host,
+        // not the initial event target in the shadow tree. Note that not all events cross the
+        // shadow boundary.
+        // For shadow trees with `mode: 'open'`, the initial event target is the first element in
+        // the eventâ€™s composed path. For shadow trees with `mode: 'closed'`, the initial event
+        // target cannot be obtained.
+        if ('composedPath' in e && typeof e.composedPath === 'function') {
+            // For open shadow trees, update `element` so that the following check works.
+            var initialEventTarget = e.composedPath()[0];
+            if (initialEventTarget !== e.target) {
+                element = initialEventTarget;
+            }
+        }
 
         // stop for input, select, and textarea
         return element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || element.isContentEditable;
@@ -1203,6 +1238,18 @@
         return self._doBlurEvent(e);
     };
 
+	/**
+     * allow custom key mappings
+     */
+    Mousetrap.addKeycodes = function(object) {
+        for (var key in object) {
+            if (object.hasOwnProperty(key)) {
+                _MAP[key] = object[key];
+            }
+        }
+        _REVERSE_MAP = null;
+    };
+	
     /**
      * Init the global mousetrap functions
      *
@@ -1238,4 +1285,4 @@
             return Mousetrap;
         });
     }
-}) (window, document);
+}) (typeof window !== 'undefined' ? window : null, typeof  window !== 'undefined' ? document : null);
