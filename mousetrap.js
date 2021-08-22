@@ -158,7 +158,8 @@
      * loop through to map numbers on the numeric keypad
      */
     for (i = 0; i <= 9; ++i) {
-        _MAP[i + 96] = (i+96).toString();
+        //_MAP[i + 96] = (i+96).toString();
+        _MAP[i + 96] = 'numpad'+(i).toString();
     }
 
     /**
@@ -185,9 +186,10 @@
      * @return {string}
      */
     function _characterFromEvent(e) {
-
+		//console.log(e.target.nodeName);
 		//if keypress and numpad number, convert to correct value	
-        if (e.type == 'keypress' && e.location == 3 && Number(e.key) >=0 && Number(e.key) <= 9) {
+        //if (e.type == 'keypress' && e.location == 3 && Number(e.key) >=0 && Number(e.key) <= 9) {
+		if ( e.location == 3 && Number(e.key) >=0 && Number(e.key) <= 9 ) {
 			//console.log("test",Number(e.key)+96);
 			//console.log(_MAP[Number(e.key)+96]);
 			return _MAP[Number(e.key)+96];
@@ -880,7 +882,8 @@
          * @returns void
          */
         function _handleKeyEvent(e) {
-
+			//if( e.target.nodeName === 'INPUT' ) return;
+			
 			//if dialog open, return
 			//if($('#MyDialog').is(':visible'))return;
 			//console.log($('#MyDialog'));
@@ -891,7 +894,6 @@
                 e.which = e.keyCode;
             }
             var character = _characterFromEvent(e);
-			
 			try{
 				//this is to fix the plus sign on the numpad not working (change it to =)
 				if(character.charCodeAt(0)==43){
