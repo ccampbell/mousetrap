@@ -20,7 +20,7 @@
  * @version 1.6.5
  * @url craig.is/killing/mice
  */
-(function(window, document, undefined) {
+ (function(window, document, undefined) {
 
     // Check if mousetrap is used inside browser, if not, return
     if (!window) {
@@ -180,6 +180,23 @@
         }
 
         object.attachEvent('on' + type, callback);
+    }
+
+     /**
+     * cross browser remove event method
+     *
+     * @param {Element|HTMLDocument} object
+     * @param {string} type
+     * @param {Function} callback
+     * @returns void
+     */
+      function _removeEvent(object, type, callback) {
+        if (object.removeEventListener) {
+            object.removeEventListener(type, callback, false);
+            return;
+        }
+
+        object.detachEvent('on' + type, callback);
     }
 
     /**
@@ -890,6 +907,19 @@
         _addEvent(targetElement, 'keydown', _handleKeyEvent);
         _addEvent(targetElement, 'keyup', _handleKeyEvent);
     }
+
+    /**
+     * Removes the event listeners. This is useful if the element is
+     * being removed and to prevent memory leaks.
+     * 
+     * @returns void
+     */
+    Mousetrap.prototype.removeListeners = function() {
+        _removeEvent(targetElement, 'keypress', _handleKeyEvent);
+        _removeEvent(targetElement, 'keydown', _handleKeyEvent);
+        _removeEvent(targetElement, 'keyup', _handleKeyEvent);
+    };
+
 
     /**
      * binds an event to mousetrap
