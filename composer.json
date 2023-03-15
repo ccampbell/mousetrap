@@ -1,0 +1,20 @@
+{
+    "name": "ccampbell/mousetrap",
+    "description": "Simple library for handling keyboard shortcuts in Javascript",
+    "type": "library",
+    "license": "Apache-2.0",
+    "homepage": "https://craig.is/killing/mice",
+    "keywords": [
+        "javascript",
+        "keyboard",
+        "keyboard-shortcuts",
+        "mousetrap"
+    ],
+    "authors": [
+        {
+            "name": "Craig Campbell",
+            "homepage": "https://craig.is",
+            "role": "Lead"
+        }
+    ]
+}
