@@ -6,9 +6,9 @@ Usage looks like:
 
 ```javascript
 Mousetrap.bind({
-    'a': function() { console.log('a'); },
-    'b': function() { console.log('b'); }
-});
+  a() { console.log('a') },
+  b() { console.log('b') }
+})
 ```
 
 You can optionally pass in ``keypress``, ``keydown`` or ``keyup`` as a second argument.

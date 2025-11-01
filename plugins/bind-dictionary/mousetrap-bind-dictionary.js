@@ -14,26 +14,26 @@
  *
  */
 /* global Mousetrap:true */
-(function(Mousetrap) {
-    var _oldBind = Mousetrap.prototype.bind;
-    var args;
+(function (Mousetrap) {
+  const _oldBind = Mousetrap.prototype.bind
+  let args
 
-    Mousetrap.prototype.bind = function() {
-        var self = this;
-        args = arguments;
+  Mousetrap.prototype.bind = function () {
+    const self = this
+    args = arguments
 
-        // normal call
-        if (typeof args[0] == 'string' || args[0] instanceof Array) {
-            return _oldBind.call(self, args[0], args[1], args[2]);
-        }
+    // normal call
+    if (typeof args[0] == 'string' || Array.isArray(args[0])) {
+      return _oldBind.call(self, args[0], args[1], args[2])
+    }
 
-        // object passed in
-        for (var key in args[0]) {
-            if (args[0].hasOwnProperty(key)) {
-                _oldBind.call(self, key, args[0][key], args[1]);
-            }
-        }
-    };
+    // object passed in
+    for (const key in args[0]) {
+      if (args[0].hasOwnProperty(key)) {
+        _oldBind.call(self, key, args[0][key], args[1])
+      }
+    }
+  }
 
-    Mousetrap.init();
-}) (Mousetrap);
+  Mousetrap.init()
+}) (Mousetrap)

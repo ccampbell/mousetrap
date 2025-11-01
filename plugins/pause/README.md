@@ -6,8 +6,8 @@ Usage looks like:
 
 ```javascript
 // stop Mousetrap events from firing
-Mousetrap.pause();
+Mousetrap.pause()
 
 // allow Mousetrap events to fire again
-Mousetrap.unpause();
+Mousetrap.unpause()
 ```
