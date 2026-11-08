@@ -190,9 +190,12 @@
      */
     function _characterFromEvent(e) {
 
+        // normalize the key code without modifying the event's read-only which property
+        var keyCode = typeof e.which === 'number' ? e.which : e.keyCode;
+
         // for keypress events we should return the character as is
         if (e.type == 'keypress') {
-            var character = String.fromCharCode(e.which);
+            var character = String.fromCharCode(keyCode);
 
             // if the shift key is not pressed then it is safe to assume
             // that we want the character to be lowercase.  this means if
@@ -211,12 +214,12 @@
         }
 
         // for non keypress events the special maps are needed
-        if (_MAP[e.which]) {
-            return _MAP[e.which];
+        if (_MAP[keyCode]) {
+            return _MAP[keyCode];
         }
 
-        if (_KEYCODE_MAP[e.which]) {
-            return _KEYCODE_MAP[e.which];
+        if (_KEYCODE_MAP[keyCode]) {
+            return _KEYCODE_MAP[keyCode];
         }
 
         // if it is not in the special map
@@ -224,7 +227,7 @@
         // with keydown and keyup events the character seems to always
         // come in as an uppercase character whether you are pressing shift
         // or not.  we should make sure it is always lowercase for comparisons
-        return String.fromCharCode(e.which).toLowerCase();
+        return String.fromCharCode(keyCode).toLowerCase();
     }
 
     /**
@@ -714,12 +717,6 @@
          * @returns void
          */
         function _handleKeyEvent(e) {
-
-            // normalize e.which for key events
-            // @see http://stackoverflow.com/questions/4285627/javascript-keycode-vs-charcode-utter-confusion
-            if (typeof e.which !== 'number') {
-                e.which = e.keyCode;
-            }
 
             var character = _characterFromEvent(e);
 

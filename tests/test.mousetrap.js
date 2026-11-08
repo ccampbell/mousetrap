@@ -770,3 +770,103 @@ describe('Mouestrap.addKeycodes', function () {
     spy.resetHistory();
   });
 });
+
+
+describe('keyboard event normalization', function () {
+  function eventWithKeyCode(type, keyCode, which, modifiers) {
+    var event = document.createEvent('Events');
+    event.initEvent(type, true, true);
+    event.keyCode = keyCode;
+    Object.defineProperty(event, 'which', {value: which});
+    modifiers = modifiers || [];
+    for (var i = 0; i < modifiers.length; i++) {
+      event[modifiers[i] + 'Key'] = true;
+    }
+    return event;
+  }
+
+  [
+    {type: 'keypress', code: 97, combo: 'a'},
+    {type: 'keypress', code: 65, combo: 'A', modifiers: ['shift']},
+    {type: 'keydown', code: 65, combo: 'a'},
+    {type: 'keyup', code: 65, combo: 'a'},
+    {type: 'keydown', code: 13, combo: 'enter'},
+    {type: 'keyup', code: 96, combo: '0'},
+    {type: 'keydown', code: 186, combo: ';'},
+    {type: 'keydown', code: 83, combo: 'ctrl+s', modifiers: ['ctrl']}
+  ].forEach(function (testCase) {
+    it('uses keyCode for read-only which on ' + testCase.type + ' ' + testCase.combo, function () {
+      var spy = sinon.spy();
+      var event = eventWithKeyCode(testCase.type, testCase.code, undefined, testCase.modifiers);
+      Mousetrap.bind(testCase.combo, spy, testCase.type);
+      document.dispatchEvent(event);
+      expect(spy.callCount).to.equal(1);
+      expect(spy.args[0][0]).to.equal(event, 'callback receives the original event');
+      expect(event.which).to.equal(undefined, 'which is not changed');
+    });
+  });
+
+  [null, '98'].forEach(function (which) {
+    it('falls back for non-numeric which ' + which, function () {
+      var spy = sinon.spy();
+      var event = eventWithKeyCode('keypress', 97, which);
+      Mousetrap.bind('a', spy);
+      document.dispatchEvent(event);
+      expect(spy.callCount).to.equal(1);
+      expect(event.which).to.equal(which);
+    });
+  });
+
+  it('keeps a numeric which ahead of keyCode', function () {
+    var spy = sinon.spy();
+    Mousetrap.bind('a', spy);
+    document.dispatchEvent(eventWithKeyCode('keypress', 98, 97));
+    expect(spy.callCount).to.equal(1);
+  });
+
+  it('does not fall back when which is zero', function () {
+    var spy = sinon.spy();
+    Mousetrap.bind('a', spy);
+    document.dispatchEvent(eventWithKeyCode('keypress', 97, 0));
+    expect(spy.callCount).to.equal(0);
+  });
+
+  it('handles frozen events without adding a which property', function () {
+    var spy = sinon.spy();
+    var event = document.createEvent('Events');
+    event.initEvent('keypress', true, true);
+    event.keyCode = 97;
+    Object.freeze(event);
+    Mousetrap.bind('a', spy);
+    document.dispatchEvent(event);
+    expect(spy.callCount).to.equal(1);
+    expect(Object.prototype.hasOwnProperty.call(event, 'which')).to.equal(false);
+  });
+
+  it('still prevents default on the original event', function () {
+    var event = eventWithKeyCode('keydown', 83, undefined, ['ctrl']);
+    Mousetrap.bind('ctrl+s', function () { return false; });
+    document.dispatchEvent(event);
+    expect(event.defaultPrevented).to.equal(true);
+  });
+
+  it('ignores the final keyup of a sequence with read-only which', function () {
+    var sequence = sinon.spy();
+    var keyup = sinon.spy();
+    var clock = sinon.useFakeTimers();
+    try {
+      Mousetrap.bind('a enter', sequence);
+      Mousetrap.bind('enter', keyup, 'keyup');
+      document.dispatchEvent(eventWithKeyCode('keypress', 97));
+      document.dispatchEvent(eventWithKeyCode('keydown', 13));
+      document.dispatchEvent(eventWithKeyCode('keyup', 13));
+      expect(sequence.callCount).to.equal(1);
+      expect(keyup.callCount).to.equal(0);
+      clock.tick(10);
+      document.dispatchEvent(eventWithKeyCode('keyup', 13));
+      expect(keyup.callCount).to.equal(1, 'only the first keyup is ignored');
+    } finally {
+      clock.restore();
+    }
+  });
+});
